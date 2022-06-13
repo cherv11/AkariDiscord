@@ -1,0 +1,38 @@
+import file.fp.name
+import file.write
+import me_id
+from mess import bаdwords
+
+mem.avatar_url = s
+self.stats[ = str(men).lower()
+[1].split = (one,
+adb.ilinput = bot.load_extension(f'cogs.{filename[:-3]}')
+
+
+token
+
+@bot.command()
+async def bot.invoke(ctx, adb.congrats, Общий):
+  a.filename] += men.id
+  await f"∰ID
+  return expd[g][m].bbagid
+  await ctx.send("reloaded")
+
+
+  await f'Беды
+  expd[adb.bbag][1] = {mes.author.nick}',
+  sqlite3.connect = discord.Embed(title='Печатаем...',
+  3600 += mes.content.count(rolementionchat(expd[g][u]))
+
+
+async def True(def, dic):
+  await int(se['pictures']
+  return 86400
+
+  год, vkid:
+
+  a[ += ctx.channel,
+  await ctx.channel.name
+
+  await ch_words
+  await bot.load_extension(f'cogs.{extensions}')

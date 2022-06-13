@@ -1,0 +1,1369 @@
+import discord
+from discord.ext import commands
+import sqlite3
+import os
+import re
+import AkariDB as adb
+import asyncio
+import random
+import time
+import requests
+from collections import Counter, defaultdict
+import shutil
+import datetime
+import vk_api
+
+DIR = os.path.dirname(__file__)
+db = sqlite3.connect(os.path.join(DIR, "Akari.db"))
+SQL = db.cursor()
+
+vk_session = vk_api.VkApi(token=open('vktoken.txt').readlines()[0])
+vk = vk_session.get_api()
+
+client = discord.Client()
+bot = commands.Bot(command_prefix=adb.prefix, intents=discord.Intents.all())
+bot.remove_command("help")
+start_time = time.time()
+activetimers = []
+expd = defaultdict(dict)
+emosdict = defaultdict(list)
+meslogs = []
+mlFlags = defaultdict(bool)
+mainchannel = None
+version = 32
+
+class Vehicle:
+    def __init__(self, sd, new=False, st=None, achs=None):
+        self.id = int(sd[0])
+        self.server = int(sd[1])
+        self.emos = []
+        self.casFlag = False
+        self.bottle = False
+        if achs:
+            self.achs = achs
+        else:
+            self.achs = []
+        if new:
+            self.exp = defaultdict(int)
+            self.bbagid = 0
+            self.role = defaultdict(int)
+            self.stats = defaultdict(int)
+            self.name = None
+            self.vkid = 0
+            self.vkemo = ''
+            return
+        self.bbagid = int(sd[2])
+        self.name = sd[3]
+        self.exp = {'exp': int(sd[4]), 'allmessages': int(sd[5]), 'messages': int(sd[6]),
+                    'pictures': int(sd[7]), 'mentions': int(sd[8]), 'smiles': int(sd[9])}
+        if st:
+            self.stats = {'mat': st[4], 'online': st[5], 'symbols': st[6], 'selfsmiles': st[7], 'bottles': st[8], 'dayphrases': st[9], 'stickers': st[10], 'vkmes': st[11], 'lastbottle': st[12]}
+        else:
+            self.stats = defaultdict(int)
+        if sd[10]:
+            self.role = {'id': int(sd[10]), 'color': int(sd[11], 16)}
+        else:
+            self.role = defaultdict(int)
+        self.vkid = sd[12]
+        self.vkemo = sd[13]
+
+        
+    def __str__(self):
+        c = [self.exp['allmessages'], self.exp['messages'], self.exp['pictures'], self.exp['mentions'], self.exp['smiles']]
+        return f'{self.name} {self.id} from {self.server}, exp: {self.exp["exp"]}, counters={c}'
+
+    def __eq__(self, other):
+        if self.id == other.id and self.server == other.server:
+            return True
+        return False
+
+    def __add__(self, other):
+        c = [self.id, self.server, self.bbagid, self.name, self.exp["exp"] + other.exp["exp"],
+             self.exp['allmessages'] + other.exp['allmessages'], self.exp['messages'] + other.exp['messages'],
+             self.exp['pictures'] + other.exp['pictures'], self.exp['mentions'] + other.exp['mentions'],
+             self.exp['smiles'] + other.exp['smiles'], self.role['id'], self.role['color'], self.vkid, self.vkemo]
+        s = [0, 0, self.stats['mat'] + other.stats['mat'], self.stats['online'] + other.stats['online'],
+             self.stats['symbols'] + other.stats['symbols'], self.stats['selfsmiles'] + other.stats['selfsmiles'],
+             self.stats['bottles'] + other.stats['bottles'], self.stats['dayphrases'] + other.stats['dayphrases'],
+             self.stats['stickers'] + other.stats['stickers'], self.stats['vkmes'] + other.stats['vkmes'],
+             self.stats['lastbottle']]
+        a = self.achs + other.achs
+        return Vehicle(c, st=s, achs=a)
+
+    async def addexp(self, eadd, channel, reason='', mem=None):
+        if eadd == 0:
+            return
+        if not mem:
+            mem = bot.get_guild(self.server).get_member(self.id)
+        if self.server == adb.bbag:
+            if mem.guild.get_role(adb.congrats) in mem.roles:
+                eadd = int(eadd * adb.ek_congrats)
+        if self.bottle:
+            eadd = int(eadd * adb.ek_bottle)
+        lvl = adb.levelget(self.exp['exp'])
+        self.exp['exp'] += eadd
+        if reason:
+            print(f'{self.name} получил {eadd} exp ({reason})')
+        else:
+            print(f'{self.name} получил {eadd} exp')
+        lvl_new = adb.levelget(self.exp['exp'])
+        if lvl_new > lvl and self.bbagid <= 10:
+            await channel.send(f'Повышение! у {rolemention(self)} **{lvl_new}** уровень!')
+
+
+def AELoad():
+    global expd
+    global emosdict
+    for c in SQL.execute('SELECT * FROM exp').fetchall():
+        s = SQL.execute(f'SELECT * FROM stats WHERE id = {c[0]} AND server = {c[1]}').fetchone()
+        expd[c[1]][c[0]] = Vehicle(c, st=s)
+    for g in bot.guilds:
+        for m in g.members:
+            try:
+                if not expd[g.id][m.id]:
+                    print(g.id, m.id)
+            except:
+                expd[g.id][m.id] = Vehicle([g.id, m.id], True)
+    for e in SQL.execute('SELECT * FROM emos').fetchall():
+        if e[5]:
+            code = f'<a:{e[0]}:{e[1]}>'
+        else:
+            code = f'<:{e[0]}:{e[1]}>'
+        if not emosdict[e[2]]:
+            emosdict[e[2]] = defaultdict(str)
+        emosdict[e[2]][e[0]] = code
+        if 0 < e[2] < 11:
+            for g in expd:
+                for m in expd[g]:
+                    if e[2] == expd[g][m].bbagid:
+                        expd[g][m].emos.append(code)
+    for a in SQL.execute('SELECT * FROM achs').fetchall():
+        ach = {'name': a[2], 'level': a[3], 'icon': a[4],
+               'title': a[5], 'desc': a[6],
+               'date': a[7], 'owner': a[0]}
+        expd[a[1]][a[0]].achs.append(ach)
+
+def AESavedef():
+    for g in expd:
+        for m in expd[g]:
+            i = expd[g][m].exp
+            a = expd[g][m].stats
+            SQL.execute(f'SELECT * FROM exp WHERE id = {m} AND server = {g}')
+            u = SQL.fetchall()
+            if not u:
+                sql_insert = 'INSERT INTO exp(id, server, exp, allmessages, messages, pictures, mentions, smiles) VALUES (?,?,?,?,?,?,?,?)'
+                SQL.execute(sql_insert, (
+                    m, g, i['exp'], i['allmessages'], i['messages'], i['pictures'], i['mentions'], i['smiles']))
+                db.commit()
+            else:
+                SQL.execute(
+                    f"UPDATE exp SET exp = {i['exp']}, allmessages = {i['allmessages']}, messages = {i['messages']}, pictures = {i['pictures']}, mentions = {i['mentions']}, smiles = {i['smiles']} WHERE id = {m} AND server = {g}")
+                db.commit()
+            if (0 < expd[g][m].bbagid < 11 or m == 1) and g == adb.bbag:
+                SQL.execute(f'SELECT * FROM stats WHERE id = {m} AND server = {g}')
+                u = SQL.fetchone()
+                if not u:
+                    sql_insert = 'INSERT INTO stats(id, server, mat, online, symbols, selfsmiles, bottles, dayphrases, stickers, vkmes, lastbottle) VALUES (?,?,?,?,?,?,?,?,?,?,?)'
+                    SQL.execute(sql_insert, (
+                        m, g, a['mat'], a['online'], a['symbols'], a['selfsmiles'], a['bottles'], a['dayphrases'], a['stickers'], a['vkmes'], a['lastbottle']))
+                    db.commit()
+                else:
+                    SQL.execute(
+                        f"UPDATE stats SET mat = {a['mat']}, online = {a['online']}, symbols = {a['symbols']}, selfsmiles = {a['selfsmiles']}, bottles = {a['bottles']} WHERE id = {m} AND server = {g}")
+                    SQL.execute(
+                        f"UPDATE stats SET vkmes = {a['vkmes']}, lastbottle = '{a['lastbottle']}' WHERE id = {m} AND server = {g}")
+                    SQL.execute(
+                        f"UPDATE stats SET dayphrases = {a['dayphrases']}, stickers = {a['stickers']} WHERE id = {m} AND server = {g}")
+                    db.commit()
+
+
+async def AESavetask():
+    while not bot.is_closed():
+        AESavedef()
+        await asyncio.sleep(adb.e_savetime)
+
+
+async def Akari_updates():
+    while not bot.is_closed():
+        if time.strftime("%H") == "16":
+            emb = adb.getpatch(version)
+            purl = await picfinder('aversion'+str(version))
+            emb.set_image(url=purl)
+            await mainchannel.send(embed=emb)
+        await asyncio.sleep(3600)
+
+
+async def daycheck():
+    while not bot.is_closed():
+        if time.strftime("%H") == "17":
+            if not os.path.exists('AEBackups'):
+                os.mkdir('AEBackups')
+            shutil.copyfile("Akari.db", f"AEBackups\\Akari{random.randint(10000, 99999)}.db")
+        await asyncio.sleep(3600)
+
+
+async def daymeme():
+    while not bot.is_closed():
+        if time.strftime("%H") == "18":
+            mems = []
+            async for m in bot.get_channel(adb.bbagpics).history():
+                if m.attachments:
+                    mems.append(m.attachments[0].url)
+            if mems:
+                emb = discord.Embed(title='Мем дня')
+                emb.set_image(url=random.choice(mems))
+                await mainchannel.send(embed=emb)
+        await asyncio.sleep(3600)
+
+
+async def daybottle():
+    while not bot.is_closed():
+        if time.strftime("%H") == "20":
+            ranmems = [i for i in expd[adb.bbag] if 0 < expd[adb.bbag][i].bbagid < 11]
+            mem = bot.get_guild(adb.bbag).get_member(random.choice(ranmems))
+            bidx = random.randrange(0, len(adb.bottles))
+            bottle = adb.bottles[bidx]
+            fil = adb.fillers[bidx]
+            emb = discord.Embed(title='Бутылка дня', description=f'На бутылку c {bottle} сегодня садится {rolemention(expd[mem.guild.id][mem.id])} :champagne: {fil} {fil} {fil} :champagne: ')
+            expd[adb.bbag][mem.id].stats['bottles'] += 1
+            expd[adb.bbag][1].stats['bottles'] += 1
+            await expd[adb.bbag][mem.id].addexp(adb.e_bottle, mainchannel, 'бутылка', mem=mem)
+            expd[adb.bbag][mem.id].stats['lastbottle'] = time.strftime("%d.%m.%Y, %H:%M", time.localtime())
+            purl = await picfinder('$$$')
+            emb.set_image(url=purl)
+            emb.set_footer(icon_url=mem.avatar.url, text=f'Опыт увеличен в {adb.ek_bottle} раза на сутки')
+            for m in expd[adb.bbag]:
+                expd[adb.bbag][m].bottle = False
+            expd[adb.bbag][mem.id].bottle = True
+            await mainchannel.send(embed=emb)
+        await asyncio.sleep(3600)
+
+
+async def dayphrase():
+    while not bot.is_closed():
+        if time.strftime("%H") == "22":
+            file = open('pips\\phrases.txt', encoding='utf-8').readlines()
+            phrase = random.choice(file)
+            author = ''
+            if '©' in phrase:
+                phrase, author = phrase.split('©')
+            phrase.rstrip()
+            emb = discord.Embed(title='Фраза дня', description=phrase)
+            if author:
+                url = ''
+                member = author.split('+')[0].split(' ')[0].replace('\n', '')
+                for m in expd[adb.bbag]:
+                    if expd[adb.bbag][m].name == member:
+                        try:
+                            mem = bot.get_guild(adb.bbag).get_member(m)
+                            url = mem.avatar_url
+                        except:
+                            continue
+                if url:
+                    emb.set_footer(icon_url=url, text=f'©{author}')
+                    expd[adb.bbag][mem.id].stats['dayphrases'] += 1
+                    expd[adb.bbag][1].stats['dayphrases'] += 1
+                    await expd[adb.bbag][mem.id].addexp(adb.e_dayphrase, mainchannel, 'фраза дня', mem=mem)
+            await mainchannel.send(embed=emb)
+        await asyncio.sleep(3600)
+
+
+async def achieve_giver():
+    while not bot.is_closed():
+        if time.strftime("%M") == "20":
+            ranmems = [i for i in expd[adb.bbag] if 0 < expd[adb.bbag][i].bbagid < 11]
+            mem = bot.get_guild(adb.bbag).get_member(random.choice(ranmems))
+            bidx = random.randrange(0, len(adb.bottles))
+            bottle = adb.bottles[bidx]
+            fil = adb.fillers[bidx]
+            emb = discord.Embed(title='Бутылка дня', description=f'На бутылку c {bottle} сегодня садится {rolemention(expd[mem.guild.id][mem.id])} :champagne: {fil} {fil} {fil} :champagne: ')
+            expd[adb.bbag][mem.id].stats['bottles'] += 1
+            expd[adb.bbag][1].stats['bottles'] += 1
+            await expd[adb.bbag][mem.id].addexp(adb.e_bottle, mainchannel, 'бутылка', mem=mem)
+            expd[adb.bbag][mem.id].stats['lastbottle'] = time.strftime("%d.%m.%Y, %H:%M", time.localtime())
+            purl = await picfinder('$$$')
+            emb.set_image(url=purl)
+            emb.set_footer(icon_url=mem.avatar.url, text=f'Опыт увеличен в {adb.ek_bottle} раза на сутки')
+            for m in expd[adb.bbag]:
+                expd[adb.bbag][m].bottle = False
+            expd[adb.bbag][mem.id].bottle = True
+            await mainchannel.send(embed=emb)
+        await asyncio.sleep(60)
+
+
+async def picfinder(text, ch=None):
+    if not ch:
+        ch = adb.enpics
+    async for m in bot.get_channel(ch).history():
+        if m.content == text:
+            if m.attachments:
+                return m.attachments[0].url
+
+
+@bot.event
+async def on_message(message):
+    if message.content.startswith(adb.prefix):
+        for i in adb.allcoms:
+            if message.content.startswith(adb.prefix+i) and i != 'clear' and i != 'newemoji' and i != 'r':
+                await message.delete()
+                print(f'{expd[message.guild.id][message.author.id].name} применил {i}')
+    await bot.process_commands(message)
+    if message.channel.id in adb.oldchannels:
+        await message.channel.send(f'Дебил! Это не тот канал! Пиши в {mainchannel.mention}', file=adb.mischat, delete_after=30)
+        if len(message.content) > 0 and len(message.content) <= 1900:
+            await mainchannel.send(f'`{message.author.name}`{smile(message)} из {message.channel.mention}:\n{message.content}')
+        return
+    if message.author.id != bot.user.id:
+        await AkariCatch(message)
+        await prCatch(message)
+    await memlog(message)
+    if message.channel.id == adb.vkchannel:
+        await vkExp(message)
+    await AkariExp(message)
+    if '&$' in message.content:
+        await rolelore(message)
+
+
+@bot.event
+async def on_message_edit(_, new):
+    await bot.process_commands(new)
+    for i in adb.allcoms:
+        if adb.prefix + i in new.content and i != 'clear':
+            await new.delete()
+            print(f'{expd[new.guild.id][new.author.id].name} применил {i}')
+
+
+@bot.event
+async def on_ready():
+    global mainchannel
+    mainchannel = bot.get_channel(adb.bbagmain)
+    AELoad()
+    bot.loop.create_task(AESavetask())
+    bot.loop.create_task(daycheck())
+    bot.loop.create_task(dayphrase())
+    bot.loop.create_task(daymeme())
+    bot.loop.create_task(daybottle())
+    bot.loop.create_task(Akari_updates())
+    gr = random.choice(adb.greets)
+    logchannel = bot.get_channel(adb.botcage)
+    await logchannel.send(gr, delete_after=30)
+    print(gr)
+    activity = discord.Activity(name=f"Плюётся в людей | {adb.prefix}help", type=0)
+    await bot.change_presence(status=discord.Status.online, activity=activity)
+
+
+@bot.event
+async def on_member_join(m):
+    try:
+        if not expd[m.guild.id][m.id]:
+            print(m.guild.id, m.id)
+    except:
+        expd[m.guild.id][m.id] = Vehicle([m.guild.id, m.id], True)
+
+
+@bot.event
+async def on_typing(channel, user, time):
+    global mlFlags
+    global meslogs
+    if adb.chance(1, 1000):
+        await channel.send(f'{rolemention(expd[channel.guild.id][user.id])}{random.choice(adb.typing)}')
+    if channel.id in adb.ilinput:
+        if not mlFlags[channel.id]:
+            meslogs.append([channel.mention, time.strftime("%d.%m %X")])
+            mlFlags[channel.id] = True
+            await asyncio.sleep(300)
+            mlFlags[channel.id] = False
+
+
+@bot.event
+async def on_member_remove(member):
+    if member.guild.id == adb.bbag:
+        await mainchannel.send(embed=discord.Embed(title='НУ ПОКА', description=f'Харон провожает **{member.nick}** в Тартар))'), file=adb.cannon)
+
+
+async def vekdef(ctx):
+    god = int(time.strftime('%Y'))
+    vekr = adb.to_roman(god)
+
+    daysec = (int(time.strftime('%j')) - 1) * 24 * 3600
+    hoursec = int(time.strftime('%H')) * 3600
+    minsec = int(time.strftime('%M')) * 60
+    secsec = int(time.strftime('%S'))
+    sec = daysec + hoursec + minsec + secsec
+    await ctx.send(f"С начала {god} года прошло {adb.postfix(sec, ['секунда', 'секунды', 'секунд'])}")
+    vek = int(sec * 99.795081967213114754098360655738) if adb.vis(god) is True else int(
+        sec * 100.06575342465753424657534246575)
+
+    year = vek // 31536000 if adb.vis(god) is True else vek // 31622400
+    year = year + 100 * god - 99
+    vek = vek % 31536000 + len([None for a in range(1, year % 100) if adb.vis(a) is True]) * 86400
+    if vek >= 31536000 and adb.vis(year) is False:
+        vek -= 31536000
+        year += 1
+    if vek >= 31622400:
+        vek -= 31622400
+        year += 1
+
+    day = adb.day_to_day(vek // 86400 + 1, year)
+    vek %= 86400
+    hour = vek // 3600
+    vek %= 3600
+    minute = vek // 60
+    vek = int(vek % 60)
+
+    if vek < 10: vek = '0' + str(vek)
+    if minute < 10: minute = '0' + str(minute)
+    if hour < 10: hour = '0' + str(hour)
+
+    await ctx.send(
+        f"{random.choice(adb.veks)} **{vekr}** век, {year} год, {day}, {random.choice(adb.hours).lower()} {hour}:{minute}:{vek}")
+
+
+@bot.command()
+async def vek(ctx):
+    await vekdef(ctx)
+
+
+@bot.command()
+async def help(ctx):
+    helps = discord.Embed(title=random.choice(adb.helps), colour=random.choice(adb.raincolors))
+    for i in range(len(adb.botcoms)):
+        helps.add_field(name=f'{random.choice(adb.garbage)} #{i + 1}',
+                        value=f"**{adb.botcoms[i]}**: {adb.comdescs[i]}", inline=False)
+    await ctx.send(embed=helps)
+
+
+@bot.command()
+async def dmhelp(ctx):
+    helps = discord.Embed(title=random.choice(adb.dmhelps), colour=random.choice(adb.raincolors))
+    for i in range(len(adb.dmcoms)):
+        helps.add_field(name=f'{random.choice(adb.garbage)} #{i + 1}',
+                        value=f"**{adb.dmcoms[i]}**: {adb.dmdescs[i]}", inline=False)
+    await ctx.send(embed=helps)
+
+
+@bot.command()
+async def uptime(ctx):
+    t = int((time.time() - start_time))
+    d, t = t // 86400, t % 86400
+    h, t = t // 3600, t % 3600
+    m, t = t // 60, t % 60
+    send = random.choice(adb.uptimes) + ' '
+    if d != 0: send += adb.postfix(d, ['день', 'дня', 'дней']) + ' '
+    if h != 0: send += adb.postfix(h, ['час', 'часа', 'часов']) + ' '
+    if m != 0: send += adb.postfix(m, ['минуту', 'минуты', 'минут']) + ' '
+    send += adb.postfix(t, ['секунду', 'секунды', 'секунд'])
+    await ctx.send(send)
+
+
+@bot.command()
+async def stol(ctx):
+    await ctx.send(random.choice(adb.stoliki))
+
+
+async def AkariCatch(mes):
+    if mes.guild.id != adb.bbag:
+        return
+    mcl = mes.content.lower()
+    for k in adb.catch:
+        if ':' in k[1]:
+            chance = adb.chance(int(k[1].split(':')[0]), int(k[1].split(':')[1]))
+        else:
+            chance = adb.chance(int(k[1]))
+        if not chance:
+            continue
+        for i in range(2, len(k)):
+            if k[i] in mcl:
+                if k[0] == 'vek': await vekdef(mes.channel)
+                if k[0] == 'sleep': await mes.channel.send(
+                    f'{random.choice(adb.sleep)}, {rolemention(expd[mes.guild.id][mes.author.id])}')
+                if k[0] == 'stol': await mes.channel.send(random.choice(adb.stoliki))
+                if k[0] == 'beda': await mes.channel.send(f'Беды с башкой, {rolemention(expd[mes.guild.id][mes.author.id])}')
+                if k[0] == 'beda': await mes.channel.send(
+                    f'Беды с башкой, {rolemention(expd[mes.guild.id][mes.author.id])}')
+                if k[0] == 'iq': await mes.channel.send(file=adb.iqpic)
+                break
+
+
+async def AkariExp(mes):
+    atts = len(mes.attachments)
+    eadd = 0
+    g = mes.guild.id
+    m = mes.author.id
+    pFlag = False
+    mFlag = False
+    eFlag = False
+    expd[g][m].exp['allmessages'] += 1
+    expd[g][m].exp['pictures'] += atts
+    if len(mes.content) > 0:
+        expd[g][m].exp['messages'] += 1
+        if len(mes.content) > adb.e_message:
+            eadd += len(mes.content)
+        else:
+            eadd += adb.e_message
+    eadd += atts * adb.e_picture
+
+    if g == adb.bbag:
+        expd[g][1].exp['allmessages'] += 1
+        expd[g][1].exp['pictures'] += atts
+        expd[g][1].exp['exp'] += eadd
+        if atts:
+            pFlag = True
+        if len(mes.content) > 0:
+            expd[g][1].exp['messages'] += 1
+
+    await expd[g][m].addexp(eadd, mes.channel, mem=mes.author)
+
+    if m != bot.user.id and len(mes.content) > 0:
+        for u in expd[g]:
+            if u == 1:
+                continue
+            if expd[g][u].id == mes.author.id:
+                continue
+            if rolementionchat(expd[g][u]):
+                mencount = mes.content.count(rolementionchat(expd[g][u]))
+                await expd[g][u].addexp(adb.e_men * mencount, mes.channel)
+                expd[g][u].exp['mentions'] += mencount
+                if g == adb.bbag:
+                    expd[g][1].exp['mentions'] += mencount
+                    mFlag = True
+            if f'{u}>' in mes.content:
+                mencount = mes.content.count(f'{u}>')
+                await expd[g][u].addexp(adb.e_men * mencount, mes.channel)
+                expd[g][u].exp['mentions'] += mencount
+                if g == adb.bbag:
+                    expd[g][1].exp['mentions'] += mencount
+                    mFlag = True
+            try:
+                for s in expd[g][u].emos:
+                    ecount = mes.content.count(s)
+                    await expd[g][u].addexp(adb.e_emo * ecount, mes.channel)
+                    expd[g][u].exp['smiles'] += ecount
+                    if g == adb.bbag:
+                        expd[g][1].exp['smiles'] += ecount
+                        eFlag = True
+            except:
+                pass
+    if g == adb.bbag:
+        await sum_achieve(m, pFlag, mFlag, eFlag)
+
+
+async def process_chaos(message):
+    ctx = await bot.get_context(message)
+    await bot.invoke(ctx)
+
+
+async def vkExp(mes):
+    text = mes.content
+    if not 'α' in text:
+        return
+    vkid = 0
+    cont = ''
+    att = 0
+    stick = 0
+    if 'δ' in text:
+        stick = int(text.split('δ')[1])
+        text = text.split('δ')[0]
+    if 'γ' in text:
+        att = int(text.split('γ')[1].rstrip().rstrip(','))
+        text = text.split('γ')[0]
+    if 'β' in text:
+        cont = text.split('β')[1].rstrip().rstrip(',')
+        text = text.split('β')[0]
+    vkid = int(text.split('α')[1].rstrip().rstrip(','))
+    eadd = 0
+    g = adb.bbag
+    m = 0
+    for mem in expd[g]:
+        if expd[g][mem].vkid == vkid:
+            m = mem
+    if not m:
+        print('Кто-то проник в беседу ВК')
+        return
+
+    expd[g][m].exp['allmessages'] += 1
+    expd[g][1].exp['allmessages'] += 1
+    if att:
+        expd[g][m].exp['pictures'] += 1
+        expd[g][1].exp['pictures'] += 1
+        eadd += adb.e_picture
+    expd[g][m].stats['vkmes'] += 1
+    expd[g][1].stats['vkmes'] += 1
+    if stick:
+        expd[g][m].stats['stickers'] += 1
+        eadd += adb.e_vkstick
+    if len(cont) > 0:
+        expd[g][m].exp['messages'] += 1
+        expd[g][1].exp['messages'] += 1
+        if len(cont) > adb.e_message:
+            eadd += len(cont)
+        else:
+            eadd += adb.e_message
+
+    expd[g][1].exp['exp'] += eadd
+    await expd[g][m].addexp(eadd, mainchannel, 'вк')
+    await sum_achieve(m, vkmes=True)
+    await process_chaos(mes)
+
+
+async def sum_achieve(mem, pic=False, men=False, emo=False, vkmes=False):
+    sumv = expd[adb.bbag][1]
+    se = sumv.exp
+    if se['exp'] % 5000000 == 0:
+        lvl = int(se['exp'] // 5000000)
+        ach = {'name': 'sum_exp', 'level': lvl, 'icon': emosdict[50]['sum_exp'], 'title': f'Общий опыт {adb.to_roman(lvl)}', 'desc': f"Получена {se['exp']}-ая единица опыта", 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+        expd[adb.bbag][mem].achs.append(ach)
+        purl = await picfinder('sum_exp')
+        emb = discord.Embed(title='Achievement get!', description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
+        emb.set_image(url=purl)
+        await mainchannel.send(embed=emb)
+        save_achieve(ach)
+        await expd[adb.bbag][mem].addexp(adb.e_sumach, mainchannel, f'sum_exp {adb.to_roman(lvl)}')
+    if se['allmessages'] % 10000 == 0:
+        lvl = int(se['allmessages'] // 10000)
+        ach = {'name': 'sum_mes', 'level': lvl, 'icon': emosdict[50]['sum_mes'], 'title': f'Общие сообщения {adb.to_roman(lvl)}', 'desc': f"Написано {se['allmessages']}-ое сообщение", 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+        expd[adb.bbag][mem].achs.append(ach)
+        purl = await picfinder('sum_mes')
+        emb = discord.Embed(title='Achievement get!', description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
+        emb.set_image(url=purl)
+        await mainchannel.send(embed=emb)
+        save_achieve(ach)
+        await expd[adb.bbag][mem].addexp(adb.e_sumach, mainchannel, f'sum_mes {adb.to_roman(lvl)}')
+    if se['pictures'] % 5000 == 0 and pic:
+        lvl = int(se['pictures'] // 5000)
+        ach = {'name': 'sum_pics', 'level': lvl, 'icon': emosdict[50]['sum_pics'], 'title': f'Общие картинки {adb.to_roman(lvl)}', 'desc': f"Отправлена {se['pictures']}-ая картинка", 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+        expd[adb.bbag][mem].achs.append(ach)
+        purl = await picfinder('sum_pics')
+        emb = discord.Embed(title='Achievement get!', description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
+        emb.set_image(url=purl)
+        await mainchannel.send(embed=emb)
+        save_achieve(ach)
+        await expd[adb.bbag][mem].addexp(adb.e_sumach, mainchannel, f'sum_pics {adb.to_roman(lvl)}')
+    if se['mentions'] % 1000 == 0 and men:
+        lvl = int(se['mentions'] // 1000)
+        ach = {'name': 'sum_mens', 'level': lvl, 'icon': emosdict[50]['sum_mens'], 'title': f'Общие упоминания {adb.to_roman(lvl)}', 'desc': f"Сделано {se['mentions']}-ое упоминание", 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+        expd[adb.bbag][mem].achs.append(ach)
+        purl = await picfinder('sum_mens')
+        emb = discord.Embed(title='Achievement get!', description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
+        emb.set_image(url=purl)
+        await mainchannel.send(embed=emb)
+        save_achieve(ach)
+        await expd[adb.bbag][mem].addexp(adb.e_sumach, mainchannel, f'sum_mens {adb.to_roman(lvl)}')
+    if se['smiles'] % 1000 == 0 and emo:
+        lvl = int(se['smiles'] // 1000)
+        ach = {'name': 'sum_emos', 'level': lvl, 'icon': emosdict[50]['sum_emos'], 'title': f'Общие смайлы {adb.to_roman(lvl)}', 'desc': f"Поставлен {se['smiles']}-ый смайлик", 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+        expd[adb.bbag][mem].achs.append(ach)
+        purl = await picfinder('sum_emos')
+        emb = discord.Embed(title='Achievement get!', description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
+        emb.set_image(url=purl)
+        await mainchannel.send(embed=emb)
+        save_achieve(ach)
+        await expd[adb.bbag][mem].addexp(adb.e_sumach, mainchannel, f'sum_emos {adb.to_roman(lvl)}')
+    if sumv.stats['vkmes'] % 1000 == 0 and vkmes:
+        lvl = int(sumv.stats['vkmes'] // 1000)
+        ach = {'name': 'sum_vkmes', 'level': lvl, 'icon': emosdict[50]['sum_vkmes'], 'title': f'Общие сообщения ВК {adb.to_roman(lvl)}', 'desc': f"Написано {sumv.stats['vkmes']}-ое сообщение ВК", 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+        expd[adb.bbag][mem].achs.append(ach)
+        purl = await picfinder('sum_vkmes')
+        emb = discord.Embed(title='Achievement get!', description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
+        emb.set_image(url=purl)
+        await mainchannel.send(embed=emb)
+        save_achieve(ach)
+        await expd[adb.bbag][mem].addexp(adb.e_sumach, mainchannel, f'sum_vkmes {adb.to_roman(lvl)}')
+
+
+def save_achieve(ach):
+    sql_insert = 'INSERT INTO achs(id, server, name, level, icon, title, desc, date) VALUES (?,?,?,?,?,?,?,?)'
+    SQL.execute(sql_insert, (ach['owner'], adb.bbag, ach['name'], ach['level'], ach['icon'], ach['title'], ach['desc'], ach['date']))
+    db.commit()
+
+
+@bot.command()
+async def aerecount(ctx, password=''):
+    if password != 'ghbdtn':
+        await ctx.send('Пароль неверный!', delete_after=5)
+        return
+    oldp = [250, 300, 120, 90, 120] #old_parameters: adb.e_message, adb.e_picture, adb.e_emo, adb.e_men, adb.e_vkstick
+    for g in expd:
+        for m in expd[g]:
+            v = expd[g][m].exp
+            oldeadd = v['messages'] * oldp[0] + v['pictures'] * oldp[1] + v['smiles'] * oldp[2] + v['mentions'] * oldp[3] + expd[g][m].stats['stickers'] * oldp[4]
+            diff = expd[g][m].exp['exp'] - oldeadd
+            eadd = v['messages'] * adb.e_message + v['pictures'] * adb.e_picture + v['smiles'] * adb.e_emo + v['mentions'] * adb.e_men + expd[g][m].stats['stickers'] * adb.e_vkstick
+            expd[g][m].exp['exp'] = eadd + diff
+    await ctx.send(f'Готово!', delete_after=5)
+
+
+@bot.command()
+async def aesave(ctx):
+    AESavedef()
+    await ctx.send('Готово!', delete_after=5)
+
+
+async def channelexpdef(channel):
+    mems = channel.guild.members
+    cve = {mem.id: Vehicle([mem.id, mem.guild.id], True) for mem in mems}
+    flist = {u.id: [rolementionchat(cve[u.id]), expd[u.guild.id][u.id].emos] for u in mems}
+    async for mes in channel.history(limit=100000):
+        try:
+            v = mes.author.id
+            atts = len(mes.attachments)
+            eadd = 0
+            cve[v].exp['allmessages'] += 1
+            cve[v].exp['pictures'] += atts
+            if len(mes.content) > 0:
+                cve[v].exp['messages'] += 1
+                if len(mes.content) > adb.e_message * 2:
+                    eadd += int(len(mes.content) / 2)
+                else:
+                    eadd += adb.e_message
+            eadd += atts * adb.e_picture
+
+            cve[v].exp["exp"] += eadd
+
+            if v != bot.user.id and len(mes.content) > 0:
+                for u in mems:
+                    if u == mes.author:
+                        continue
+                    if rolementionchat(cve[u.id]):
+                        mencount = mes.content.count(flist[u.id][0])
+                        cve[v].exp["exp"] += adb.e_men * mencount
+                        cve[u.id].exp['mentions'] += mencount
+                    if f'{u.id}>' in mes.content:
+                        mencount = mes.content.count(f'{u.id}>')
+                        cve[v].exp["exp"] += adb.e_men * mencount
+                        cve[u.id].exp['mentions'] += mencount
+                    try:
+                        for s in flist[u.id][1]:
+                            ecount = mes.content.count(s)
+                            cve[v].exp["exp"] += adb.e_emo * ecount
+                            cve[u.id].exp['smiles'] += ecount
+                    except:
+                        pass
+        except:
+            pass
+
+    return [cve[v] for v in cve if cve[v].exp['exp'] != 0]
+
+
+@bot.command()
+async def channelexp(ctx, all=''):
+    stime = time.time()
+    if all == 'all':
+        embed = discord.Embed(title=f'Опыт во всех каналах {ctx.guild.name}', colour=random.choice(adb.raincolors))
+        newvehicles = []
+        for g in ctx.guild.text_channels:
+            newvehicles += await channelexpdef(g)
+        newvehicles = adb.uniquesum(newvehicles)
+    else:
+        newvehicles = await channelexpdef(ctx.channel)
+        embed = discord.Embed(title=f'Опыт в {ctx.channel.name}', colour=random.choice(adb.raincolors))
+    newvehicles = aesort(newvehicles)
+    for i in newvehicles:
+        text = f'{rolemention(expd[i.server][i.id])} {adb.levelget(i.exp["exp"])} уровня'
+        if i.exp["allmessages"] > 0:
+            text += f', сообщений: {i.exp["allmessages"]}'
+        if i.exp["messages"] > 0:
+            text += f', с текстом: {i.exp["messages"]}'
+        if i.exp["pictures"] > 0:
+            text += f', картиночек: {i.exp["pictures"]}'
+        if i.exp["mentions"] > 0:
+            text += f', упоминаний: {i.exp["mentions"]}'
+        if i.exp["smiles"] > 0:
+            text += f', смайликов с ним: {i.exp["smiles"]}'
+        embed.add_field(name=f'Опыт: {i.exp["exp"]}', value=text, inline=False)
+    await ctx.send(embed=embed)
+    await ctx.send(f'Выполнено за {time.time() - stime}', delete_after=10)
+
+
+def aesort(l):
+    a = [v for v in l]
+    for i in range(len(a) - 1):
+        for j in range(len(a) - i - 1):
+            if a[j].exp["exp"] < a[j + 1].exp["exp"]:
+                a[j], a[j + 1] = a[j + 1], a[j]
+    return a
+
+
+def finduserindex(men, gid):
+    for g in expd[gid]:
+        s = expd[gid][g]
+        if str(men).lower() in [f'<@!{s.id}>', f'<@{s.id}>', f'<@&{s.role["id"]}>', str(s.bbagid), s.name.lower(),
+                                str(s.id)]:
+            return s
+    for g in expd[gid]:
+        s = expd[gid][g]
+        if men.id == s.id:
+            return s
+
+
+def rolemention(e, opt=None):
+    if e.server == adb.bbag:
+        try:
+            if e.bbagid <= 10:
+                return f'{bot.get_guild(e.server).get_role(e.role["id"]).mention}{emosdict[e.bbagid][random.choice(emosdict[e.bbagid])]}'
+        except:
+            return bot.get_guild(e.server).get_member(e.id).mention
+    if opt:
+        return f'**{opt}**'
+    return bot.get_guild(e.server).get_member(e.id).mention
+
+
+def rolementionchat(e):
+    try:
+        if e.bbagid <= 10:
+            return f'<@&{e.role["id"]}>'
+    except:
+        return None
+
+
+@bot.command()
+async def exp(ctx, mem=None):
+    if not mem:
+        newvehicles = aesort([expd[ctx.guild.id][e] for e in expd[ctx.guild.id]])
+        embed = discord.Embed(title=f'Опыт {ctx.guild.name}', colour=random.choice(adb.raincolors))
+        memids = [x.id for x in ctx.guild.members]
+        for i in newvehicles:
+            if i.id in memids and (i.bbagid <= 10 or i.server != adb.bbag):
+                e = i.exp
+                lvl = adb.levelget(e["exp"], all=True)
+                text = f'{rolemention(i)} {lvl[0]} уровня'
+                if e['allmessages'] > 0:
+                    text += f', сообщений: {e["allmessages"]}'
+                if e['messages'] > 0:
+                    text += f', текстовых: {e["messages"]}'
+                if e["pictures"] > 0:
+                    text += f', картиночек: {e["pictures"]}'
+                if e["mentions"] > 0:
+                    text += f', упоминаний: {e["mentions"]}'
+                if e["smiles"] > 0:
+                    text += f', смайликов с ним: {e["smiles"]}'
+                prog = int(round((lvl[1] / lvl[2]) * 20))
+                prog = f"{'▓' * prog}{'░' * (20 - prog)}"
+                perc = f'{round((lvl[1] / lvl[2]) * 100, 2)}%'
+                embed.add_field(name=f'Опыт: {e["exp"]}, {prog} {perc}', value=text, inline=False)
+        await ctx.send(embed=embed)
+    else:
+        mem = finduserindex(mem, ctx.guild.id)
+        e = mem.exp
+        lvl = adb.levelget(e["exp"], all=True)
+        embed = discord.Embed(title=f'{mem.name} {emosdict[mem.bbagid][random.choice(emosdict[mem.bbagid])]} {lvl[0]} уровня',
+                              colour=mem.role["color"])
+        prog = int(round((lvl[1] / lvl[2]) * 20))
+        prog = f"{'▓' * prog}{'░' * (20 - prog)}"
+        perc = f'{round((lvl[1] / lvl[2]) * 100, 2)}%'
+        embed.add_field(name='Прогресс', value=f'{prog} {perc}', inline=False)
+        embed.add_field(name='Всего опыта', value=e["exp"], inline=True)
+        if e["allmessages"] > 0:
+            embed.add_field(name='Сообщений', value=e["allmessages"], inline=True)
+        if e["messages"] > 0:
+            embed.add_field(name='Текстовых', value=e["messages"], inline=True)
+        if e["pictures"] > 0:
+            embed.add_field(name='Картиночек', value=e["pictures"], inline=True)
+        if e["mentions"] > 0:
+            embed.add_field(name='Упоминаний', value=e["mentions"], inline=True)
+        if e["smiles"] > 0:
+            embed.add_field(name='Смайликов с ним', value=e["smiles"], inline=True)
+        await ctx.send(embed=embed)
+        return
+
+
+async def new_role(mes, name, color=None):
+    if color in adb.colnames:
+        c = adb.colnames[color]
+        color = discord.Colour.from_rgb(c[0], c[1], c[2])
+    else:
+        color = discord.Colour.from_rgb(255, 255, 255)
+    newrole = await mes.guild.create_role(name=name, color=color, reason=f'Так захотел {mes.author.nick}', mentionable=True)
+    return newrole
+
+
+async def rolelore(mes):
+    roles = []
+    text = mes.content.split('&$')
+    for i, a in enumerate(text[1:]):
+        color = None
+        men = None
+        b = a.split(' ', maxsplit=1)
+        if '$' in b[0]:
+            d = b[0].split('$')
+            name = d[0]
+            color = d[1].lower()
+            try:
+                men = d[2:]
+            except:
+                pass
+        else:
+            name = b[0]
+        role = await new_role(mes, name, color)
+        roles.append(role)
+        b[0] = role.mention
+        if men:
+            for m in men:
+                me = finduserindex(m, mes.guild.id)
+                me = mes.guild.get_member(me.id)
+                await me.add_roles(role, reason=f'Так захотел {mes.author.nick}')
+        text[i + 1] = ' '.join(b)
+    text = ''.join(text)
+    await mes.channel.send(text)
+    await mes.delete()
+    for r in roles:
+        await r.delete(reason=f'Так захотел {mes.author.nick}')
+
+
+@bot.command()
+async def channelsave(ctx, pics='', name=None):
+    stime = time.time()
+    cve = {}
+    if not name:
+        name = ctx.channel.name
+    if not os.path.exists(name):
+        os.mkdir(name)
+    file = open(f'{name}\\{name}.txt', 'a', encoding='utf-8')
+    co, sum = 0, 0
+    data = []
+    dic = []
+    atts = []
+    async for i in ctx.channel.history(limit=10000000):
+        co += 1
+        v = i.author.id
+        if v not in cve:
+            cve[v] = defaultdict(int)
+            cve[v]['id'] = v
+            cve[v]['name'] = i.author.name
+            cve[v]['onserver'] = True if i.author in ctx.guild.members else False
+        cve[v]['allmessages'] += 1
+        cve[v]['pictures'] += len(i.attachments)
+        if len(i.content) > 0:
+            cve[v]['messages'] += 1
+            cve[v]['symbols'] += len(i.content)
+            for a in i.attachments:
+                if a.filename.endswith((".png", ".jpg", ".gif")):
+                    atts.append([a.url, a.filename])
+                    data.append(f"∭")
+            data.append(f"∬{co}, {len(i.content)} sym, {len(i.content.split(' '))} words\n")
+            data.append(f"∫{i.author.id}, {i.created_at.strftime('%d.%m.%Y, %X')}\n")
+            data.append(f'{i.content}\n')
+            sum += len(i.content)
+            mes = re.sub(r'[^\s\w-]', '', re.sub('\n_', ' ', i.content))
+            split = mes.split(' ')
+            dic += split
+            cve[v]['words'] += len(split)
+        else:
+            for a in i.attachments:
+                if a.filename.endswith((".png", ".jpg", ".gif")):
+                    atts.append([a.url, a.filename])
+                    data.append("∭")
+            if len(i.attachments) > 0:
+                data.append(f"∬{co}\n")
+                data.append(f"∫{i.author.id}, {i.created_at.strftime('%d.%m.%Y, %X')}\n")
+    data = data[::-1]
+    atts = atts[::-1]
+    if pics != 'False':
+        for i, a in enumerate(atts):
+            pic = requests.get(a[0])
+            pf = open(f'{name}\\{i + 1}-{a[1]}', 'wb')
+            pf.write(pic.content)
+            pf.close()
+    att_index = 0
+    for d in data:
+        if d == '∭':
+            wr = f"∭{name}\\{att_index + 1}-{atts[att_index][1]}\n"
+            att_index += 1
+            file.write(wr)
+        else:
+            file.write(d)
+    words = len(dic)
+    total = f"⨌{co} messages, {sum} symbols, {words} words, {round(words / (co - len(atts)), 2)} avg, {len(atts)} pics, {time.time() - stime} seconds to parse\n\n"
+    file.write(total)
+    cve_main = adb.esort_ext(cve, 'allmessages', 'onserver', True)
+    cve_rest = adb.esort_ext(cve, 'allmessages', 'onserver', False)
+    for m in cve_main:
+        if m['messages'] == 0:
+            file.write(
+                f"∰ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n")
+        else:
+            file.write(
+                f"∰ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n"
+                f"  Символов: {m['symbols']}, слов: {m['words']}, в среднем {round(m['words'] / m['messages'], 2)} слов/сообщение\n")
+    if cve_rest:
+        file.write('\nНе на сервере:\n')
+    for m in cve_rest:
+        if m['messages'] == 0:
+            file.write(
+                f"⨏ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n")
+        else:
+            file.write(
+                f"⨏ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n"
+                f"  Символов: {m['symbols']}, слов: {m['words']}, в среднем {round(m['words'] / m['messages'], 2)} слов/сообщение\n")
+    file = open(f'{name}\\dict.txt', 'a', encoding='utf-8')
+    dic = adb.ownname(Counter(dic)).most_common()
+    for x in dic:
+        file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / words * 100, 3)) + '%'}\n")
+    await ctx.send(f"Готово! ❖❖❖ {co} messages, {sum} symbols, {words} words, {round(words / (co - len(atts)), 2)} avg, {len(atts)} pics ❖❖❖ Выполнено за {time.time() - stime}")
+
+
+@bot.command()
+async def guildsave(ctx, pics='', dirr=None):
+    stime = time.time()
+    cve = {}
+    if not dirr:
+        dirr = f'{ctx.guild.name}\\'
+    if not os.path.exists(dirr):
+        os.mkdir(dirr)
+    count, sum, all_atts = 0, 0, 0
+    dic = []
+    for c in ctx.guild.text_channels:
+        name = c.name
+        if not os.path.exists(f'{dirr}{name}'):
+            os.mkdir(f'{dirr}{name}')
+        file = open(f'{dirr}{name}\\{name}.txt', 'a', encoding='utf-8')
+        data = []
+        atts = []
+        ch_dic = []
+        co, sym = 0, 0
+        ntime = time.time()
+        async for i in c.history(limit=10000000):
+            co += 1
+            count += 1
+            v = i.author.id
+            if v not in cve:
+                cve[v] = defaultdict(int)
+                cve[v]['id'] = v
+                cve[v]['name'] = i.author.name
+                cve[v]['onserver'] = True if i.author in ctx.guild.members else False
+            cve[v]['allmessages'] += 1
+            cve[v]['pictures'] += len(i.attachments)
+            if len(i.content) > 0:
+                cve[v]['messages'] += 1
+                cve[v]['symbols'] += len(i.content)
+                for a in i.attachments:
+                    if a.filename.endswith((".png", ".jpg", ".gif")):
+                        atts.append([a.url, a.filename])
+                        data.append(f"∭")
+                        all_atts += 1
+                data.append(f"∬{co}, {len(i.content)} sym, {len(i.content.split(' '))} words\n")
+                data.append(f"∫{i.author.id}, {i.created_at.strftime('%d.%m.%Y, %X')}\n")
+                data.append(f'{i.content}\n')
+                sum += len(i.content)
+                sym += len(i.content)
+                mes = re.sub(r'[^\s\w-]', '', re.sub('\n_', ' ', i.content))
+                split = mes.split(' ')
+                dic += split
+                ch_dic += split
+                cve[v]['words'] += len(split)
+            else:
+                for a in i.attachments:
+                    if a.filename.endswith((".png", ".jpg", ".gif")):
+                        atts.append([a.url, a.filename])
+                        data.append("∭")
+                        all_atts += 1
+                if len(i.attachments) > 0:
+                    data.append(f"∬{co}\n")
+                    data.append(f"∫{i.author.id}, {i.created_at.strftime('%d.%m.%Y, %X')}\n")
+        data = data[::-1]
+        atts = atts[::-1]
+        if pics != 'False':
+            for i, a in enumerate(atts):
+                pic = requests.get(a[0])
+                pf = open(f'{dirr}{name}\\{i + 1}-{a[1]}', 'wb')
+                pf.write(pic.content)
+                pf.close()
+        att_index = 0
+        for d in data:
+            if d == '∭':
+                wr = f"∭{dirr}{name}\\{att_index + 1}-{atts[att_index][1]}\n"
+                att_index += 1
+                file.write(wr)
+            else:
+                file.write(d)
+        ch_words = len(ch_dic)
+        if not co:
+            file.write(f"⨌{co} messages, {sym} symbols, {ch_words} words, N/A avg, {len(atts)} pics, {time.time() - ntime} seconds to parse\n")
+        else:
+            file.write(f"⨌{co} messages, {sym} symbols, {ch_words} words, {round(ch_words / (co - len(atts)), 2)} avg, {len(atts)} pics, {time.time() - ntime} seconds to parse\n")
+    words = len(dic)
+    total = f"⨌{count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics, {time.time() - stime} seconds to parse\n\n"
+    file = open(f'{dirr}total.txt', 'a', encoding='utf-8')
+    file.write(total)
+    cve_main = adb.esort_ext(cve, 'allmessages', 'onserver', True)
+    cve_rest = adb.esort_ext(cve, 'allmessages', 'onserver', False)
+    for m in cve_main:
+        if m['messages'] == 0:
+            file.write(
+                f"∰ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n")
+        else:
+            file.write(
+                f"∰ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n"
+                f"  Символов: {m['symbols']}, слов: {m['words']}, в среднем {round(m['words'] / m['messages'], 2)} слов/сообщение\n")
+    if cve_rest:
+        file.write('\nНе на сервере:\n')
+    for m in cve_rest:
+        if m['messages'] == 0:
+            file.write(
+                f"⨏ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n")
+        else:
+            file.write(
+                f"⨏ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n"
+                f"  Символов: {m['symbols']}, слов: {m['words']}, в среднем {round(m['words'] / m['messages'], 2)} слов/сообщение\n")
+    file = open(f'{dirr}dict.txt', 'a', encoding='utf-8')
+    dic = adb.ownname(Counter(dic)).most_common()
+    for x in dic:
+        file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / words * 100, 3)) + '%'}\n")
+    await ctx.send(f"Готово! ❖❖❖ {count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics ❖❖❖ Выполнено за {time.time() - stime}")
+
+
+@bot.command()
+async def chencounter(ctx):
+    stime = time.time()
+    co, sum, atts = 0, 0, 0
+    dic = []
+    async for i in ctx.channel.history(limit=100000):
+        if len(i.content) > 0:
+            sum += len(i.content)
+            co += 1
+            mes = re.sub(r'[^\s\w-]', '', re.sub('\n_', ' ', i.content))
+            dic += mes.split(' ')
+        for a in i.attachments:
+            if a.filename.endswith((".png", ".jpg", ".gif")):
+                atts += 1
+    words = len(dic)
+    total = f"❖❖❖\nСообщений: {co}\nВсего символов: {sum}\nВсего слов: {words}\nСреднее: {round(words / co, 2)}\nВсего фоточек: {atts}"
+    await ctx.send(f"{total}\n❖❖❖\nВыполнено за {time.time() - stime}")
+
+
+@bot.command()
+async def nikki(ctx):
+    async for i in ctx.channel.history(limit=1000):
+        if '▲' in i.content:
+            yw = i.content.split('*Неделя* __***')[1].split('*')[0]
+            ano = yw[:2]
+            semana = yw[3:5]
+            rd = i.content.split('РД')[0][-8:-5]
+            ra = i.content.split('РА')[0][-9:-5]
+            rm = i.content.split('РМ')[0][-9:-5]
+            rest = i.content.split('***')[-1]
+            break
+    try:
+        semana = int(semana) + 1
+        if semana < 10:
+            semana = "0" + str(semana)
+        mes = '▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼▲▼\n'
+        mes += f'\*Неделя\* \_\_\*\*\*{ano}w{semana}\*\*\*\_\_\n'
+        mes += f'\*{int(rd) + 7}\* \*\*\*РД\*\*\* \*{int(ra) + 7}\* \*\*\*РА\*\*\* \*{int(rm) + 7}\* \*\*\*РМ\*\*\* \*'
+        mes += rest
+        await ctx.send(mes, delete_after=60)
+    except:
+        await ctx.send(file=adb.errorpic, delete_after=10)
+
+
+@bot.command()
+async def ping(ctx):
+    em = discord.Embed(title='**Текущая задержка:**', description=f'{bot.ws.latency * 1000:.0f} ms', color=random.choice(adb.raincolors))
+    await ctx.send(embed=em)
+
+
+@bot.command()
+async def felete(ctx, file):
+    if not '.' in file:
+        file +='.txt'
+    os.remove(file)
+    await ctx.send(f'Файл {file} удалён!', delete_after=5)
+
+
+@bot.command()
+async def lognull(ctx):
+    global meslogs
+    global mlFlags
+    m = adb.listsplit(meslogs)
+    logemb = {}
+    for i, mm in enumerate(m):
+        logemb[i] = discord.Embed(title='Печатаем...', colour=random.choice(adb.raincolors))
+        for mmm in mm:
+            logemb[i].add_field(name=mmm[1], value=mmm[0], inline=False)
+    for i in logemb:
+        await ctx.send(embed=logemb[i])
+    meslogs = []
+    mlFlags = defaultdict(bool)
+
+
+def smile(mes):
+    obj = expd[mes.guild.id][mes.author.id]
+    if obj.bbagid <= 10:
+        return random.choice(emosdict[obj.bbagid][random.choice(emosdict[obj.bbagid])])
+    else:
+        return ''
+
+
+@bot.command()
+async def transfer(ctx, ch, count):
+    ch = ctx.guild.get_channel(int(ch))
+    days = False
+    if 'd' in count:
+        days = True
+        count = count.split('d')[0]
+    count = int(count)
+    mess = []
+    mems = []
+    if days:
+        if count < 1:
+            await ctx.send(f'Введите количество дней')
+        trans_time = datetime.datetime.now() - datetime.timedelta(days=count-1)
+        async for mes in ch.history(limit=100000):
+            if mes.created_at.date() >= trans_time.date():
+                mess.append(mes)
+        days_count = count
+        count = len(mess)
+    else:
+        async for mes in ch.history(limit=count):
+            mess.append(mes)
+        days_count = 1
+    mess = mess[::-1]
+    for m in mess:
+        cont = m.content
+        # mentions = re.findall(r'<@.?>', cont)
+        # print(mentions)
+        # for me in mentions:
+        #     me_id = re.sub(r'\D', '', me)
+        #     mem = m.guild.get.member(me_id)
+        #     re.sub(me, f'{mem.name}{smile(mem)}', cont)
+        file = None
+        for a in m.attachments:
+            if a.filename.endswith((".png", ".jpg", ".gif")):
+                pic = requests.get(a.url)
+                pf = open(f'{a.filename}', 'wb')
+                pf.write(pic.content)
+                pf.close()
+                file = discord.File(fp=a.filename)
+                break
+        if len(cont) > 1900:
+            await ctx.send(f'`{m.author.name}`{smile(m)}, `{m.created_at.strftime("%d.%m.%Y, %X")}`')
+            await ctx.send(cont, file=file)
+        else:
+            await ctx.send(f'`{m.author.name}`{smile(m)}, `{m.created_at.strftime("%d.%m.%Y, %X")}`\n{cont}', file=file)
+        mems.append(m.author)
+        await asyncio.sleep(0.3)
+        if file:
+            os.remove(file.fp.name)
+    if count <= 5:
+        return
+    mems = set(mems)
+    mems = [rolemention(expd[me.guild.id][me.id]) for me in mems]
+    mems = '\n'.join(mems)
+    desc = f'Перекинул {count} сообщений '
+    if days:
+        desc += f'(за {adb.postfix(days_count, ["день", "дня", "дней"])}) '
+    desc += f'из {ch.mention} ({ch.guild.name})\nАвторы сообщений:\n{mems}'
+    embed = discord.Embed(tile='Перенос', description=desc)
+    embed.set_footer(icon_url=ctx.author.avatar_url, text=f'Вызвал: {ctx.author.name}')
+    await ctx.send(embed=embed)
+
+
+@bot.command()
+async def newemoji(ctx, e, three=0, clas=''):
+    sql_insert = 'INSERT INTO emos(emoji, eid, bbagid, server, class) VALUES (?,?,?,?,?)'
+    one = e.split(':')[1]
+    two = e.split(':')[2].split('>')[0]
+    print(one, two)
+    SQL.execute(sql_insert, (one, two, three, ctx.guild.id, clas))
+    db.commit()
+
+
+async def memlog(mes):
+    if (mes.channel.id in adb.mlinput) and len(mes.content) > 105:
+        cout = bot.get_channel(adb.memlog)
+        c = mes.content
+        if '<' in c and '>' in c:
+            title = f"<{c.split('<')[1].split('>')[0]}> "
+        else: title = f"{c[:1]} "
+        c = c.replace(title, '', 1).replace('\n', ' ')
+        title += f'{random.choice(adb.letter)} {mes.channel.name}'
+        emb = discord.Embed(title=title, colour=random.choice(adb.raincolors))
+        d = c[:100][::-1].split(' ', maxsplit=1)[1][::-1]
+        emb.add_field(name='Запись', value=d+'...', inline=False)
+        emb.add_field(name='Символов', value=str(len(mes.content)), inline=True)
+        emb.add_field(name='Время', value=time.strftime("%d.%m.%Y, %X", time.localtime()))
+        await cout.send(embed=emb)
+
+
+@commands.command()
+async def vksend(ctx, *text: str, keyboard='', att=''):
+    g = ctx.guild.id
+    m = ctx.author.id
+    mes = expd[g][m].name
+    if expd[g][m].vkemo:
+        mes += expd[g][m].vkemo
+    mes += ':\n'
+    mes += ' '.join(text)
+    return vk.messages.send(user_id=156809784, message=mes, random_id=random.randint(0, 1000000), keyboard=keyboard, attachment=att)
+
+
+@commands.command()
+async def vk(ctx, *text: str, chat_id=3, keyboard='', att=''):
+    g = ctx.guild.id
+    m = ctx.author.id
+    mes = expd[g][m].name
+    if expd[g][m].vkemo:
+        mes += expd[g][m].vkemo
+    mes += ':\n'
+    mes += ' '.join(text)
+    return vk.messages.send(random_id=random.randint(0, 1000000), message=mes, chat_id=chat_id, keyboard=keyboard, attachment=att)
+
+
+@bot.command()
+async def load(ctx, extensions):
+    bot.load_extension(f'cogs.{extensions}')
+    await ctx.send("loaded")
+
+
+@bot.command()
+async def unload(ctx, extensions):
+    bot.unload_extension(f'cogs.{extensions}')
+    await ctx.send("unloaded")
+
+
+@bot.command()
+async def reload(ctx, extensions):
+    bot.unload_extension(f'cogs.{extensions}')
+    bot.load_extension(f'cogs.{extensions}')
+    await ctx.send("reloaded")
+
+def casino_def():
+    a = random.choice(adb.cas_list)
+    b = random.choice(adb.cas_list)
+    c = random.choice(adb.cas_list)
+    return [a,b,c]
+
+@bot.command()
+async def casino(ctx):
+    g = ctx.guild.id
+    m = ctx.author.id
+    if expd[g][m].casFlag:
+        return
+    emb = discord.Embed(title='Казино 🪓🪓🪓', description='Вращайте барабан!')
+    embed = await ctx.send(embed=emb)
+    res = casino_def()
+    mes = await ctx.send(f'{res[0]}{res[1]}{res[2]}')
+    for i in range(4):
+        await asyncio.sleep(1)
+        res = casino_def()
+        await mes.edit(content=f'{res[0]}{res[1]}{res[2]}')
+    await mes.delete()
+    if res[1]==res[2] and res[0]==res[1]:
+        emb.add_field(name=f'Джекпот!', value=f'{res[0]}{res[0]}{res[0]}! Ваш выигрыш: **{adb.cas_reward[res[0]]}**')
+        await expd[g][m].addexp(adb.cas_reward[res[0]], ctx.channel, 'казино', mem=ctx.author)
+        await embed.edit(embed=emb)
+    else:
+        emb.add_field(name=f'Неудача((', value=f'Повезёт в другой раз!')
+        await embed.edit(embed=emb)
+    expd[g][m].casFlag = True
+    await asyncio.sleep(adb.cas_cd)
+    expd[g][m].casFlag = False
+
+
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'cogs.{filename[:-3]}')
+
+
+token = open('token.txt').readlines()[0]
+bot.run(token)
