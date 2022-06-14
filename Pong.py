@@ -3,10 +3,15 @@ import discord
 from discord.ext import commands
 from collections import defaultdict
 
+pong_a = "<:pong_a:986404127988908103>"
+pong_z = "<:pong_z:986404133961613342>"
+pong_k = "<:pong_k:986404130291580968>"
+pong_m = "<:pong_m:986404132174856212>"
+
 
 class Pong:
     def __init__(self, channel_id):
-        self.FIELD_SIZE = [80, 25]
+        self.FIELD_SIZE = [70, 25]
         self.paddle_a_y = self.paddle_b_y = self.FIELD_SIZE[1] // 2
         self.ball_cords = [self.FIELD_SIZE[0] // 2, self.FIELD_SIZE[1] // 2]
         self.ball_speed = [2, 2]
@@ -93,7 +98,7 @@ class Pong:
         if defaultFlag:
             self.set_default_values()
         return 0
-            
+
     def set_default_values(self):
         self.ball_cords[0] = self.FIELD_SIZE[0] // 2
         self.ball_cords[1] = self.FIELD_SIZE[1] // 2
@@ -112,13 +117,13 @@ class PongCog(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         if self.pongs[payload.channel_id]:
             pong = self.pongs[payload.channel_id]
-            if payload.emoji == "emoji_a":
+            if payload.emoji == pong_a:
                 pong.move_paddle(1, -1)
-            if payload.emoji == "emoji_z":
+            if payload.emoji == pong_z:
                 pong.move_paddle(1, 1)
-            if payload.emoji == "emoji_k":
+            if payload.emoji == pong_k:
                 pong.move_paddle(2, -1)
-            if payload.emoji == "emoji_m":
+            if payload.emoji == pong_m:
                 pong.move_paddle(2, 1)
 
     @commands.command(aliases=["pong"])
@@ -128,6 +133,10 @@ class PongCog(commands.Cog):
         pong = self.pongs[ctx.channel.id]
         if not pong.message:
             pong.message = await ctx.send(pong.draw_field())
+            await pong.message.add_reaction(pong_a)
+            await pong.message.add_reaction(pong_z)
+            await pong.message.add_reaction(pong_k)
+            await pong.message.add_reaction(pong_m)
         while not self.bot.is_closed() and pong.active:
             await asyncio.sleep(0.5)
             tick = pong.tick()
@@ -135,8 +144,6 @@ class PongCog(commands.Cog):
                 await pong.message.channel.send(f"Player {tick} wins!")
                 return
             await pong.message.edit(content=pong.draw_field())
-            # emojis, buttons, etc
-            # TODO: 2000 length restriction, emojis
 
 
 def setup(bot):
