@@ -10,7 +10,7 @@ pong_m = "<:pong_m:986404132174856212>"
 
 
 class Pong:
-    def __init__(self, channel_id):
+    def __init__(self, channel_id, mem1, mem2):
         self.FIELD_SIZE = [70, 25]
         self.paddle_a_y = self.paddle_b_y = self.FIELD_SIZE[1] // 2
         self.ball_cords = [self.FIELD_SIZE[0] // 2, self.FIELD_SIZE[1] // 2]
@@ -20,6 +20,8 @@ class Pong:
         self.channel = channel_id
         self.message = None
         self.active = True
+        self.mem1 = mem1
+        self.mem2 = mem2
         
     def draw_field(self):
         res = ''
@@ -117,19 +119,27 @@ class PongCog(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         if self.pongs[payload.channel_id]:
             pong = self.pongs[payload.channel_id]
-            if payload.emoji == pong_a:
-                pong.move_paddle(1, -1)
-            if payload.emoji == pong_z:
-                pong.move_paddle(1, 1)
-            if payload.emoji == pong_k:
-                pong.move_paddle(2, -1)
-            if payload.emoji == pong_m:
-                pong.move_paddle(2, 1)
+            if payload.user_id == pong.mem1:
+                if payload.emoji == pong_a:
+                    pong.move_paddle(1, -1)
+                elif payload.emoji == pong_z:
+                    pong.move_paddle(1, 1)
+            elif payload.user_id == pong.mem2:
+                if payload.emoji == pong_k:
+                    pong.move_paddle(2, -1)
+                elif payload.emoji == pong_m:
+                    pong.move_paddle(2, 1)
 
     @commands.command(aliases=["pong"])
-    async def run_pong(self, ctx):
+    async def run_pong(self, ctx, mem1: discord.Member, mem2: discord.Member = None):
+        if mem2 is None:
+            mem2 = mem1
+            mem1 = ctx.author
         if not self.pongs[ctx.channel.id]:
-            self.pongs[ctx.channel.id] = Pong(ctx.channel.id)
+            self.pongs[ctx.channel.id] = Pong(ctx.channel.id, mem1.id, mem2.id)
+        else:
+            self.pongs[ctx.channel.id].mem1 = mem1.id
+            self.pongs[ctx.channel.id].mem2 = mem2.id
         pong = self.pongs[ctx.channel.id]
         if not pong.message:
             pong.message = await ctx.send(pong.draw_field())
