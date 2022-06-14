@@ -23,7 +23,7 @@ from PIL import ImageDraw
 from bs4 import BeautifulSoup
 from pyppeteer import launch
 
-# TODO: обновить иконки ачивок, сделать их одинакового размера
+# TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
 
 # Contents:
 # Vehicle class
@@ -2767,8 +2767,7 @@ async def emoji(ctx, e):
 
 @bot.command()
 async def all_emoji(ctx):
-    await ctx.send(', '.join([str(s) for s in ctx.guild.emojis]))
-    await ctx.send('\n'.join(['/' + str(s) for s in ctx.guild.emojis]))
+    await ctx.send('\n'.join([str(s) + '  \\' + str(s) for s in ctx.guild.emojis]))
 
 
 # @bot.command()
