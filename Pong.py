@@ -110,8 +110,8 @@ class PongCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if self.pongs[payload.channel.id]:
-            pong = self.pongs[payload.channel.id]
+        if self.pongs[payload.channel_id]:
+            pong = self.pongs[payload.channel_id]
             if payload.emoji == "emoji_a":
                 pong.move_paddle(1, -1)
             if payload.emoji == "emoji_z":

@@ -23,6 +23,8 @@ from PIL import ImageDraw
 from bs4 import BeautifulSoup
 from pyppeteer import launch
 
+# TODO: обновить иконки ачивок, сделать их одинакового размера
+
 # Contents:
 # Vehicle class
 # Nexus class
@@ -2729,6 +2731,7 @@ async def memlog(mes):
         emb.add_field(name='Время', value=time.strftime("%d.%m.%Y, %X", time.localtime()))
         await cout.send(embed=emb)
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Emoji functions
 def smile(mes=None, mem=None):
@@ -2746,7 +2749,7 @@ def smile(mes=None, mem=None):
 
 @bot.command()
 async def newemoji(ctx, e, three=0, clas=''):
-    sql_insert = 'INSERT INT emos(emoji, eid, bbagid, server, class) VALUES (?,?,?,?,?)'
+    sql_insert = 'INSERT INTO emos(emoji, eid, bbagid, server, class) VALUES (?,?,?,?,?)'
     one = e.split(':')[1]
     two = e.split(':')[2].split('>')[0]
     print(one, two)
@@ -2765,7 +2768,7 @@ async def emoji(ctx, e):
 @bot.command()
 async def all_emoji(ctx):
     await ctx.send(', '.join([str(s) for s in ctx.guild.emojis]))
-    await ctx.send('\n'.join(['/'+ str(s) for s in ctx.guild.emojis]))
+    await ctx.send('\n'.join(['/' + str(s) for s in ctx.guild.emojis]))
 
 
 # @bot.command()
