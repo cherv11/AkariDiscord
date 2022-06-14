@@ -11,7 +11,7 @@ pong_m = "<:pong_m:986404132174856212>"
 
 class Pong:
     def __init__(self, channel_id, mem1, mem2):
-        self.FIELD_SIZE = [70, 25]
+        self.FIELD_SIZE = [60, 25]
         self.paddle_a_y = self.paddle_b_y = self.FIELD_SIZE[1] // 2
         self.ball_cords = [self.FIELD_SIZE[0] // 2, self.FIELD_SIZE[1] // 2]
         self.ball_speed = [2, 2]
