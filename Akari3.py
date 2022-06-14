@@ -184,15 +184,15 @@ class Nexus:
     def __init__(self):
         data = None
         last_time = 0
-        for i in os.listdir('nexus\\data'): # find newest nexus
-            le = ast.literal_eval(open(f'nexus\\data\\{i}').read())
+        for i in os.listdir('nexus/data'): # find newest nexus
+            le = ast.literal_eval(open(f'nexus/data/{i}').read())
             if le['last_played'] > last_time:
                 last_time = le['last_played']
                 data = le
         if not data: # if not found, create one
             data = {'season': 1, 'year': int(time.strftime("%y")), 'month': int(time.strftime("%m")), 'players': {},
-                    'health0': 1000, 'health1': 1000, 'style': 'hotwater', 'img': 'nexus\\data\\1.png', 'days': 0}
-            with open('nexus\\data\\1.png', 'w', encoding='uif-8') as f:
+                    'health0': 1000, 'health1': 1000, 'style': 'hotwater', 'img': 'nexus/data/1.png', 'days': 0}
+            with open('nexus/data/1.png', 'w', encoding='uif-8') as f:
                 f.write(data)
         self.data = data
 
@@ -367,7 +367,7 @@ async def daycheck():
     if time.strftime("%H") == "17":
         if not os.path.exists('AEBackups'):
             os.mkdir('AEBackups')
-        shutil.copyfile("Akari.db", f"AEBackups\\Akari{random.randint(10000, 99999)}.db")
+        shutil.copyfile("Akari.db", f"AEBackups/Akari{random.randint(10000, 99999)}.db")
 
 
 @tasks.loop(hours=1)
@@ -396,7 +396,7 @@ async def daybottle():
 @tasks.loop(hours=1)
 async def dayphrase():
     if time.strftime("%H") == "22":
-        file = open('pips\\phrases.txt', encoding='utf-8').readlines()
+        file = open('pips/phrases.txt', encoding='utf-8').readlines()
         phrase = random.choice(file)
         author = ''
         if '©' in phrase:
@@ -467,7 +467,7 @@ async def all_guilds_save():
         if adb.if_host:
             for g in bot.guilds:
                 savepics = 'False' if g.id in adb.guildsave_pic_blacklist else ''
-                await guildsavedef(g, None, savepics, f'D:\\Brutal Bro Abnormal Gang\\Archives\\{g.name}')
+                await guildsavedef(g, None, savepics, f'D:/Brutal Bro Abnormal Gang/Archives/{g.name}')
         else:
             tai = bot.get_guild(adb.dmh).get_channel(adb.taisetsu)
             await tai.send('Время делать бекап!')
@@ -487,7 +487,7 @@ def nsort(l):
 
 
 def nexus_draw():
-    phone = Image.open(f'nexus\\{nexus1.season}_raw.png').convert('RGBA')
+    phone = Image.open(f'nexus/{nexus1.season}_raw.png').convert('RGBA')
     SQL.execute(f'SELECT * FROM nexus_style_poses WHERE style = "{nexus1.style}"')
     pos1 = SQL.fetchone()
     SQL.execute(f'SELECT * FROM nexus_style_poses WHERE style = "{nexus2.style}"')
@@ -499,19 +499,19 @@ def nexus_draw():
         idx = len(imgs1)-i-1
         items = []
         if pos1[idx][5]:
-            pad = Image.open(f'nexus\\pad_{nexus1.style}.png').convert('RGBA')
+            pad = Image.open(f'nexus/pad_{nexus1.style}.png').convert('RGBA')
             if pos1[idx][8] != 100:
                 h, w = pad.size
                 pad = pad.resize((h*pos1[idx][8]/100, w*pos1[idx][8]/100))
             phone.paste(pad, (pos1[idx][6], pos1[idx][7]), pad)
 
-        img = Image.open(f'nexus\\{expd[adb.bbag][id].nplayer["icon"]}').convert('RGBA')
+        img = Image.open(f'nexus/{expd[adb.bbag][id].nplayer["icon"]}').convert('RGBA')
         if pos1[idx][4] != 100:
             h, w = img.size
             img = img.resize((h * pos1[idx][4] / 100, w * pos1[idx][4] / 100))
         phone.paste(img, (pos1[idx][2], pos1[idx][3]), img)
 
-        av = Image.open(f'nexus\\a{expd[adb.bbag][id].bbagid}.png').convert('RGBA')
+        av = Image.open(f'nexus/a{expd[adb.bbag][id].bbagid}.png').convert('RGBA')
         if pos1[idx][4] != 100:
             h, w = av.size
             av = av.resize((h * pos1[idx][4] / 100, w * pos1[idx][4] / 100))
@@ -519,7 +519,7 @@ def nexus_draw():
 
         nitems = nsort(list(expd[adb.bbag][id].nitems.keys()))
         for item in nitems:
-            itg = Image.open(f'nexus\\i{item}.png').convert('RGBA')
+            itg = Image.open(f'nexus/i{item}.png').convert('RGBA')
             if pos1[idx][4] != 100:
                 h, w = itg.size
                 av = itg.resize((h * pos1[idx][4] / 100, w * pos1[idx][4] / 100))
@@ -540,19 +540,19 @@ def nexus_draw():
         items = []
 
         if pos2[idx][5]:
-            pad = Image.open(f'nexus\\pad_{nexus2.style}.png').convert('RGBA')
+            pad = Image.open(f'nexus/pad_{nexus2.style}.png').convert('RGBA')
             if pos2[idx][8] != 100:
                 h, w = pad.size
                 pad = pad.resize((h*pos2[idx][8]/100, w*pos2[idx][8]/100))
             phone.paste(pad, (pos2[idx][6], pos2[idx][7]), pad)
 
-        img = Image.open(f'nexus\\{expd[adb.bbag][id].nplayer["icon"]}').convert('RGBA')
+        img = Image.open(f'nexus/{expd[adb.bbag][id].nplayer["icon"]}').convert('RGBA')
         if pos2[idx][4] != 100:
             h, w = img.size
             img = img.resize((h * pos2[idx][4] / 100, w * pos2[idx][4] / 100))
         phone.paste(img, (pos2[idx][2], pos2[idx][3]), img)
 
-        av = Image.open(f'nexus\\a{expd[adb.bbag][id].bbagid}.png').convert('RGBA')
+        av = Image.open(f'nexus/a{expd[adb.bbag][id].bbagid}.png').convert('RGBA')
         if pos2[idx][4] != 100:
             h, w = av.size
             av = av.resize((h * pos2[idx][4] / 100, w * pos2[idx][4] / 100))
@@ -560,7 +560,7 @@ def nexus_draw():
 
         nitems = nsort(list(expd[adb.bbag][id].nitems.keys()))
         for item in nitems:
-            itg = Image.open(f'nexus\\i{item}.png').convert('RGBA')
+            itg = Image.open(f'nexus/i{item}.png').convert('RGBA')
             if pos2[idx][4] != 100:
                 h, w = itg.size
                 av = itg.resize((h * pos2[idx][4] / 100, w * pos2[idx][4] / 100))
@@ -576,8 +576,8 @@ def nexus_draw():
                 phone.paste(av, (pos2[idx][2] + idata[3], pos2[idx][3] + idata[4]), av)
             items.append(item)
 
-    phone.save(f'nexus\\{nexus1.season}.png')
-    file = discord.File(fp=f'nexus\\{nexus1.season}.png')
+    phone.save(f'nexus/{nexus1.season}.png')
+    file = discord.File(fp=f'nexus/{nexus1.season}.png')
     return file
 
 
@@ -838,7 +838,7 @@ async def forceplay(name, channel):
         except:
             pass
         voice = discord.utils.get(bot.voice_clients, guild=guild)
-        voice.play(discord.FFmpegPCMAudio(executable="C:\\ffmpeg\\bin\\ffmpeg.exe", source=f'music\\{name}'))
+        voice.play(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source=f'music/{name}'))
         voice.source = discord.PCMVolumeTransformer(voice.source)
         voice.source.volume = 100
     except:
@@ -847,7 +847,7 @@ async def forceplay(name, channel):
 
 def number_gif(num):
     if int(num) < 10:
-        return discord.File(fp=f'pips\\{num}.gif')
+        return discord.File(fp=f'pips/{num}.gif')
     num = str(num)
     main_ims = []
     frames = {'0':9, '1':6, '2':7, '3':11, '4':9, '5':7, '6':6, '7':6, '8':5, '9':7}
@@ -855,13 +855,13 @@ def number_gif(num):
         main_im = Image.new('RGBA', (45 * len(num), 100), (54, 57, 63, 255))
         for i, im in enumerate(num):
             frame_num = f if f < frames[im] else frames[im]
-            im = Image.open(f'pips\\numgifs\\{im}_{frame_num}.png').convert('RGBA')
+            im = Image.open(f'pips/numgifs/{im}_{frame_num}.png').convert('RGBA')
             main_im.paste(im, (45 * i, 0, 45 * (i + 1), 100), im)
         main_ims.append(main_im)
 
-    if not os.path.exists('pips\\numgifs_'):
-        os.mkdir('pips\\numgifs_')
-    path = f'pips\\numgifs_\\{num}.gif'
+    if not os.path.exists('pips/numgifs_'):
+        os.mkdir('pips/numgifs_')
+    path = f'pips/numgifs_/{num}.gif'
     main_ims[0].save(
         path,
         optimize=False,
@@ -1284,9 +1284,9 @@ async def AkariCoderEvent(mes):
 
 
 def AkariCoder():
-    file = open('pips\\AkariCode.txt', encoding='utf-8').read()
-    file2 = open('pips\\AkariOnlyfuncs.txt', encoding='utf-8').read()
-    file3 = open('pips\\bbagdict.txt', encoding='utf-8').read()
+    file = open('pips/AkariCode.txt', encoding='utf-8').read()
+    file2 = open('pips/AkariOnlyfuncs.txt', encoding='utf-8').read()
+    file3 = open('pips/bbagdict.txt', encoding='utf-8').read()
     main = list(set(re.findall(r'[\w\.\[\]_]+', file)))
     code = list(set(file2.split(' ')))
     words = file3.split('\n')
@@ -1325,12 +1325,12 @@ def AkariCoder():
         sym -= len(comms[-1])
         del comms[-1]
     text = res + '\n\n'.join(comms)
-    if os.path.exists('pips\\ac.py'):
-        os.remove('pips\\ac.py')
-    file4 = open('pips\\ac.py', 'a', encoding='utf-8')
+    if os.path.exists('pips/ac.py'):
+        os.remove('pips/ac.py')
+    file4 = open('pips/ac.py', 'a', encoding='utf-8')
     file4.write(text)
     file4.close()
-    file5 = discord.File(fp='pips\\ac.py')
+    file5 = discord.File(fp='pips/ac.py')
     return file5
 
 
@@ -1700,14 +1700,14 @@ async def corona(ctx):
     heads = ['В больничку', 'Обратно', 'Заболело', 'Сдохло', 'Здоровых', 'Заболело', 'Сдохло']
     heads_icons = ['hospital', 'medcar', 'biohazard', 'skull', 'plus', 'biohazard', 'skull']
 
-    icons = {i.split('.png')[0]: Image.open('pips\\plgs\\' + i).convert('RGBA') for i in os.listdir('pips\\plgs')}
-    font = ImageFont.truetype('pips\\arial.ttf', size=55)
-    fontmd = ImageFont.truetype('pips\\blood.ttf', size=44)
-    fontsm = ImageFont.truetype('pips\\arial.ttf', size=36)
+    icons = {i.split('.png')[0]: Image.open('pips/plgs/' + i).convert('RGBA') for i in os.listdir('pips/plgs')}
+    font = ImageFont.truetype('pips/arial.ttf', size=55)
+    fontmd = ImageFont.truetype('pips/blood.ttf', size=44)
+    fontsm = ImageFont.truetype('pips/arial.ttf', size=36)
 
-    im = Image.open(f'pips\\plg.png').convert('RGBA')
-    photo = random.choice(os.listdir("pips\\plgphones"))
-    photo = Image.open(f'pips\\plgphones\\{photo}').convert('RGBA')
+    im = Image.open(f'pips/plg.png').convert('RGBA')
+    photo = random.choice(os.listdir("pips/plgphones"))
+    photo = Image.open(f'pips/plgphones/{photo}').convert('RGBA')
     photo = photo.resize((445, 445))
     im.paste(photo, (137, 14), photo)
     im.paste(icons['corner1'], (137, 401), icons['corner1'])
@@ -2096,9 +2096,9 @@ async def vkExp(mes):
             cont = cont.split(adb.vk_prefix+'ds', maxsplit=1)[1]
             if len(cont) <= 1900:
                 if att:
-                    file = discord.File(fp=f'vk\\{att}.jpg')
+                    file = discord.File(fp=f'vk/{att}.jpg')
                     await mainchannel.send(f'`{expd[g][m].name}`{random.choice(expd[g][m].emos)} из {emosdict[51]["vk"]}:\n{cont}', file=file)
-                    os.remove(f'vk\\{att}.jpg')
+                    os.remove(f'vk/{att}.jpg')
                 else:
                     await mainchannel.send(f'`{expd[g][m].name}`{random.choice(expd[g][m].emos)} из {emosdict[51]["vk"]}:\n{cont}')
                 save_vk_comm(expd[g][m], 'vk_ds')
@@ -2286,7 +2286,7 @@ async def channelsavedef(channel, pics='', name=None):
         name = channel.name
     if not os.path.exists(name):
         os.mkdir(name)
-    file = open(f'{name}\\{name}.txt', 'w', encoding='utf-8')
+    file = open(f'{name}/{name}.txt', 'w', encoding='utf-8')
     co, sum = 0, 0
     data = []
     dic = []
@@ -2331,11 +2331,11 @@ async def channelsavedef(channel, pics='', name=None):
     if pics != 'False':
         for i, a in enumerate(atts):
             if f'{i+1}-{a.filename}' not in exfiles:
-                await a.save(f'{name}\\{i+1}-{a.filename}')
+                await a.save(f'{name}/{i+1}-{a.filename}')
     att_index = 0
     for d in data:
         if d == '∭':
-            wr = f"∭{name}\\{att_index+1}-{atts[att_index].filename}\n"
+            wr = f"∭{name}/{att_index+1}-{atts[att_index].filename}\n"
             att_index += 1
             file.write(wr)
         else:
@@ -2363,7 +2363,7 @@ async def channelsavedef(channel, pics='', name=None):
             file.write(
                 f"⨏ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n"
                 f"  Символов: {m['symbols']}, слов: {m['words']}, в среднем {round(m['words'] / m['messages'], 2)} слов/сообщение\n")
-    file = open(f'{name}\\dict.txt', 'w', encoding='utf-8')
+    file = open(f'{name}/dict.txt', 'w', encoding='utf-8')
     dic = adb.ownname(Counter(dic)).most_common()
     for x in dic:
         file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / words * 100, 3)) + '%'} — {dicdate[x[0]]}\n")
@@ -2391,9 +2391,9 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
     for c in guild.text_channels:
         name = c.name
         print(f'\033[32m{c.name}... \033[0m')
-        if not os.path.exists(f'{dirr}\\{name}'):
-            os.mkdir(f'{dirr}\\{name}')
-        file = open(f'{dirr}\\{name}\\{name}.txt', 'w', encoding='utf-8')
+        if not os.path.exists(f'{dirr}/{name}'):
+            os.mkdir(f'{dirr}/{name}')
+        file = open(f'{dirr}/{name}/{name}.txt', 'w', encoding='utf-8')
         data = []
         atts = []
         ch_dic = []
@@ -2441,15 +2441,15 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
                     data.append(f"∫{i.author.id}, {i.created_at.strftime('%d.%m.%Y, %X')}\n")
         data = data[::-1]
         atts = atts[::-1]
-        exfiles = os.listdir(f'{dirr}\\{name}')
+        exfiles = os.listdir(f'{dirr}/{name}')
         if pics != 'False':
             for i, a in enumerate(atts):
                 if f'{i+1}-{a.filename}' not in exfiles:
-                    await a.save(f'{dirr}\\{name}\\{i+1}-{a.filename}')
+                    await a.save(f'{dirr}/{name}/{i+1}-{a.filename}')
         att_index = 0
         for d in data:
             if d == '∭':
-                wr = f"∭{dirr}\\{name}\\{att_index+1}-{atts[att_index].filename}\n"
+                wr = f"∭{dirr}/{name}/{att_index+1}-{atts[att_index].filename}\n"
                 att_index += 1
                 file.write(wr)
             else:
@@ -2459,7 +2459,7 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
             file.write(f"⨌{co} messages, {sym} symbols, {ch_words} words, N/A avg, {len(atts)} pics, {time.time() - ntime} seconds to parse\n")
         else:
             file.write(f"⨌{co} messages, {sym} symbols, {ch_words} words, {round(ch_words / (co - len(atts)), 2)} avg, {len(atts)} pics, {time.time() - ntime} seconds to parse\n")
-        file = open(f'{dirr}\\{name}\\dict.txt', 'w', encoding='utf-8')
+        file = open(f'{dirr}/{name}/dict.txt', 'w', encoding='utf-8')
         ch_dic = adb.ownname(Counter(ch_dic)).most_common()
         for x in ch_dic:
             file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / ch_words * 100, 3)) + '%'} — {ch_dicdate[x[0]]}\n")
@@ -2467,7 +2467,7 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
         print(f'\033[32m{c.name} done!\033[0m')
     words = len(dic)
     total = f"⨌{count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics, {time.time() - stime} seconds to parse\n\n"
-    file = open(f'{dirr}\\total.txt', 'w', encoding='utf-8')
+    file = open(f'{dirr}/total.txt', 'w', encoding='utf-8')
     file.write(total)
     cve_main = adb.esort_ext(cve, 'allmessages', 'onserver', True)
     cve_rest = adb.esort_ext(cve, 'allmessages', 'onserver', False)
@@ -2489,7 +2489,7 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
             file.write(
                 f"⨏ID {m['id']} {m['name']}: Всего сообщений: {m['allmessages']}, текстовых: {m['messages']}, картиночек: {m['pictures']}\n"
                 f"  Символов: {m['symbols']}, слов: {m['words']}, в среднем {round(m['words'] / m['messages'], 2)} слов/сообщение\n")
-    file = open(f'{dirr}\\dict.txt', 'w', encoding='utf-8')
+    file = open(f'{dirr}/dict.txt', 'w', encoding='utf-8')
     dic = adb.ownname(Counter(dic)).most_common()
     for x in dic:
         file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / words * 100, 3)) + '%'} — {dicdate[x[0]]}\n")
@@ -2765,7 +2765,7 @@ async def emoji(ctx, e):
 @bot.command()
 async def all_emoji(ctx):
     await ctx.send(', '.join([str(s) for s in ctx.guild.emojis]))
-    await ctx.send('\n'.join(['\\'+ str(s) for s in ctx.guild.emojis]))
+    await ctx.send('\n'.join(['/'+ str(s) for s in ctx.guild.emojis]))
 
 
 # @bot.command()

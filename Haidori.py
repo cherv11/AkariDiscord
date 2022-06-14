@@ -100,7 +100,7 @@ async def vkmessage(obj):
             if obj['text'].startswith(adb.prefix+'ds'):
                 name = obj['attachments'][0]['photo']['id']
                 pic = requests.get(obj['attachments'][0]['photo']['sizes'][-1]['url'].split('/')[-1])
-                pf = open(f'vk\\{name}', 'wb')
+                pf = open(f'vk/{name}', 'wb')
                 pf.write(pic.content)
                 pf.close()
         if obj['attachments'][0]['type'] == 'sticker':

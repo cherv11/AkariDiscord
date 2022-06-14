@@ -142,12 +142,12 @@ class Funx(commands.Cog):
             os.mkdir('memeUpload')
         for a in os.listdir('memeUpload'):
             if a.endswith((".png", ".jpg", ".gif")):
-                file = discord.File(fp=f'memeUpload\\{a}')
+                file = discord.File(fp=f'memeUpload/{a}')
                 try:
                     await ctx.send(file=file)
                     await asyncio.sleep(0.5)
                     if not de:
-                        os.remove(f'memeUpload\\{a}')
+                        os.remove(f'memeUpload/{a}')
                 except:
                     pass
 
@@ -186,7 +186,7 @@ class Funx(commands.Cog):
     @commands.command()
     async def phrase(self, ctx, *text: str):
         text = ' '.join(text)
-        file = open('pips\\phrases.txt', 'a', encoding='utf-8')
+        file = open('pips/phrases.txt', 'a', encoding='utf-8')
         file.write(text+'\n')
         file.close()
 

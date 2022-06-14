@@ -172,8 +172,8 @@ import time
 import re
 
 if os.path.exists('pips'):
-    rusdict = open('pips\\engwords.txt', 'r', encoding='utf-8').read().split('\n')
-    engdict = open('pips\\ruswords.txt', 'r', encoding='utf-8').read().split('\n')
+    rusdict = open('pips/engwords.txt', 'r', encoding='utf-8').read().split('\n')
+    engdict = open('pips/ruswords.txt', 'r', encoding='utf-8').read().split('\n')
 
 
 def ti(func):
@@ -501,13 +501,13 @@ def correct_word(word):
 
 # Файлы и прочее
 if os.path.exists('pips'):
-    errorpic = discord.File(fp='pips\\error.jpg')
-    progerpic = discord.File(fp='pips\\proger.png')
-    cannon = discord.File(fp='pips\\uranus.mp4')
-    mischat = discord.File(fp='pips\\mischat.png')
-    iqpic = discord.File(fp='pips\\iqpic.png')
-    streetracing = discord.File(fp='pips\\streetracing.png')
-    phrasestxt = open('pips\\phrases.txt', encoding='utf-8').readlines()
+    errorpic = discord.File(fp='pips/error.jpg')
+    progerpic = discord.File(fp='pips/proger.png')
+    cannon = discord.File(fp='pips/uranus.mp4')
+    mischat = discord.File(fp='pips/mischat.png')
+    iqpic = discord.File(fp='pips/iqpic.png')
+    streetracing = discord.File(fp='pips/streetracing.png')
+    phrasestxt = open('pips/phrases.txt', encoding='utf-8').readlines()
 
 
 # Обработка команд бота

@@ -18,7 +18,7 @@ log = logging.getLogger('Monopoly')
 log.setLevel(logging.INFO)
 if not os.path.exists('logs'):
     os.mkdir('logs')
-fh = logging.FileHandler(f'logs\\Monopoly-{time.strftime("%d.%m.%Y %H.%M", time.localtime())}.txt')
+fh = logging.FileHandler(f'logs/Monopoly-{time.strftime("%d.%m.%Y %H.%M", time.localtime())}.txt')
 fh.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)

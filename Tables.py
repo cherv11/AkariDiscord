@@ -40,7 +40,7 @@ class Tables(commands.Cog):
             await ctx.send('Максимальный размер — 75х50!')
             return
         tb = np.zeros((x, y), 'int')
-        np.save(f'tables\\{name}', tb)
+        np.save(f'tables/{name}', tb)
         await self.show(ctx, name)
 
     @commands.command()
