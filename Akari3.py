@@ -2890,7 +2890,6 @@ for i in adb.cogs:
 
 
 token = open('token.txt').readlines()[0]
-bot.load_extension('jishaku')
 bot.run(token)
 
 
