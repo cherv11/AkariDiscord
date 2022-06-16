@@ -24,6 +24,8 @@ from bs4 import BeautifulSoup
 from pyppeteer import launch
 
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
+# TODO: словари для описания команд и микрохелпа (списки на случай если нужно много страниц), ревизия команд
+# TODO: Логирование
 
 # Contents:
 # Vehicle class
@@ -426,7 +428,7 @@ async def dayphrase():
 
 @tasks.loop(minutes=1)
 async def achieve_giver():
-    if time.strftime("%M") == "30":
+    if time.strftime("%M") != "30":
         SQL.execute("SELECT * FROM achs")
         achs = SQL.fetchall()
         for m in expd[adb.bbag]:
@@ -830,6 +832,7 @@ async def picfinder(text, ch=None):
         if m.content == text:
             if m.attachments:
                 return m.attachments[0].url
+    raise ValueError(f"Encoded pic {text} not found")
 
 
 async def forceplay(name, channel):

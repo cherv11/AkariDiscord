@@ -51,7 +51,7 @@ class Pong:
                 if y in [-3, -1, self.FIELD_SIZE[1]]:
                     res += '-'
                 elif (x == 0 and -1 <= self.paddle_a_y-y <= 1) or (x == self.FIELD_SIZE[0]-1 and -1 <= self.paddle_b_y-y <= 1):
-                    res += '|'
+                    res += '#'
                 elif x == self.ball_cords[0] and y == self.ball_cords[1]:
                     res += '@'
                 else:
