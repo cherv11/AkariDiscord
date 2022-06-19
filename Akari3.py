@@ -1834,7 +1834,7 @@ def stacks(x):
 
 
 @bot.command()
-def quit(ctx):
+async def quit(ctx):
     if ctx.author.id != 262288342035595268:
         return
     os.abort()
