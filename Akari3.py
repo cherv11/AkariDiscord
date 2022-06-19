@@ -24,6 +24,7 @@ from bs4 import BeautifulSoup
 from pyppeteer import launch
 
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
+#        добаивить сообщения ВК в стату и общую стату
 # TODO: словари для описания команд и микрохелпа (списки на случай если нужно много страниц), ревизия команд
 # TODO: Логирование
 
@@ -1393,7 +1394,7 @@ async def bottledef(m, g=None, channel=None):
 
 @bot.command()
 async def bottle(ctx, mem=None):
-    if not ctx.author.id == 262288342035595268:
+    if ctx.author.id != 262288342035595268:
         return
     if mem:
         mem = finduserindex(mem, ctx.guild.id)
@@ -1831,9 +1832,16 @@ def mceil(a, b):
 def stacks(x):
     return x // 64, x % 64
 
+
+@bot.command()
+def quit(ctx):
+    if ctx.author.id != 262288342035595268:
+        return
+    os.abort()
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Blackout
-
 async def whiteoutdef(ctx):
     if not os.path.exists('whiteout.txt'):
         return
@@ -2892,7 +2900,7 @@ async def reload(ctx, extensions):
 
 for i in adb.cogs:
     bot.load_extension(i)
-
+bot.load_extension('jishaku')
 
 token = open('token.txt').readlines()[0]
 bot.run(token)

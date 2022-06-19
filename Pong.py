@@ -2,6 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands
 from collections import defaultdict
+import random
 
 pong_a = "<:pong_a:986404127988908103>"
 pong_z = "<:pong_z:986404133961613342>"
@@ -11,7 +12,7 @@ pong_m = "<:pong_m:986404132174856212>"
 
 class Pong:
     def __init__(self, channel_id, mem1, mem2):
-        self.FIELD_SIZE = [60, 25]
+        self.FIELD_SIZE = [57, 18]
         self.paddle_a_y = self.paddle_b_y = self.FIELD_SIZE[1] // 2
         self.ball_cords = [self.FIELD_SIZE[0] // 2, self.FIELD_SIZE[1] // 2]
         self.ball_speed = [2, 2]
@@ -25,9 +26,11 @@ class Pong:
         
     def draw_field(self):
         res = ''
+        space_kef = 1.5789
         for y in range(self.FIELD_SIZE[1]+4):
             y -= 3
             res += '|'
+            space_counter = 0
             if y == -2:
                 sign, a_chars, b_chars = self.FIELD_SIZE[0] // 2, 1, 1
                 if self.a_score > 9:
@@ -38,13 +41,13 @@ class Pong:
                     a_chars += 1
                 else:
                     b_chars += 1
-                res += ' '*(sign-a_chars)
+                res += ' ' * int((sign-a_chars) * space_kef)
                 if self.player == 1:
                     res += "<"
                 res += f"{self.a_score}:{self.b_score}"
                 if self.player == 2:
                     res += ">"
-                res += ' '*(self.FIELD_SIZE[0]-(sign+1+b_chars))
+                res += ' ' * int((self.FIELD_SIZE[0]-(sign+1+b_chars)) * space_kef)
                 res += '|\n'
                 continue
             for x in range(self.FIELD_SIZE[0]):
@@ -55,7 +58,8 @@ class Pong:
                 elif x == self.ball_cords[0] and y == self.ball_cords[1]:
                     res += '@'
                 else:
-                    res += ' '
+                    res += ' ' * int(space_kef * x - space_counter)
+                    space_counter += int(space_kef * x - space_counter)
             res += "|\n"
         return res
         
@@ -104,8 +108,8 @@ class Pong:
     def set_default_values(self):
         self.ball_cords[0] = self.FIELD_SIZE[0] // 2
         self.ball_cords[1] = self.FIELD_SIZE[1] // 2
-        self.ball_speed[0] = 1 if self.paddle_a_y % 2 == 0 else -1
-        self.ball_speed[1] = 1 if self.paddle_b_y % 2 == 0 else -1
+        self.ball_speed[0] = random.choice([-1, 1])
+        self.ball_speed[1] = random.choice([-1, 1])
         self.paddle_a_y = self.FIELD_SIZE[0] // 2
         self.paddle_b_y = self.FIELD_SIZE[0] // 2
             
@@ -131,7 +135,10 @@ class PongCog(commands.Cog):
                     pong.move_paddle(2, 1)
 
     @commands.command(aliases=["pong"])
-    async def run_pong(self, ctx, mem1: discord.Member, mem2: discord.Member = None):
+    async def run_pong(self, ctx, mem1: discord.Member = None, mem2: discord.Member = None):
+        if mem1 is None:
+            await ctx.channel.send(f"Determine a player!")
+            return
         if mem2 is None:
             mem2 = mem1
             mem1 = ctx.author
