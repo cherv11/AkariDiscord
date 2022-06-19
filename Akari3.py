@@ -308,9 +308,7 @@ def AELoad():
                     if e[2] == expd[g][m].bbagid:
                         expd[g][m].emos.append(code)
     for a in SQL.execute('SELECT * FROM achs').fetchall():
-        ach = {'name': a[2], 'level': a[3], 'icon': a[4],
-               'title': a[5], 'desc': a[6],
-               'date': a[7], 'owner': a[0]}
+        ach = {'owner': a[0], 'name': a[2], 'level': a[3], 'value': a[4], 'date': a[5]}
         expd[a[1]][a[0]].achs.append(ach)
 
 
@@ -429,6 +427,7 @@ async def dayphrase():
 
 @tasks.loop(minutes=1)
 async def achieve_giver():
+    return
     if time.strftime("%M") != "30":
         SQL.execute("SELECT * FROM achs")
         achs = SQL.fetchall()
@@ -442,14 +441,14 @@ async def achieve_giver():
                 nextvalue = c[nextlevel-1] if nextlevel <= len(c) else c[-1] + ac * (nextlevel-len(c))
                 value = adb.levelget(expd[adb.bbag][m].exp[s]) if s == 'exp' else expd[adb.bbag][m].exp[s]
                 if value >= nextvalue:
-                    ach = {'name': n, 'level': nextlevel, 'icon': emosdict[50][icon],
-                           'title': f'{t} {adb.to_roman(nextlevel)}',
-                           'desc': d.format(nextvalue),
+                    ach = {'name': n, 'level': nextlevel, 'value': nextvalue,
                            'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': m}
+                    title = f'{t} {adb.to_roman(nextlevel)}'
+                    desc = d.format(nextvalue)
                     expd[adb.bbag][m].achs.append(ach)
                     purl = await picfinder(icon)
                     emb = discord.Embed(title='Achievement get!',
-                                        description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][m])}')
+                                        description=f'**{title}**\n{desc}\nНаграду получил: {rolemention(expd[adb.bbag][m])}')
                     emb.set_image(url=purl)
                     await mainchannel.send(embed=emb)
                     save_achieve(ach)
@@ -2181,24 +2180,33 @@ def sum_stats(g=adb.bbag):
 
 
 async def sum_achieve(mem, flags):
+    return
     stats = sum_stats()
+    SQL.execute("SELECT * FROM achs")
+    achs = SQL.fetchall()
     for i in adb.sum_achieves:
         s, lv, n, t, d = i['stat'], i["levelvalue"], i["name"], i["title"], i["desc"]
-        if stats[s] % lv == 0 and s in flags:
+        if s in flags:
+            cur_levels = [a[3] for a in achs if a[0] == mem and a[2] == n]
+            nextlevel = max(cur_levels) + 1 if cur_levels else 1
             lvl = int(stats[s] // lv)
-            ach = {'name': n, 'level': lvl, 'icon': emosdict[50][n], 'title': f"{t} {adb.to_roman(lvl)}", 'desc': d.format(stats[s]), 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
-            expd[adb.bbag][mem].achs.append(ach)
-            purl = await picfinder(n)
-            emb = discord.Embed(title='Achievement get!', description=f'**{ach["title"]}**\n{ach["desc"]}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
-            emb.set_image(url=purl)
-            await mainchannel.send(embed=emb)
-            save_achieve(ach)
-            await expd[adb.bbag][mem].addexp(adb.e_sumach, reason=f'{n} {adb.to_roman(lvl)}')
+            if lvl >= nextlevel:
+                nextvalue = lv * lvl
+                ach = {'name': n, 'level': lvl, 'value': nextvalue, 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+                title = f"{t} {adb.to_roman(lvl)}"
+                desc = d.format(nextvalue)
+                expd[adb.bbag][mem].achs.append(ach)
+                purl = await picfinder(n)
+                emb = discord.Embed(title='Achievement get!', description=f'**{title}**\n{desc}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
+                emb.set_image(url=purl)
+                await mainchannel.send(embed=emb)
+                save_achieve(ach)
+                await expd[adb.bbag][mem].addexp(1000, reason=f'{n} {adb.to_roman(lvl)}')
 
 
 def save_achieve(ach):
-    sql_insert = 'INSERT INTO achs(id, server, name, level, icon, title, desc, date) VALUES (?,?,?,?,?,?,?,?)'
-    SQL.execute(sql_insert, (ach['owner'], adb.bbag, ach['name'], ach['level'], ach['icon'], ach['title'], ach['desc'], ach['date']))
+    sql_insert = 'INSERT INTO achs(id, server, name, level, value, date) VALUES (?,?,?,?,?,?)'
+    SQL.execute(sql_insert, (ach['owner'], adb.bbag, ach['name'], ach['level'], ach['value'], ach['date']))
     db.commit()
 
 
