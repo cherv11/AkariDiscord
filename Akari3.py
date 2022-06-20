@@ -22,11 +22,11 @@ from PIL import ImageFont
 from PIL import ImageDraw
 from bs4 import BeautifulSoup
 from pyppeteer import launch
+import logging
 
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
 #        добаивить сообщения ВК в стату и общую стату
 # TODO: словари для описания команд и микрохелпа (списки на случай если нужно много страниц), ревизия команд
-# TODO: Логирование
 
 # Contents:
 # Vehicle class
@@ -60,8 +60,22 @@ bot = commands.Bot(command_prefix=adb.prefix, intents=discord.Intents.all())
 bot.remove_command("help")
 start_time = time.time()
 
+# Logging
+logger = logging.getLogger('AkariWood')
+logger.setLevel(logging.INFO)
+if not os.path.exists('logs'):
+    os.mkdir('logs')
+fh = logging.FileHandler(f'logs/Akari-{time.strftime("%d.%m.%Y-%H.%M", time.localtime())}.txt')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+def logg(x):
+    return logger.info(re.sub(r'[^\w\s:()\-<>.,/]|\n', '', x))
+
+
 # Some Vars
 activetimers = []
+achs = []
 expd = defaultdict(dict)
 emosdict = defaultdict(dict)
 meslogs = defaultdict(list)
@@ -99,15 +113,11 @@ class Vehicle:
     """
     experience, statistics, custom user-linked emojis, nexus items and stuff
     """
-    def __init__(self, sd, new=False, achs=None):
+    def __init__(self, sd, new=False):
         self.id = int(sd[0])
         self.server = int(sd[1])
         self.emos = []
         self.bottle = False
-        if achs:
-            self.achs = achs
-        else:
-            self.achs = []
         if new:
             self.exp = defaultdict(int)
             self.bbagid = 0
@@ -158,8 +168,10 @@ class Vehicle:
         if reason:
             if reason != 'online':
                 print(f'{self.name} получил {eadd} exp ({reason})')
+            logg(f'exp: {self.name} ({self.server}/{self.id}) <- {eadd} exp ({reason})')
         else:
             print(f'{self.name} получил {eadd} exp')
+            logg(f'exp: {self.name} ({self.server}/{self.id}) <- {eadd} exp')
         lvl_new = adb.levelget(self.exp['exp'])
         if lvl_new > lvl and self.bbagid <= 10:
             if self.server == adb.bbag:
@@ -182,6 +194,7 @@ class Vehicle:
                 return
             await channel.send(f'{rolemention(self)} апнул новый **{lvl_new}** уровень!', file=number_gif(lvl_new))
             print(f'{self.name} апнул {lvl_new} уровень!')
+            logg(f'lvlup: {self.name} ({self.server}/{self.id}) <- {lvl_new} уровень!')
 
 
 class Nexus:
@@ -309,7 +322,7 @@ def AELoad():
                         expd[g][m].emos.append(code)
     for a in SQL.execute('SELECT * FROM achs').fetchall():
         ach = {'owner': a[0], 'name': a[2], 'level': a[3], 'value': a[4], 'date': a[5]}
-        expd[a[1]][a[0]].achs.append(ach)
+        achs.append(ach)
 
 
 def AESavedef():
@@ -332,11 +345,13 @@ def AESavedef():
                     f"UPDATE exp SET vkmes = {i['vkmes']}, lastbottle = '{i['lastbottle']}' WHERE id = {m} AND server = {g}")
                 SQL.execute(
                     f"UPDATE exp SET dayphrases = {i['dayphrases']}, stickers = {i['stickers']} WHERE id = {m} AND server = {g}")
-                db.commit()
+    db.commit()
+    logg(f'aesave: DB saved!')
 
 
 @tasks.loop(minutes=adb.e_savetime)
 async def AESavetask():
+    logg(f'aesave: Saving DB after a while...')
     AESavedef()
 
 
@@ -363,6 +378,7 @@ async def online_counter():
             await expd[adb.bbag][m].addexp(adb.e_online, reason='online')
             expd[adb.bbag][m].exp['online'] += adb.e_onlinetime
             await sum_achieve(m, {"online": True})
+            await asyncio.sleep(1)
 
 
 @tasks.loop(hours=1)
@@ -423,36 +439,37 @@ async def dayphrase():
         mes = await mainchannel.send(embed=emb)
         await mes.add_reaction(get_emoji('TemaOr'))
         await mes.add_reaction(get_emoji('Tthinking'))
+        logg(f'aesave: Saving DB after a dayphrase')
+        AESavedef()
 
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=3)
 async def achieve_giver():
-    return
-    if time.strftime("%M") != "30":
-        SQL.execute("SELECT * FROM achs")
-        achs = SQL.fetchall()
-        for m in expd[adb.bbag]:
-            if not 0 < expd[adb.bbag][m].bbagid < 11:
-                continue
-            for i in adb.achieves:
-                c, ac, s, n, t, d, icon = i['counts'], i['addcount'], i['stat'], i['name'], i['title'], i['desc'], i['icon']
-                cur_levels = [a[3] for a in achs if a[0] == m and a[2] == n]
-                nextlevel = max(cur_levels)+1 if cur_levels else 1
-                nextvalue = c[nextlevel-1] if nextlevel <= len(c) else c[-1] + ac * (nextlevel-len(c))
-                value = adb.levelget(expd[adb.bbag][m].exp[s]) if s == 'exp' else expd[adb.bbag][m].exp[s]
-                if value >= nextvalue:
-                    ach = {'name': n, 'level': nextlevel, 'value': nextvalue,
-                           'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': m}
-                    title = f'{t} {adb.to_roman(nextlevel)}'
-                    desc = d.format(nextvalue)
-                    expd[adb.bbag][m].achs.append(ach)
-                    purl = await picfinder(icon)
-                    emb = discord.Embed(title='Achievement get!',
-                                        description=f'**{title}**\n{desc}\nНаграду получил: {rolemention(expd[adb.bbag][m])}')
-                    emb.set_image(url=purl)
-                    await mainchannel.send(embed=emb)
-                    save_achieve(ach)
-                    await expd[adb.bbag][m].addexp(adb.e_ach, reason=f'{n} {adb.to_roman(nextlevel)}')
+    for m in expd[adb.bbag]:
+        if not 0 < expd[adb.bbag][m].bbagid < 11:
+            continue
+        for i in adb.achieves:
+            c, ac, s, n, t, d, icon = i['counts'], i['addcount'], i['stat'], i['name'], i['title'], i['desc'], i['icon']
+            cur_levels = [a['level'] for a in achs if a['owner'] == m and a['name'] == n]
+            nextlevel = max(cur_levels) + 1 if cur_levels else 1
+            nextvalue = c[nextlevel - 1] if nextlevel <= len(c) else c[-1] + ac * (nextlevel - len(c))
+            value = adb.levelget(expd[adb.bbag][m].exp[s]) if s == 'exp' else expd[adb.bbag][m].exp[s]
+            if value >= nextvalue:
+                ach = {'name': n, 'level': nextlevel, 'value': nextvalue,
+                       'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': m}
+                achs.append(ach)
+                save_achieve(ach)
+                title = f'{t} {adb.to_roman(nextlevel)}'
+                desc = d.format(nextvalue)
+                purl = await picfinder(icon)
+                emb = discord.Embed(title='Achievement get!',
+                                    description=f'**{title}**\n{desc}\nНаграду получил: {rolemention(expd[adb.bbag][m])}')
+                emb.set_image(url=purl)
+                await mainchannel.send(embed=emb)
+                await expd[adb.bbag][m].addexp(adb.e_ach + nextlevel * adb.e_ach_lvladd,
+                                               reason=f'{n} {adb.to_roman(nextlevel)}')
+                logg(f'aesave: Saving DB after giving an achieve')
+                AESavedef()
 
 
 @tasks.loop(hours=1)
@@ -465,9 +482,9 @@ async def bbag_reminder():
         await mes.add_reaction('<:agroMornyX:833000410976354334>')
 
 
-@tasks.loop(hours=24)
+@tasks.loop(hours=1)
 async def all_guilds_save():
-    if time.strftime("%d") == "24":
+    if time.strftime("%d") == "24" and time.strftime("%H") == "11":
         if adb.if_host:
             for g in bot.guilds:
                 savepics = 'False' if g.id in adb.guildsave_pic_blacklist else ''
@@ -757,7 +774,7 @@ async def nexus_daily():
                     if dmg > maxdmg:
                         maxdmg = dmg
                         maxdmgp = p
-                    await expd[adb.bbag][p].addexp(int(adb.e_nexwinner * halfor))
+                    await expd[adb.bbag][p].addexp(int(adb.e_nexwinner * halfor), reason='Nexus winner!')
                 for p in list(nexus1.players.keys()) + list(nexus2.players.keys()):
                     expd[adb.bbag][p].nitems = defaultdict(int)
                     expd[adb.bbag][p].nplayer = defaultdict(int)
@@ -843,7 +860,7 @@ async def forceplay(name, channel):
         except:
             pass
         voice = discord.utils.get(bot.voice_clients, guild=guild)
-        voice.play(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source=f'music/{name}'))
+        voice.play(discord.FFmpegOpusAudio(source=f'music/{name}'))
         voice.source = discord.PCMVolumeTransformer(voice.source)
         voice.source.volume = 100
     except:
@@ -901,6 +918,7 @@ async def on_message(message):
                         pass
                 name = expd[message.guild.id][message.author.id].name
                 print(f'{name} применил {i}')
+                logg(f'command: {name} ({message.guild.id}/{message.author.id}) -> {i}')
                 sql_insert = 'INSERT INTO commlog(id, server, name, command, date) VALUES (?,?,?,?,?)'
                 SQL.execute(sql_insert, (message.author.id, message.guild.id, name, i, time.strftime("%d.%m.%Y, %X", time.localtime())))
                 db.commit()
@@ -937,6 +955,7 @@ async def on_message_edit(_, new):
                     await new.delete()
                 name = expd[new.guild.id][new.author.id].name
                 print(f'{name} применил {i}')
+                logg(f'command_edit: {name} ({new.guild.id}/{new.author.id}) -> {i}')
                 sql_insert = 'INSERT INTO commlog(id, server, name, command, date) VALUES (?,?,?,?,?)'
                 SQL.execute(sql_insert, (
                 new.author.id, new.guild.id, name, i, time.strftime("%d.%m.%Y, %X", time.localtime())))
@@ -973,6 +992,7 @@ async def on_ready():
     await logchannel.send(gr, delete_after=30)
     print(gr)
     all_guilds_save.start()
+    logg("start: Bot started, all tasks work and tables loaded!")
     activity = discord.Activity(name=f"Плюётся в людей | {adb.prefix}help", type=0)
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
@@ -1135,7 +1155,8 @@ async def on_member_remove(member):
 @bot.event
 async def on_member_update(before, after):
     if before.display_name != after.display_name:
-        print(f'{before.display_name} сменил имя на {after.display_name}')
+        print(f'{before.display_name} ({before.guild.id}/{before.id}) сменил имя на {after.display_name}')
+        logg(f'changename: {expd[after.guild.id][after.id].name} ({after.id}/{after.guild.id}) {before.display_name} -> {after.display_name}')
         sql_insert = 'INSERT INTO changenicks(id, server, before, after, time) VALUES (?,?,?,?,?)'
         SQL.execute(sql_insert, (after.id, after.guild.id, before.display_name, after.display_name, time.strftime("%d.%m.%Y, %X", time.localtime())))
         db.commit()
@@ -1389,6 +1410,8 @@ async def bottledef(m, g=None, channel=None):
         await mem.add_roles(role)
     db.commit()
     await channel.send(embed=emb)
+    logg(f'aesave: Saving DB after giving a bottle')
+    AESavedef()
 
 
 @bot.command()
@@ -2005,7 +2028,7 @@ async def AkariExp(mes):
         for u in mes.raw_mentions:
             if u == m or u not in ids:
                 continue
-            await expd[g][u].addexp(adb.e_men, mes.channel)
+            await expd[g][u].addexp(adb.e_men, mes.channel, 'mention')
             expd[g][u].exp['mentions'] += 1
             flags['mentions'] = True
         for r in mes.raw_role_mentions:
@@ -2014,7 +2037,7 @@ async def AkariExp(mes):
             u = roles[r]
             if u == m or u not in ids:
                 continue
-            await expd[g][u].addexp(adb.e_men, mes.channel)
+            await expd[g][u].addexp(adb.e_men, mes.channel, 'role_mention')
             expd[g][u].exp['mentions'] += 1
             flags['mentions'] = True
         smiles = Counter(re.findall(r'<:\S{,10}:\S{,20}>', mes.content))
@@ -2033,7 +2056,7 @@ async def AkariExp(mes):
                     if s in smiles:
                         ecount = smiles[s]
                         if ecount > 0:
-                            await expd[g][u].addexp(adb.e_emo * ecount, mes.channel)
+                            await expd[g][u].addexp(adb.e_emo * ecount, mes.channel, 'smile')
                             expd[g][u].exp['smiles'] += ecount
                             flags['smiles'] = True
     if g == adb.bbag:
@@ -2132,6 +2155,7 @@ async def vkExp(mes):
 
 def save_vk_comm(e, comm):
     print(f'{e.name} применил {comm}')
+    logg(f'command_vk: {e.name} ({e.server}/{e.id}) -> {comm}')
     sql_insert = 'INSERT INTO commlog(id, server, name, command, date) VALUES (?,?,?,?,?)'
     SQL.execute(sql_insert, (e.id, e.server, e.name, comm, time.strftime("%d.%m.%Y, %X", time.localtime())))
     db.commit()
@@ -2155,6 +2179,7 @@ async def aerecount(ctx, password=''):
 
 @bot.command()
 async def aesave(ctx):
+    logg(f'aesave: Saving DB after user request')
     AESavedef()
     await ctx.send('Готово!', delete_after=5)
 
@@ -2180,28 +2205,27 @@ def sum_stats(g=adb.bbag):
 
 
 async def sum_achieve(mem, flags):
-    return
     stats = sum_stats()
-    SQL.execute("SELECT * FROM achs")
-    achs = SQL.fetchall()
     for i in adb.sum_achieves:
         s, lv, n, t, d = i['stat'], i["levelvalue"], i["name"], i["title"], i["desc"]
         if s in flags:
-            cur_levels = [a[3] for a in achs if a[0] == mem and a[2] == n]
-            nextlevel = max(cur_levels) + 1 if cur_levels else 1
+            cur_levels = [a['level'] for a in achs if a['name'] == n]
             lvl = int(stats[s] // lv)
-            if lvl >= nextlevel:
+            if lvl == 0: continue
+            if not cur_levels or lvl > max(cur_levels):
                 nextvalue = lv * lvl
                 ach = {'name': n, 'level': lvl, 'value': nextvalue, 'date': time.strftime("%d.%m.%Y, %H:%M", time.localtime()), 'owner': mem}
+                achs.append(ach)
+                save_achieve(ach)
                 title = f"{t} {adb.to_roman(lvl)}"
                 desc = d.format(nextvalue)
-                expd[adb.bbag][mem].achs.append(ach)
                 purl = await picfinder(n)
                 emb = discord.Embed(title='Achievement get!', description=f'**{title}**\n{desc}\nНаграду получил: {rolemention(expd[adb.bbag][mem])}')
                 emb.set_image(url=purl)
                 await mainchannel.send(embed=emb)
-                save_achieve(ach)
-                await expd[adb.bbag][mem].addexp(1000, reason=f'{n} {adb.to_roman(lvl)}')
+                await expd[adb.bbag][mem].addexp(adb.e_sumach+lvl*adb.e_sumach_lvladd, reason=f'{n} {adb.to_roman(lvl)}')
+                logg(f'aesave: Saving DB after giving sum_achieve')
+                AESavedef()
 
 
 def save_achieve(ach):
@@ -2297,7 +2321,10 @@ async def channelexp(ctx, all=''):
         embed.add_field(name=f'Опыт: {i.exp["exp"]}', value=text, inline=False)
     await ctx.send(embed=embed)
     await ctx.send(f'Выполнено за {time.time() - stime}', delete_after=300)
-    print(f'channelexp {all} completed by {time.time() - stime}')
+    stamp = time.time() - stime
+    print(f'channelexp {all} completed by {stamp}')
+    allmes = f'server {ctx.guild.id}' if all == 'all' else f'channel {ctx.channel.id}'
+    logg(f'channelexp: {allmes} completed by {stamp}')
 
 
 async def channelsavedef(channel, pics='', name=None):
@@ -2389,8 +2416,10 @@ async def channelsavedef(channel, pics='', name=None):
     for x in dic:
         file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / words * 100, 3)) + '%'} — {dicdate[x[0]]}\n")
     file.write(f"Всего: {adb.postfix(len(dic), ('слово', 'слова', 'слов'))}")
-    await channel.send(f"Готово! ❖❖❖ {co} messages, {sum} symbols, {words} words, {round(words / (co - len(atts)), 2)} avg, {len(atts)} pics ❖❖❖ Выполнено за {time.time() - stime}")
-    print(f"{channel.name} channel saved! ❖❖❖ {co} messages, {sum} symbols, {words} words, {round(words / (co - len(atts)), 2)} avg, {len(atts)} pics ❖❖❖ Выполнено за {time.time() - stime}")
+    stamp = time.time() - stime
+    await channel.send(f"Готово! ❖❖❖ {co} messages, {sum} symbols, {words} words, {round(words / (co - len(atts)), 2)} avg, {len(atts)} pics ❖❖❖ Выполнено за {stamp}")
+    print(f"{channel.name} channel saved! ❖❖❖ {co} messages, {sum} symbols, {words} words, {round(words / (co - len(atts)), 2)} avg, {len(atts)} pics ❖❖❖ Выполнено за {stamp}")
+    logg(f"channelsave: {channel.name} ({channel.guild.id}/{channel.id}) saved with {co} mes, {sum} sym, {words} words, {round(words / (co - len(atts)), 2)} avg, {len(atts)} pics. Done for {stamp}")
 
 
 @bot.command()
@@ -2400,6 +2429,7 @@ async def channelsave(ctx, pics='', name=None):
 
 async def guildsavedef(guild, channel=None, pics='', dirr=None):
     print(f'\033[33m\033[4mStarting backup {guild.name}...\033[0m')
+    logg(f'guildsave: Backup of {guild.name} ({guild.id}) started!')
     stime = time.time()
     cve = {}
     if not dirr:
@@ -2411,7 +2441,8 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
     dicdate = defaultdict(str)
     for c in guild.text_channels:
         name = c.name
-        print(f'\033[32m{c.name}... \033[0m')
+        print(f'\033[32m{name}... \033[0m')
+        logg(f'guildsave: Backup of {name} ({guild.id}/{c.id}) started!')
         if not os.path.exists(f'{dirr}/{name}'):
             os.mkdir(f'{dirr}/{name}')
         file = open(f'{dirr}/{name}/{name}.txt', 'w', encoding='utf-8')
@@ -2476,18 +2507,19 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
             else:
                 file.write(d)
         ch_words = len(ch_dic)
-        if co - len(atts) == 0:
-            file.write(f"⨌{co} messages, {sym} symbols, {ch_words} words, N/A avg, {len(atts)} pics, {time.time() - ntime} seconds to parse\n")
-        else:
-            file.write(f"⨌{co} messages, {sym} symbols, {ch_words} words, {round(ch_words / (co - len(atts)), 2)} avg, {len(atts)} pics, {time.time() - ntime} seconds to parse\n")
+        nstamp = time.time() - ntime
+        avgsyms = str(round(ch_words / (co - len(atts)), 2)) if co - len(atts) == 0 else 'N/A'
+        file.write(f"⨌{co} messages, {sym} symbols, {ch_words} words, {avgsyms} avg, {len(atts)} pics, {nstamp} seconds to parse\n")
         file = open(f'{dirr}/{name}/dict.txt', 'w', encoding='utf-8')
         ch_dic = adb.ownname(Counter(ch_dic)).most_common()
         for x in ch_dic:
             file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / ch_words * 100, 3)) + '%'} — {ch_dicdate[x[0]]}\n")
         file.write(f"Всего: {adb.postfix(len(ch_dic), ('слово', 'слова', 'слов'))}")
-        print(f'\033[32m{c.name} done!\033[0m')
+        print(f'\033[32m{name} done!\033[0m')
+        logg(f'guildsave: Backup of {name} ({guild.id}/{c.id}) done with {co} mes, {sym} sym, {ch_words} words, {avgsyms} avg, {len(atts)} pics. Done for {nstamp}')
     words = len(dic)
-    total = f"⨌{count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics, {time.time() - stime} seconds to parse\n\n"
+    stamp = time.time() - stime
+    total = f"⨌{count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics, {stamp} seconds to parse\n\n"
     file = open(f'{dirr}/total.txt', 'w', encoding='utf-8')
     file.write(total)
     cve_main = adb.esort_ext(cve, 'allmessages', 'onserver', True)
@@ -2516,8 +2548,9 @@ async def guildsavedef(guild, channel=None, pics='', dirr=None):
         file.write(f"{x[0]} — {adb.postfix(x[1], ('раз', 'раза', 'раз'))}, {str(round(x[1] / words * 100, 3)) + '%'} — {dicdate[x[0]]}\n")
     file.write(f"Всего: {adb.postfix(len(dic), ('слово', 'слова', 'слов'))}")
     if channel:
-        await channel.send(f"Готово! ❖❖❖ {count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics ❖❖❖ Выполнено за {time.time() - stime}")
-    print(f"{guild.name} saved! ❖❖❖ {count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics ❖❖❖ Выполнено за {time.time() - stime}")
+        await channel.send(f"Готово! ❖❖❖ {count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics ❖❖❖ Выполнено за {stamp}")
+    print(f"{guild.name} saved! ❖❖❖ {count} messages, {sum} symbols, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics ❖❖❖ Выполнено за {stamp}")
+    logg(f'guildsave: Backup of {guild.name} ({guild.id}) done with {count} mes, {sum} sym, {words} words, {round(words / (count - all_atts), 2)} avg, {all_atts} pics. Done for {stamp}')
 
 
 @bot.command()

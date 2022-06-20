@@ -16,13 +16,14 @@ db = sqlite3.connect(os.path.join(DIR, "Monopoly.db"))
 SQL = db.cursor()
 log = logging.getLogger('Monopoly')
 log.setLevel(logging.INFO)
-if not os.path.exists('logs'):
-    os.mkdir('logs')
-fh = logging.FileHandler(f'logs/Monopoly-{time.strftime("%d.%m.%Y %H.%M", time.localtime())}.txt')
+if not os.path.exists('MonopolyLogs'):
+    os.mkdir('MonopolyLogs')
+fh = logging.FileHandler(f'MonopolyLogs/Monopoly-{time.strftime("%d.%m.%Y-%H.%M", time.localtime())}.txt')
 fh.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 log.addHandler(fh)
+
 moves = ['Следующим ходит: {0}', '{0}, ваш ход!']
 emos = ['🤪', '🥐', '🌭', '🦄', '🤬', '🛶', '📡']
 ai_names = ['Bot Dima', 'Bot Max', 'Bot Danil', 'Bot Ilyuha']
