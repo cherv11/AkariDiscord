@@ -325,7 +325,7 @@ def AELoad():
         achs.append(ach)
 
 
-def AESavedef():
+def AESavedef(reason=None):
     for g in expd:
         for m in expd[g]:
             i = expd[g][m].exp
@@ -346,12 +346,14 @@ def AESavedef():
                 SQL.execute(
                     f"UPDATE exp SET dayphrases = {i['dayphrases']}, stickers = {i['stickers']} WHERE id = {m} AND server = {g}")
     db.commit()
-    logg(f'aesave: DB saved!')
+    if reason:
+        logg(f'aesave: DB saved after '+reason)
+    else:
+        logg(f'aesave: DB saved after a while...')
 
 
 @tasks.loop(minutes=adb.e_savetime)
 async def AESavetask():
-    logg(f'aesave: Saving DB after a while...')
     AESavedef()
 
 
@@ -439,8 +441,7 @@ async def dayphrase():
         mes = await mainchannel.send(embed=emb)
         await mes.add_reaction(get_emoji('TemaOr'))
         await mes.add_reaction(get_emoji('Tthinking'))
-        logg(f'aesave: Saving DB after a dayphrase')
-        AESavedef()
+        AESavedef('a dayphrase')
 
 
 @tasks.loop(minutes=3)
@@ -468,8 +469,7 @@ async def achieve_giver():
                 await mainchannel.send(embed=emb)
                 await expd[adb.bbag][m].addexp(adb.e_ach + nextlevel * adb.e_ach_lvladd,
                                                reason=f'{n} {adb.to_roman(nextlevel)}')
-                logg(f'aesave: Saving DB after giving an achieve')
-                AESavedef()
+                AESavedef('giving an achieve')
 
 
 @tasks.loop(hours=1)
@@ -1410,8 +1410,7 @@ async def bottledef(m, g=None, channel=None):
         await mem.add_roles(role)
     db.commit()
     await channel.send(embed=emb)
-    logg(f'aesave: Saving DB after giving a bottle')
-    AESavedef()
+    AESavedef('giving a bottle')
 
 
 @bot.command()
@@ -1843,7 +1842,7 @@ async def AkariCalculatingProcessor(message):
         a = vars["a"]
         await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {a}')
     except Exception as e:
-        if 'invalid syntax' not in e:
+        if 'invalid syntax' not in str(e):
             await message.channel.send(f'{get_emoji("AgroMornyX")} {e}')
 
 
@@ -2179,8 +2178,7 @@ async def aerecount(ctx, password=''):
 
 @bot.command()
 async def aesave(ctx):
-    logg(f'aesave: Saving DB after user request')
-    AESavedef()
+    AESavedef('user request')
     await ctx.send('Готово!', delete_after=5)
 
 
@@ -2224,8 +2222,7 @@ async def sum_achieve(mem, flags):
                 emb.set_image(url=purl)
                 await mainchannel.send(embed=emb)
                 await expd[adb.bbag][mem].addexp(adb.e_sumach+lvl*adb.e_sumach_lvladd, reason=f'{n} {adb.to_roman(lvl)}')
-                logg(f'aesave: Saving DB after giving sum_achieve')
-                AESavedef()
+                AESavedef('giving sum_achieve')
 
 
 def save_achieve(ach):
