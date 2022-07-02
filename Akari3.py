@@ -1,3 +1,7 @@
+from math import *
+from random import *
+from functools import *
+from AkariDB import stacks, mceil
 import discord
 from discord.ext import commands, tasks
 import sqlite3
@@ -7,10 +11,9 @@ import AkariDB as adb
 import io
 import ast
 import asyncio
-import random
 import time
 import math
-from math import *
+import random
 import requests
 from collections import Counter, defaultdict
 import shutil
@@ -23,6 +26,7 @@ from PIL import ImageDraw
 from bs4 import BeautifulSoup
 from pyppeteer import launch
 import logging
+from rnnmorph.predictor import RNNMorphPredictor
 
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
 #        добаивить сообщения ВК в стату и общую стату
@@ -60,6 +64,8 @@ bot = commands.Bot(command_prefix=adb.prefix, intents=discord.Intents.all())
 bot.remove_command("help")
 start_time = time.time()
 
+predictor = RNNMorphPredictor(language="ru")
+
 # Logging
 logger = logging.getLogger('AkariWood')
 logger.setLevel(logging.INFO)
@@ -81,6 +87,7 @@ emosdict = defaultdict(dict)
 meslogs = defaultdict(list)
 mlFlags = defaultdict(bool)
 quis = {}
+ACPvars = {}
 
 # Future Vars
 bbag = None
@@ -932,6 +939,7 @@ async def on_message(message):
         await AkariCatch(message)
         await AkariCoderEvent(message)
         await AkariCalculatingProcessor(message)
+        await AkariMetrics(message)
     await memlog(message)
     if message.channel.id == adb.vkchannel:
         await vkExp(message)
@@ -1822,10 +1830,10 @@ async def rantime(ctx, *args):
 async def AkariCalculatingProcessor(message):
     t = message.content
     u = message.author
-    if not t or not t[0].isdigit() or t.isdigit():
+    if not t or t.isdigit(): # or (not t[0].isdigit() and not t[0] == '(' and not t[0] == '#'):
         return
-    for i in re.findall(r'[^\W\d]+\.', t):
-        if 'math.' not in i and 'adb.' not in i:
+    for i in re.findall(r'[A-Za-z]+\.[A-Za-z]+', t):
+        if all(j not in i for j in ['math.', 'random.', 'adb.']):
             await message.channel.send('ТЫ АХУЕЛ?')
             return
     for i in ['exit', 'quit']:
@@ -1833,25 +1841,60 @@ async def AkariCalculatingProcessor(message):
             await message.channel.send('ТЫ АХУЕЛ?')
             return
     try:
-        t = re.sub(r'[xхч]', '*', t)
+        ACPvars['result'] = 0
+        if "#" in t and not t.endswith("#"):
+            t, tt = t.split("#")[:2]
+            vars = {'result': 0}
+            for i in tt.split(","):
+                m, n = i.split("=")
+                m = m.strip()
+                n = n.strip()
+                exec('result='+n, globals(), vars)
+                ACPvars[m] = vars['result'] if not adb.is_float(vars['result']) or int(vars['result']) != float(vars['result']) else int(vars['result'])
         t = re.sub(r'==', '=', t)
         t = re.sub(r'=', '==', t)
         t = re.sub(r'\^', '**', t)
-        vars = {'a': 0}
-        exec('a='+t, globals(), vars)
-        a = vars["a"]
-        await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {a}')
+        exec('result='+t, globals(), ACPvars)
+        res = ACPvars["result"] if not adb.is_float(ACPvars["result"]) or int(ACPvars["result"]) != float(ACPvars["result"]) else int(ACPvars["result"])
+        await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {res}')
     except Exception as e:
-        if 'invalid syntax' not in str(e):
+        if all(i not in str(e) for i in ['invalid syntax', 'is not defined']):
             await message.channel.send(f'{get_emoji("AgroMornyX")} {e}')
 
 
-def mceil(a, b):
-    return b*math.ceil(a/b)
+async def AkariMetrics(message):
+    t = message.content
+    u = message.author
+    if not t:
+        return
+    num = re.findall(r'[\d]+', t)
+    if not num:
+        return
+    tl = t.split(" ")
+    num = num[0]
+    a = []
+    for s in tl:
+        reg = re.findall(r'[^\W\d_]+', s)
+        if reg:
+            a.append(reg[0])
+    res = predictor.predict(tl)
+    for i,s in enumerate(res):
+        if s.pos == 'NOUN' and 'Case=Gen' in s.tag:
+            await message.channel.send(f'{num} {tl[i]} тебе в жопу, {rolemention(expd[u.guild.id][u.id])}')
+            return
 
 
-def stacks(x):
-    return x // 64, x % 64
+@bot.command()
+async def nlp(ctx, *args):
+    a = []
+    for s in args:
+        reg = re.findall(r'[^\W\d_]+', s)
+        if reg:
+            a.append(reg[0])
+    res = predictor.predict(a)
+    res = [adb.pretty_nlp_tag(a[i], s) for i, s in enumerate(res)]
+    for i in adb.longsplit_lines(res):
+        await ctx.channel.send('```py\n'+i+'```')
 
 
 @bot.command()

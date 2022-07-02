@@ -439,16 +439,22 @@ def esortatte(l, attr, rev=False):
     return a
 
 
-def longsplit(mes, n):
-    l = len(mes)
-    if l <= n:
-        return [mes]
-    c = math.ceil(l/n)
+def longsplit(mes, n=1800):
+    return [mes[i:i+n] for i in range(0, len(mes), n)]
+
+
+def longsplit_lines(lst, n=1800, sep='\n'):
     res = []
-    for i in range(c-1):
-        res.append(mes[:n])
-        mes = mes[n:]
-    res.append(mes)
+    i = 0
+    s = ''
+    while i < len(lst):
+        while i < len(lst) and len(s)+len(lst[i])+1 < n:
+            if s:
+                s += sep
+            s += lst[i]
+            i += 1
+        res.append(s)
+        s = ''
     return res
 
 
@@ -502,6 +508,26 @@ def correct_word(word):
 
 def reverse_usability(l):
     return 1-functools.reduce(lambda a, b: a*b, [1-i for i in l])
+
+
+def is_float(a):
+    try:
+        float(a)
+        return True
+    except:
+        return False
+
+
+def pretty_nlp_tag(word, tag):
+    return f'{word:<15} | {tag.normal_form:<15} | {tag.pos:<4} | {" | ".join(tag.tag.split("|"))}'.replace("_", '-')
+
+
+def mceil(a, b):
+    return b*math.ceil(a/b)
+
+
+def stacks(x):
+    return x // 64, x % 64
 
 
 # Файлы и прочее
