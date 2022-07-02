@@ -170,6 +170,7 @@ import math
 import os
 import time
 import re
+import functools
 
 if os.path.exists('pips'):
     rusdict = open('pips/engwords.txt', 'r', encoding='utf-8').read().split('\n')
@@ -499,6 +500,10 @@ def correct_word(word):
     return res
 
 
+def reverse_usability(l):
+    return 1-functools.reduce(lambda a, b: a*b, [1-i for i in l])
+
+
 # Файлы и прочее
 if os.path.exists('pips'):
     errorpic = discord.File(fp='pips/error.jpg')
@@ -633,4 +638,3 @@ monop_sequences = {0: [(0,0), (0,1), (0,2), (0,3), (0,4), (0,5), (0,6), (0,7), (
                        (13,6), (13,7), (14,8), (15,8), (16,7), (16,6), (15,5), (14,5), (14,4), (14,3), (15,3), (16,2),
                        (16,1), (15,0), (14,0), (13,1), (13,2), (12,2), (11,2), (10,2), (9,2), (8,2), (7,2), (6,2),
                        (5,2), (4,2), (3,2), (2,2), (1,2), (0,3), (0,4)]}
-
