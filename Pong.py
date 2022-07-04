@@ -12,7 +12,7 @@ pong_m = "<:pong_m:986404132174856212>"
 
 class Pong:
     def __init__(self, channel_id, mem1, mem2):
-        self.FIELD_SIZE = [57, 18]
+        self.FIELD_SIZE = [70, 22]
         self.paddle_a_y = self.paddle_b_y = self.FIELD_SIZE[1] // 2
         self.ball_cords = [self.FIELD_SIZE[0] // 2, self.FIELD_SIZE[1] // 2]
         self.ball_speed = [2, 2]
@@ -26,11 +26,9 @@ class Pong:
         
     def draw_field(self):
         res = ''
-        space_kef = 1.5789
         for y in range(self.FIELD_SIZE[1]+4):
             y -= 3
             res += '|'
-            space_counter = 0
             if y == -2:
                 sign, a_chars, b_chars = self.FIELD_SIZE[0] // 2, 1, 1
                 if self.a_score > 9:
@@ -41,13 +39,13 @@ class Pong:
                     a_chars += 1
                 else:
                     b_chars += 1
-                res += ' ' * int((sign-a_chars) * space_kef)
+                res += ' ' * int(sign-a_chars)
                 if self.player == 1:
                     res += "<"
                 res += f"{self.a_score}:{self.b_score}"
                 if self.player == 2:
                     res += ">"
-                res += ' ' * int((self.FIELD_SIZE[0]-(sign+1+b_chars)) * space_kef)
+                res += ' ' * int(self.FIELD_SIZE[0]-(sign+1+b_chars))
                 res += '|\n'
                 continue
             for x in range(self.FIELD_SIZE[0]):
@@ -58,16 +56,15 @@ class Pong:
                 elif x == self.ball_cords[0] and y == self.ball_cords[1]:
                     res += '@'
                 else:
-                    res += ' ' * int(space_kef * x - space_counter)
-                    space_counter += int(space_kef * x - space_counter)
+                    res += ' '
             res += "|\n"
-        return res
+        return "```\n"+res+"```"
         
     def move_paddle(self, moving_player, value):
         if moving_player == 1:
-            self.paddle_a_y = max(min(self.paddle_a_y+value, self.FIELD_SIZE[1]-1), 1) 
+            self.paddle_a_y = max(min(self.paddle_a_y+value, self.FIELD_SIZE[1]-2), 1)
         elif moving_player == 2:
-            self.paddle_b_y = max(min(self.paddle_b_y+value, self.FIELD_SIZE[1]-1), 1) 
+            self.paddle_b_y = max(min(self.paddle_b_y+value, self.FIELD_SIZE[1]-2), 1)
             
     def tick(self):
         self.ball_cords[0] += self.ball_speed[0]
@@ -110,8 +107,8 @@ class Pong:
         self.ball_cords[1] = self.FIELD_SIZE[1] // 2
         self.ball_speed[0] = random.choice([-1, 1])
         self.ball_speed[1] = random.choice([-1, 1])
-        self.paddle_a_y = self.FIELD_SIZE[0] // 2
-        self.paddle_b_y = self.FIELD_SIZE[0] // 2
+        self.paddle_a_y = self.FIELD_SIZE[1] // 2
+        self.paddle_b_y = self.FIELD_SIZE[1] // 2
             
 
 class PongCog(commands.Cog):
@@ -123,16 +120,21 @@ class PongCog(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         if self.pongs[payload.channel_id]:
             pong = self.pongs[payload.channel_id]
+            mes = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             if payload.user_id == pong.mem1:
-                if payload.emoji == pong_a:
+                if str(payload.emoji) == pong_a:
                     pong.move_paddle(1, -1)
-                elif payload.emoji == pong_z:
+                    await mes.remove_reaction(pong_a, payload.member)
+                elif str(payload.emoji) == pong_z:
                     pong.move_paddle(1, 1)
+                    await mes.remove_reaction(pong_z, payload.member)
             elif payload.user_id == pong.mem2:
-                if payload.emoji == pong_k:
+                if str(payload.emoji) == pong_k:
                     pong.move_paddle(2, -1)
-                elif payload.emoji == pong_m:
+                    await mes.remove_reaction(pong_k, payload.member)
+                elif str(payload.emoji) == pong_m:
                     pong.move_paddle(2, 1)
+                    await mes.remove_reaction(pong_m, payload.member)
 
     @commands.command(aliases=["pong"])
     async def run_pong(self, ctx, mem1: discord.Member = None, mem2: discord.Member = None):

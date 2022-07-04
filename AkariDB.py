@@ -604,6 +604,7 @@ reload = '<:reload:849129952707870760>'
 
 nexus_on = False
 if_host = 'coconut.png' in os.listdir('.')
+tensor_on = if_host
 
 print(time.strftime("%d.%m.%Y, %X", time.localtime()))
 

@@ -26,7 +26,8 @@ from PIL import ImageDraw
 from bs4 import BeautifulSoup
 from pyppeteer import launch
 import logging
-from rnnmorph.predictor import RNNMorphPredictor
+if adb.tensor_on:
+    from rnnmorph.predictor import RNNMorphPredictor
 
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
 #        добаивить сообщения ВК в стату и общую стату
@@ -64,7 +65,8 @@ bot = commands.Bot(command_prefix=adb.prefix, intents=discord.Intents.all())
 bot.remove_command("help")
 start_time = time.time()
 
-predictor = RNNMorphPredictor(language="ru")
+if adb.tensor_on:
+    predictor = RNNMorphPredictor(language="ru")
 
 # Logging
 logger = logging.getLogger('AkariWood')
@@ -1318,8 +1320,8 @@ async def AkariCoderEvent(mes):
 
 
 def AkariCoder():
-    file = open('pips/AkariCode.txt', encoding='utf-8').read()
-    file2 = open('pips/AkariOnlyfuncs.txt', encoding='utf-8').read()
+    file = open('pips/AkariRunaCode.txt', encoding='utf-8').read()
+    file2 = open('pips/AkariRunaOnlyfuncs.txt', encoding='utf-8').read()
     file3 = open('pips/bbagdict.txt', encoding='utf-8').read()
     main = list(set(re.findall(r'[\w\.\[\]_]+', file)))
     code = list(set(file2.split(' ')))
@@ -1347,12 +1349,12 @@ def AkariCoder():
                     comm += f"@bot.event\n"
                 else:
                     comm += f"@bot.command()\n"
-                comm += f'async def {adb.ranget(main)}(ctx, {adb.ranget(main, random.randint(1, 3))}):\n  '
+                comm += f'async def {adb.ranget(words)}(ctx, {adb.ranget(main, random.randint(1, 3))}):\n  '
             else:
-                comm += f'async def {adb.ranget(main)}({adb.ranget(main, random.randint(2, 3))}):\n  '
+                comm += f'async def {adb.ranget(words)}({adb.ranget(main, random.randint(2, 3))}):\n  '
         else:
             comm += f'def {adb.ranget(words)}({adb.ranget(main, random.randint(2, 5))}):\n  '
-        comm += '\n  '.join([f'{random.choice(["await ", f"{adb.ranget(main)} = ", f"{adb.ranget(main)} += ", "return ", f"{adb.ranget(code)} "])}{adb.ranget(code)}' for _ in range(random.randint(1, 9))])
+        comm += '\n'.join([f'    {random.choice(["await ", f"{adb.ranget(main)} = ", f"{adb.ranget(main)} += ", "return ", f"{adb.ranget(code)} "])}{adb.ranget(code)}' for _ in range(random.randint(1, 9))])
         sym += len(comm)
         comms.append(comm)
     while sym > 1800:
@@ -1830,11 +1832,12 @@ async def rantime(ctx, *args):
 async def AkariCalculatingProcessor(message):
     t = message.content
     u = message.author
-    if not t or t.isdigit(): # or (not t[0].isdigit() and not t[0] == '(' and not t[0] == '#'):
+    if not t or t.isdigit():  # or (not t[0].isdigit() and not t[0] == '(' and not t[0] == '#'):
         return
     for i in re.findall(r'[A-Za-z]+\.[A-Za-z]+', t):
         if all(j not in i for j in ['math.', 'random.', 'adb.']):
-            await message.channel.send('ТЫ АХУЕЛ?')
+            if 'os.' in i or 'system.' in i:
+                await message.channel.send('ТЫ АХУЕЛ?')
             return
     for i in ['exit', 'quit']:
         if i in t:
@@ -1858,12 +1861,14 @@ async def AkariCalculatingProcessor(message):
         res = ACPvars["result"] if not adb.is_float(ACPvars["result"]) or int(ACPvars["result"]) != float(ACPvars["result"]) else int(ACPvars["result"])
         await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {res}')
     except Exception as e:
-        if all(i not in str(e) for i in ['invalid syntax', 'is not defined']):
+        if all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing']):
             await message.channel.send(f'{get_emoji("AgroMornyX")} {e}')
 
 
 async def AkariMetrics(message):
-    t = message.content
+    if not adb.tensor_on:
+        return
+    t = message.clean_content
     u = message.author
     if not t:
         return
@@ -1886,6 +1891,8 @@ async def AkariMetrics(message):
 
 @bot.command()
 async def nlp(ctx, *args):
+    if not adb.tensor_on:
+        return
     a = []
     for s in args:
         reg = re.findall(r'[^\W\d_]+', s)
