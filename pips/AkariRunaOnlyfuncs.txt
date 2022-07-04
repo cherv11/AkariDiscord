@@ -1,0 +1,4454 @@
+DIR = os.path.dirname(__file__)
+db = sqlite3.connect(os.path.join(DIR, "Akari.db"))
+SQL = db.cursor()
+vk_session = vk_api.VkApi(token=open('vktoken.txt').readlines()[0])
+vka = vk_session.get_api()
+client = discord.Client()
+bot = commands.Bot(command_prefix=adb.prefix, intents=discord.Intents.all())
+bot.remove_command("help")
+start_time = time.time()
+predictor = RNNMorphPredictor(language="ru")
+logger = logging.getLogger('AkariWood')
+logger.setLevel(logging.INFO)
+if not os.path.exists('logs'):
+os.mkdir('logs')
+fh = logging.FileHandler(f'logs/Akari-{time.strftime("%d.%m.%Y-%H.%M", time.localtime())}.txt')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+return logger.info(re.sub(r'[^\w\s:()\-<>.,/]|\n', '', x))
+activetimers = []
+achs = []
+expd = defaultdict(dict)
+emosdict = defaultdict(dict)
+meslogs = defaultdict(list)
+mlFlags = defaultdict(bool)
+quis = {}
+ACPvars = {}
+bbag = None
+programistishe = None
+monopolishe = None
+mainchannel = None
+logchannel = None
+nexus1 = None
+nexus2 = None
+nex1roles = []
+nex2roles = []
+kingrole = None
+mainchannel2 = None
+mainchannel2id = 823312775468023858
+self.id = int(sd[0])
+self.server = int(sd[1])
+self.emos = []
+self.bottle = False
+if new:
+self.exp = defaultdict(int)
+self.bbagid = 0
+self.role = defaultdict(int)
+self.name = None
+self.vkid = 0
+self.vkemo = ''
+return
+self.bbagid = int(sd[2])
+self.name = sd[3]
+self.exp = {'exp': int(sd[4]), 'allmessages': int(sd[5]), 'messages': int(sd[6]),
+'pictures': int(sd[7]), 'mentions': int(sd[8]), 'smiles': int(sd[9]),
+'mat': sd[14], 'online': sd[15], 'symbols': sd[16], 'selfsmiles': sd[17],
+'bottles': sd[18], 'dayphrases': sd[19], 'stickers': sd[20], 'vkmes': sd[21],
+'lastbottle': sd[22]}
+if sd[23]:
+print(f'На бутылке: {sd[3]} ({int(sd[0])})')
+self.bottle = True
+if sd[10]:
+self.role = {'id': int(sd[10]), 'color': int(sd[11], 16)}
+else:
+self.role = defaultdict(int)
+self.vkid = sd[12]
+self.vkemo = sd[13]
+c = [self.exp['allmessages'], self.exp['messages'], self.exp['pictures'], self.exp['mentions'], self.exp['smiles']]
+return f'{self.name} {self.id} from {self.server}, exp: {self.exp["exp"]}, counters={c}'
+if self.id == other.id and self.server == other.server:
+return True
+return False
+if eadd == 0:
+return
+if self.server == adb.bbag:
+if not mem:
+mem = bot.get_guild(self.server).get_member(self.id)
+roles = [i.id for i in mem.roles]
+if adb.congrats in roles:
+eadd = int(eadd * adb.ek_congrats)
+if self.bottle:
+eadd = int(eadd * adb.ek_bottle)
+lvl = adb.levelget(self.exp['exp'])
+self.exp['exp'] += eadd
+if reason:
+if reason != 'online':
+print(f'{self.name} получил {eadd} exp ({reason})')
+logg(f'exp: {self.name} ({self.server}/{self.id}) <- {eadd} exp ({reason})')
+else:
+print(f'{self.name} получил {eadd} exp')
+logg(f'exp: {self.name} ({self.server}/{self.id}) <- {eadd} exp')
+lvl_new = adb.levelget(self.exp['exp'])
+if lvl_new > lvl and self.bbagid <= 10:
+if self.server == adb.bbag:
+if not channel:
+channel = mainchannel
+if os.path.exists('music') and os.listdir('music') and mem:
+sound = random.choice(os.listdir('music'))
+if mem.voice and mem.voice.channel:
+await forceplay(sound, mem.voice.channel)
+else:
+vv = None
+vvn = -1
+for vc in mem.guild.voice_channels:
+if len(vc.members) > vvn:
+vvn = len(vc.members)
+vv = vc
+if vvn > 0:
+await forceplay(sound, vv)
+else:
+return
+await channel.send(f'{rolemention(self)} апнул новый **{lvl_new}** уровень!', file=number_gif(lvl_new))
+print(f'{self.name} апнул {lvl_new} уровень!')
+logg(f'lvlup: {self.name} ({self.server}/{self.id}) <- {lvl_new} уровень!')
+self.bot = bot
+self.monop_channelid = adb.monopolishe
+self.monop_channel = None
+self.maptype = 0
+self.map = None
+self.mapmes = None
+self.playmes = None
+self.infomes = None
+self.sellmes = None
+self.stockmes = None
+self.trademes = None
+self.curblock = ''
+self.players = []
+self.player_colors = []
+self.w8react = []
+self.on = False
+self.ongame = {}
+self.credits = defaultdict(dict)
+self.pledges = defaultdict(dict)
+self.stocks = []
+self.upgradeFlag = False
+self.userlist = defaultdict(dict)
+self.emosdict = defaultdict(list)
+self.emos = []
+self.ai_emos = []
+self.ai_names = []
+self.timers = []
+dbAkari = sqlite3.connect(os.path.join(DIR, "Akari.db"))
+SQLA = dbAkari.cursor()
+SQLA.execute('SELECT * FROM emos')
+emos = SQLA.fetchall()
+for e in emos:
+if e[5]:
+code = f'<a:{e[0]}:{e[1]}>'
+else:
+code = f'<:{e[0]}:{e[1]}>'
+self.emosdict[e[2]].append(code)
+emb = discord.Embed(title='Игроки', color=random.choice(adb.raincolors))
+for p in self.players:
+if not p.ikiru:
+text = f'Мёртв)) Очки: {p.worth}'
+emb.add_field(name=f'{p.nick}', value=text, inline=False)
+continue
+text = f'${p.money}, положение: {p.cords}\n∑{p.get_netmort()}'
+if p.credit:
+text += f', кредит: ${p.credit["money"]} ({p.credit["expires"]})'
+if p.stocks:
+text += f', акций: {len(p.stocks)})'
+text += f'\nОчки: {p.worth}'
+if p.slaps:
+text += f', {slap}{p.slaps}'
+if p.shops:
+text += f'\nСобственность: {p.show_shops()}'
+if p == self.ongame['cur_player']:
+if self.curblock:
+emb.add_field(name=f'{p.nick}', value=text, inline=True)
+if self.ongame['status'] == 'cubes':
+emb.add_field(name=f'Текущий ход', value=f'Бросайте кубик!', inline=True)
+else:
+emb.add_field(name=f'Текущий ход', value=f'{self.curblock}', inline=True)
+continue
+emb.add_field(name=f'{p.nick}', value=text, inline=False) editFlag = False
+if self.mapmes:
+async for i in self.monop_channel.history(limit=7):
+if i.id == self.mapmes.id:
+editFlag = True
+if editFlag:
+if self.playmes:
+try:
+await self.playmes.edit(embed=emb)
+if self.mapmes:
+try:
+await self.mapmes.edit(content=str(self.map))
+except:
+pass
+else:
+self.mapmes = await self.monop_channel.send(str(self.map))
+return
+except:
+pass
+if self.playmes:
+try:
+await self.playmes.delete()
+except:
+pass
+self.playmes = await self.monop_channel.send(embed=emb)
+if self.mapmes:
+try:
+await self.mapmes.delete()
+except:
+pass
+self.mapmes = await self.monop_channel.send(str(self.map))
+for i, p in enumerate(self.players):
+if p.id == player.id:
+self.players[i] = player
+pid = str(pid).lower()
+for i in self.players:
+if pid in [i.name.lower(), i.men.lower(), str(i.id), i.icon.lower(), i.color.lower(), i.nick.lower()]:
+return i
+for j in [i.name.lower(), i.men.lower(), str(i.id), i.icon.lower(), i.color.lower(), i.nick.lower()]:
+if j in pid:
+return i
+for i in self.userlist:
+if pid == str(self.userlist[i]['bbagid']) or pid in self.userlist[i]['name'].lower() or str(self.userlist[i]['roleid']) in pid:
+for p in self.players:
+if self.userlist[i]['id'] == p.id:
+return p
+count = player.cubes
+random.seed(mes.content)
+vs = [random.randint(1, 6) for _ in range(count)]
+cubes = [Cube(vs[i]) for i in range(count)]
+self.map.inject_cubes(cubes, sum(vs))
+self.map.move_player(player, sum(vs))
+self.curblock = self.map.blockinfo(player, self.players)
+self.map.show_shops(self.players, player)
+player.update_shop(self.map.blocks[player.si])
+self.update_player(player)
+await self.showmap()
+for i in ai.shops:
+if i.buyback:
+return 0
+if self.ongame['round'] < 20:
+return 3
+if ai.monopolies:
+return 3
+return 2
+@commands.Cog.listener()
+if self.monop_channelid:
+self.monop_channel = self.bot.get_channel(self.monop_channelid)
+for p in self.players:
+if p.id == player:
+for i in range(len(self.map.blocks)):
+s = self.map.blocks[i]
+if s.cat == 'shop':
+if s.shop == shop:
+s.owner = None
+s.icon = s.icons[0]
+s.income = 0
+s.buyback = False
+self.map.blocks[i] = s
+p.update_shop(s)
+self.update_player(p)
+del self.pledges[player][shop]
+return
+tosell, emb = self.ongame['cur_player'].to_sell()
+if tosell:
+if self.sellmes:
+await self.sellmes.delete()
+self.sellmes = None
+self.sellmes = await self.monop_channel.send(embed=emb)
+for e in tosell:
+await self.sellmes.add_reaction(e)
+self.w8react.append(('sell', self.sellmes, self.ongame['cur_player']))
+await self.monop_channel.send(f'{self.ongame["cur_player"].nick}, закончились деньги! Закладывайте филиалы, берите кредит, следайте что-нибудь!')
+@commands.command()
+if self.ongame:
+await ctx.send(f"Игра уже началась!", delete_after=10)
+return
+if not self.monop_channelid == ctx.channel.id:
+if self.monop_channel:
+monop_channel = self.bot.get_channel(self.monop_channelid)
+await ctx.send(f"Вы не можете играть в этом канале. Играть в {monop_channel.mention}", delete_after=10)
+else:
+await ctx.send("У нас нет канала для монополии. Задать канал командой **monop_setchannel**", delete_after=10)
+return
+evrv = ctx.guild.default_role
+await self.monop_channel.set_permissions(evrv, view_channel=True)
+self.map = Map(t)
+self.on = True
+self.player_colors = [pc for pc in player_colors]
+self.ai_names = [a for a in ai_names]
+self.ai_emos = [e for e in ai_emos]
+noPlayer = False
+if ais < 0:
+ais = abs(ais)
+noPlayer = True
+colors = adb.sevranchoice(self.player_colors, ais+1)
+emos = adb.sevranchoice(self.ai_emos, ais)
+names = adb.sevranchoice(self.ai_names, ais)
+for i in range(ais+1):
+if i == ais:
+if not noPlayer:
+self.players.append(Player(ctx.author, '🤪', colors[i], t))
+await ctx.channel.send(f'{ctx.author.mention} 🤪, ваш цвет — {colors[i]}')
+else:
+self.players.append(Player(ctx.author, emos[i], colors[i], t, ai=names[i]))
+await ctx.channel.send(f'{names[i]} {emos[i]}, ваш цвет — {colors[i]}')
+self.monop_channel = self.bot.get_channel(self.monop_channelid)
+random.shuffle(self.players)
+self.ongame = {'cp_id': 0, 'cur_player': self.players[0], 'status': 'cubes', 'round': 1, 'criminal': '', 'crm_player': None}
+self.w8react = []
+await self.mhelp()
+self.map.show_colors(self.players[1])
+await self.showmap()
+await ctx.send(f"Игра начинается!")
+if self.ongame['cur_player'].AI:
+await self.ai_processing(self.ongame['cur_player'], 'cubes', ctx.message.content)
+@commands.command()
+self.maptype = 0
+self.map = None
+self.mapmes = None
+self.playmes = None
+self.infomes = None
+self.sellmes = None
+self.stockmes = None
+self.trademes = None
+self.curblock = ''
+self.players = []
+self.player_colors = []
+self.w8react = []
+self.on = False
+self.ongame = {}
+self.credits = defaultdict(dict)
+self.pledges = defaultdict(dict)
+self.stocks = []
+self.upgradeFlag = False
+self.userlist = defaultdict(dict)
+self.emosdict = defaultdict(list)
+self.emos = []
+self.ai_emos = []
+self.ai_names = []
+self.timers = []
+@commands.command()
+self.on = False
+@commands.command()
+self.on = True
+@commands.command()
+await self.mhelp()
+@commands.command()
+if self.monop_channel:
+evrv = ctx.guild.default_role
+await self.monop_channel.set_permissions(evrv, view_channel=True)
+if t == 'help':
+await self.mhelp()
+return
+if self.ongame:
+await ctx.send(f"Игра уже началась!", delete_after=10)
+return
+if not self.monop_channelid == ctx.channel.id:
+if self.monop_channel:
+monop_channel = self.bot.get_channel(self.monop_channelid)
+await ctx.send(f"Вы не можете играть в этом канале. Играть в {monop_channel.mention}", delete_after=10)
+else:
+await ctx.send("У нас нет канала для монополии. Задать канал командой **monop_setchannel**", delete_after=10)
+return
+self.maptype = int(t)
+self.map = Map(self.maptype)
+db = sqlite3.connect(os.path.join(self.DIR, "Akari.db"))
+SQL = db.cursor()
+for m in ctx.guild.members:
+try:
+SQL.execute(f'SELECT bbagid, name, roleid FROM exp WHERE id = {m.id} AND server = {ctx.guild.id}')
+data = SQL.fetchone()
+self.userlist[m.id] = {'id': m.id, 'bbagid': int(data[0]), 'name': data[1], 'roleid': int(data[2])}
+except:
+pass
+db.close()
+self.on = True
+self.player_colors = [pc for pc in player_colors]
+self.emos = [e for e in emos]
+self.ai_names = [a for a in ai_names]
+self.ai_emos = [e for e in ai_emos]
+await ctx.send("Добро пожаловать в Монополию! Ставьте +, чтобы присоединиться, и ++, чтобы закончить набор игроков")
+@commands.command()
+self.monop_channelid = ctx.channel.id
+self.monop_channel = ctx.channel
+await ctx.send(f"Монополия теперь в канале {ctx.channel.mention}", delete_after=10)
+@commands.command()
+evrv = ctx.guild.default_role
+await self.monop_channel.set_permissions(evrv, view_channel=False)
+self.cat = 'shop'
+self.shop = data['name']
+self.vinshop = data['name']
+self.rodshop = data['name']
+if 'vin' in data['special']:
+self.vinshop = data['special']['vin']
+if 'rod' in data['special']:
+self.rodshop = data['special']['rod']
+self.monopoly = data['mon_name']
+self.cost = data['buyfor']
+self.mortgage = [self.cost//10, self.cost//2, self.cost, self.cost*2, self.cost*3, self.cost*5]
+self.up = data['up']
+self.icons = iconfinder(data['brief'])
+self.icon = self.icons[0]
+self.raw_icon = self.icons[0]
+self.special = data['special']
+self.level = 0
+self.owner = None
+self.cords = cords
+self.number = number
+self.desc = ''
+self.worth = data['buyfor']
+self.income = 0
+self.in_monopoly = False
+self.buyback = False
+self.stocks = defaultdict(int)
+self.anomale = False
+try:
+res = self.mortgage[self.level]
+except:
+res = self.mortgage[-1]
+return res
+if not hasattr(other, 'shop'):
+if self.shop == other:
+return True
+return False
+if self.shop == other.shop:
+return True
+return False
+return f'{self.shop}{self.raw_icon} {self.cords} owner={self.owner} level={self.level}'
+self.cat = 'special'
+self.type = typ
+self.cords = cords
+self.icons = ['<:mss:829981282649899030>', '<:msp:829981282511486977>', '<:msr:829981282310160414>', '<:msj:829981282167029760>', '<:msc:829981281973567499>', '<:msd:829981282830123059>']
+self.icon = self.icons[typ]
+self.brief = ['start', 'police', 'roulette', 'jail', 'criminal', 'ruins']
+self.roulettes = ['<:msr0:829981282486059038>', '<:msr1:829981282946777088>', '<:msr2:829981282036744203>', '<:msr3:829981282586198036>', '<:msr4:829981282464169984>', '<:msr5:829981282569158676>', '<:msr6:829981282200584243>']
+self.desc = ''
+self.chanced = 0
+self.cat = 'bonus'
+self.type = typ
+self.cords = cords
+self.icon = '<:msb:829981283366076457>'
+self.desc = ''
+self.cat = 'anti'
+self.type = typ
+self.cords = cords
+self.icon = '<:msa:829981282263629835>'
+self.desc = ''
+self.value = value
+self.icon = cube_values[value-1]
+self.mem = mem
+self.name = mem.display_name
+self.men = mem.mention
+self.id = mem.id
+self.icon = icon
+self.lockicon = locked_icons[player_colors.index(color)]
+self.levelicons = player_color_icons[player_colors.index(color)]
+self.color = color
+self.nick = color + mem.display_name + icon
+self.money = 15000
+self.cords = adb.monop_sequences[mt][0]
+self.si = 0  self.shops = []
+self.monopolies = []
+self.credit = defaultdict(int)
+self.stocks = defaultdict(int)
+self.AI = ai
+if ai:
+self.mem = ai + ' <:msi:830199941640618005>'
+self.name = ai
+self.men = ai + ' <:msi:830199941640618005>'
+self.id = random.randint(100000000, 999999999)
+self.nick = color + self.men + icon
+self.worth = 0
+self.jailed = False
+self.slaps = 0
+self.circle = 0
+self.ikiru = True
+self.cubes = 2
+res = ''
+for m in self.monopolies:
+for s in self.shops:
+if s.monopoly == m:
+res += s.icon
+res += '◈'
+for s in self.shops:
+if s.monopoly not in self.monopolies:
+res += s.icon + ' '
+return res
+toup = []
+emb_dict = {m: [] for m in self.monopolies}
+for m in self.monopolies:
+for s in self.shops:
+if s.monopoly == m and s.level < 5 and not s.anomale:
+if ai:
+toup.append(s)
+else:
+toup.append(s.raw_icon)
+emb_dict[m].append(f'{s.icon}{s.up}')
+backs = []
+for s in self.shops:
+if s.buyback:
+if ai:
+backs.append(s)
+else:
+toup.append(s.raw_icon)
+backs.append(f'{s.icon}{int(s.cost * 0.6)}')
+if ai:
+return toup, backs
+emb = discord.Embed(title='Доступно для апгрейда')
+for m in self.monopolies:
+if emb_dict[m]:
+emb.add_field(name=m, value=' '.join(emb_dict[m]), inline=True)
+if backs:
+emb.add_field(name='Доступно для выкупа', value=' '.join(backs), inline=False)
+return toup, emb
+tosell = []
+emb_dict = {m: [] for m in self.monopolies}
+for m in self.monopolies:
+for s in self.shops:
+if s.monopoly == m and s.level > 0:
+if ai:
+tosell.append(s)
+else:
+tosell.append(s.raw_icon)
+emb_dict[m].append(f'{s.icon}{int(s.up * 0.5)}')
+pleds = []
+if pledge or ai:
+for m in self.monopolies:
+mFlag = True
+for s in self.shops:
+if s.monopoly == m and s.level > 0:
+mFlag = False
+if mFlag:
+for s in self.shops:
+if s.monopoly == m:
+if ai:
+pleds.append(s)
+else:
+tosell.append(s.raw_icon)
+pleds.append(f'{s.icon}{int(s.cost * 0.5)}')
+for s in self.shops:
+if s.monopoly not in self.monopolies:
+if ai:
+pleds.append(s)
+else:
+tosell.append(s.raw_icon)
+pleds.append(f'{s.icon}{int(s.cost * 0.5)}')
+if ai:
+return tosell, pleds
+emb = discord.Embed(title='Доступно для продажи')
+for m in self.monopolies:
+if emb_dict[m]:
+emb.add_field(name=m, value=' '.join(emb_dict[m]), inline=True)
+if pleds:
+emb.add_field(name='Доступно под залог', value=' '.join(pleds), inline=False)
+return tosell, emb
+for i in range(len(self.shops)):
+if shop.cat == 'shop':
+if self.shops[i].shop == shop.shop:
+self.shops[i] = shop
+return self.money + int(sum([s.worth for s in self.shops]))
+return self.money + int(sum([s.worth for s in self.shops]) // 2)
+res = self.money + self.worth
+return res
+if not other:
+return False
+if self.id == other.id:
+return True
+return False
+self.type = typ
+map_grid = adb.monop_maps[typ]
+self.sequence = adb.monop_sequences[typ]
+self.prefs = adb.monop_prefs[typ]
+self.cubes = adb.monop_cubes[typ]
+self.cube_nums = adb.monop_cube_nums[typ]
+sizes = self.prefs[5]
+self.base = [['⬛' for _ in range(sizes[0])] for _ in range(sizes[1])]
+for i in self.cubes:
+self.base[i[0]][i[1]] = '🧊'
+for i in self.sequence:
+self.base[i[0]][i[1]] = '⬜'
+self.blocks = []
+get_shops, self.monopolies = self.get_shops(self.prefs[0])
+shops_idx = 0
+spec_idx = 0
+bonus_idx = 0
+anti_idx = 0
+bonuses = adb.sevranchoice([1, 2, 3, 4], self.prefs[2])
+antis = adb.sevranchoice([1, 2, 3, 4, 5], self.prefs[3])
+for i, s in enumerate(self.sequence):
+ind = map_grid[s[0]][s[1]]
+obj = None
+if ind == 1:
+obj = Shop(s, get_shops[shops_idx], shops_idx)
+shops_idx += 1
+elif ind == 2:
+obj = Special(s, spec_idx)
+spec_idx += 1
+elif ind == 3:
+obj = Bonus(s, bonuses[bonus_idx])
+bonus_idx += 1
+elif ind == 4:
+obj = Anti(s, antis[anti_idx])
+anti_idx += 1
+self.blocks.append(obj)
+res = []
+shops = [i for i in all_shops if i['special'] != 'add' and i['name'] != 'Disabled']  addictional = [i for i in all_shops if i['special'] == 'add' and i['name'] != 'Disabled']  c = 0
+i = 0
+while c != count:  if c > count:   idxs = [idx for idx, j in enumerate(res) if j['length'] == 4 and j['special'] != 'shuffled']
+idx = random.choice(idxs)
+res[idx] = random.choice([k for k in addictional if k['length'] == 3])
+del addictional[addictional.index(res[idx])]
+c -= 1
+break
+else:
+res.append(shops[i])
+c += shops[i]['length']
+i += 1
+idxs = []
+for i in addictional: if adb.chance(14):
+choice_list = [j for j, k in enumerate(res) if k['length'] == i['length'] and k['special'] != 'shuffled' and j not in idxs]
+if choice_list:
+idx = random.choice(choice_list)
+idxs.append(idx) res[idx] = i
+monopolies = {} mons = [m for m in res]
+for m in mons:
+monopolies[m['name']] = {'name': m['name'], 'length': m['length'], 'special': m['special']}
+shuffled_monopoly = None
+shuf_idxs = [] if_shuf = [k for k in res if k['special'] == 'shuffled']
+if if_shuf:
+space = count // if_shuf[0]['length'] cur_shuf_idx = space // 2             shuf_idxs.append(cur_shuf_idx)
+for i in range(1, if_shuf[0]['length']):
+cur_shuf_idx += space             shuf_idxs.append(cur_shuf_idx)    shuffled_monopoly = if_shuf[0]
+del res[res.index(shuffled_monopoly)] result = [{} for _ in range(count)]
+c = 0
+if shuffled_monopoly:
+for i, shop in enumerate(shuffled_monopoly['shops']):
+result[shuf_idxs[i]] = shop
+for mon in res:
+for shop in mon['shops']:
+while result[c]:
+c += 1
+result[c] = shop
+c += 1
+return result, monopolies
+a = adb.sevranchoice(self.cubes, len(cubes))
+for idx, i in enumerate(a):
+self.base[i[0]][i[1]] = cubes[idx].icon
+dec = self.cube_nums[0]
+uni = self.cube_nums[1]
+if sum >= 10:
+self.base[dec[0]][dec[1]] = cube_numbers[sum // 10]
+self.base[uni[0]][uni[1]] = cube_numbers[sum % 10]
+player.si += value
+if player.si >= len(self.sequence):
+player.si -= len(self.sequence)
+player.circle += 1
+player.money += 2000
+player.cords = self.sequence[player.si]
+for i in self.cubes:
+self.base[i[0]][i[1]] = '🧊'
+for i in self.cube_nums:
+self.base[i[0]][i[1]] = '⬛'
+for idx, i in enumerate(self.sequence):
+if self.blocks[idx].cat == 'shop':
+if self.blocks[idx].owner:
+if self.blocks[idx].buyback:
+self.base[i[0]][i[1]] = self.blocks[idx].owner.lockicon
+elif self.blocks[idx].level > 0:
+self.base[i[0]][i[1]] = self.blocks[idx].owner.shopcolors[self.blocks[idx].level - 1]
+else:
+self.base[i[0]][i[1]] = self.blocks[idx].owner.color
+else:
+self.base[i[0]][i[1]] = '⬜'
+i = next_player.cords
+self.base[i[0]][i[1]] = next_player.icon
+for idx, i in enumerate(self.sequence):
+self.base[i[0]][i[1]] = self.blocks[idx].icon
+for p in players:
+if p.ikiru:
+i = p.cords
+self.base[i[0]][i[1]] = p.icon
+i = cur_player.cords
+self.base[i[0]][i[1]] = cur_player.icon
+monopoly = ''
+for i in self.base:
+for j in i:
+monopoly += j
+monopoly += '\n'
+return monopoly
+bot.add_cog(Monopoly(bot))
+translator = google_translator()
+self.bot = bot
+self.DIR = os.path.dirname(__file__)
+self.reminder_list = []
+self.transchan_mode = 'en'
+self.nikki_en = None
+self.nikki_ja = None
+self.nikki_es = None
+@tasks.loop(seconds=15)
+rainbowrole = self.bot.get_guild(adb.dmh).get_role(393305847930945536)
+await rainbowrole.edit(colour=discord.Colour(random.choice(adb.raincolors)))
+@tasks.loop(seconds=adb.reminder_cd)
+remchannel = self.bot.get_channel(388321118269734922)
+adm = self.bot.get_guild(adb.dmh).get_member(262288342035595268)
+if self.reminder_list:
+async for i in remchannel.history(limit=100):
+if i.embeds:
+if i.embeds[0].title in adb.businesses:
+await i.delete()
+emb = discord.Embed(title=random.choice(adb.businesses), colour=random.choice(adb.raincolors))
+for i in range(len(self.reminder_list)):
+t = self.reminder_list[i][1]
+if t <= 0:
+await remchannel.send(f'{adm.mention}, настала пора {self.reminder_list[i][0]}')
+del self.reminder_list[i]
+continue
+send = ""
+if t // 86400 > 0: send += adb.postfix(t // 86400, ['день', 'дня', 'дней']) + ' '
+m = t % 86400
+if m // 3600 > 0: send += adb.postfix(m // 3600, ['час', 'часа', 'часов']) + ' '
+m = m % 3600
+if m // 60 > 0: send += adb.postfix(m // 60, ['минута', 'минуты', 'минут']) + ' '
+m %= 60
+if m >= 0: send += adb.postfix(m, ['секунда', 'секунды', 'секунд'])
+emb.add_field(name=f'{random.choice(adb.business)} value=f"Осталось: {send}", inline=False)
+self.reminder_list[i][1] -= adb.reminder_cd
+if len(emb.fields) > 0:
+await remchannel.send(embed=emb)
+@commands.Cog.listener()
+self.rainbow.start()
+remchannel = self.bot.get_channel(388321118269734922)
+async for i in remchannel.history(limit=100):
+if i.embeds:
+for f in i.embeds[0].fields:
+one = f.name.split(':')[1].lstrip()
+two = 0
+v = f.value
+if 'де' in v or 'дн' in v:
+two += int(v.split('д')[0].split(' ')[-2])
+if 'ча' in v:
+two += int(v.split('ча')[0].split(' ')[-2])
+if 'мин' in v:
+two += int(v.split('мин')[0].split(' ')[-2])
+self.reminder_list.append([one, two])
+self.reminder.start()
+self.nikki_en = self.bot.get_channel(adb.nikkis[1])
+self.nikki_ja = self.bot.get_channel(adb.nikkis[2])
+self.nikki_es = self.bot.get_channel(adb.nikkis[3])
+tr1 = ''
+tr2 = ''
+if len(tr[0]) > 1900:
+tr1 = tr[0][1900:]
+tr[0] = tr[0][:1900]
+if tr[2]:
+if len(tr[2]) > 1900:
+tr2 = tr[2][1900:]
+tr[2] = tr[2][:1900]
+await chan.send(tr[0])
+if tr1:
+await chan.send(tr1)
+if tr[2]:
+await chan.send(tr[2])
+if tr2:
+await chan.send(tr2)
+@commands.Cog.listener()
+if message.type is discord.MessageType.pins_add:
+await message.delete()
+if message.channel.id == adb.transchan:
+if message.author.bot:
+return
+if message.content.startswith(adb.prefix):
+return
+tr = translator.translate(message.clean_content, lang_tgt=self.transchan_mode, pronounce=True)
+await message.channel.send(tr[0])
+if tr[2]:
+await message.channel.send(tr[2])
+if message.channel.id == adb.nikkis[0] and message.author.id != self.bot.user.id and not message.content.startswith(adb.prefix):
+if message.content:
+tr_en = translator.translate(message.clean_content, lang_tgt='en', pronounce=True)
+tr_ja = translator.translate(message.clean_content, lang_tgt='ja', pronounce=True)
+tr_es = translator.translate(message.clean_content, lang_tgt='es', pronounce=True)
+await self.nikkisend(tr_en, self.nikki_en)
+await self.nikkisend(tr_ja, self.nikki_ja)
+await self.nikkisend(tr_es, self.nikki_es)
+for a in message.attachments:
+if a.filename.endswith((".png", ".jpg", ".gif")):
+pic = requests.get(a.url)
+pf = open(a.filename, 'wb')
+pf.write(pic.content)
+pf.close()
+await self.nikki_en.send(file=discord.File(fp=a.filename))
+await self.nikki_ja.send(file=discord.File(fp=a.filename))
+await self.nikki_es.send(file=discord.File(fp=a.filename))
+await asyncio.sleep(1)
+os.remove(a.filename)
+@commands.command()
+await ctx.send("Мантра программиста перед началом проекта. Аминь", file=adb.progerpic)
+@commands.command()
+if not os.path.exists('memeUpload'):
+os.mkdir('memeUpload')
+for a in os.listdir('memeUpload'):
+if a.endswith((".png", ".jpg", ".gif")):
+file = discord.File(fp=f'memeUpload/{a}')
+try:
+await ctx.send(file=file)
+await asyncio.sleep(0.5)
+if not de:
+os.remove(f'memeUpload/{a}')
+except:
+pass
+@commands.command()
+limit = 20
+if amount > limit:
+await ctx.message.delete()
+await ctx.send(f"Не больше {limit}", file=adb.errorpic, delete_after=5)
+else:
+await ctx.channel.purge(limit=amount + 1)
+clearemb = discord.Embed(
+title=f"{random.choice(adb.clears)} {adb.postfix(amount, ['сообщение', 'сообщения', 'сообщений'])}",
+colour=random.choice(adb.raincolors))
+await ctx.send(embed=clearemb, delete_after=5)
+@commands.command()
+if desc == 'delete':
+del self.reminder_list[t-1]
+return
+t = str(t)
+ti = 0
+if 'd' in t: ti += int(t.split('d')[0]) * 86400
+elif 'h' in t: ti += int(t.split('h')[0]) * 3600
+elif 'm' in t: ti += int(t.split('m')[0]) * 60
+else: ti += int(t)
+t = int(ti)
+self.reminder_list.append([desc, t])
+@commands.command()
+text = ' '.join(text)
+ctx.send(reversed(text))
+@commands.command()
+text = ' '.join(text)
+file = open('pips/phrases.txt', 'a', encoding='utf-8')
+file.write(text+'\n')
+file.close()
+if not ch:
+ch = adb.enpics
+async for m in self.bot.get_channel(ch).history():
+if m.content == text:
+if m.attachments:
+return m.attachments[0].url
+@commands.command()
+one = await self.picfinder('Lt1')
+two = await self.picfinder('Lt2')
+three = await self.picfinder('Lt3')
+four = await self.picfinder('Lt4')
+await ctx.send(one)
+await ctx.send(two)
+await ctx.send(three)
+await ctx.send(four)
+@commands.command()
+one = await self.picfinder('Lt21')
+two = await self.picfinder('Lt22')
+three = await self.picfinder('Lt23')
+four = await self.picfinder('Lt24')
+await ctx.send(one)
+await ctx.send(two)
+await ctx.send(three)
+await ctx.send(four)
+@commands.command()
+if url == 'help':
+emb = discord.Embed(description=f'Доступные языки [здесь](https://github.com/lushan88a/google_trans_new/blob/main/constant.py)')
+await ctx.send(embed=emb)
+return
+mes_id = url.split('/')[-1]
+mes = await ctx.message.channel.fetch_message(mes_id)
+tr = translator.translate(mes.clean_content, lang_tgt=lang, pronounce=True)
+emb = discord.Embed(description=f'Перевод:\n{tr[0]}\nПроизношение:{tr[2]}\n\n[Оригинал]({mes.jump_url})')
+emb.set_footer(text=f"{mes.author.name}", icon_url=mes.author.avatar_url)
+await ctx.send(embed=emb)
+@commands.command()
+self.transchan_mode = lang
+await ctx.send(f'Language is successfully set to **{lang}**')
+bot.add_cog(Funx(bot))
+return [i for i in units if (team == 'enemies' and i.team != caster.team or i.team == team) and circleColl(center.cort(), radius, i.hitbox())]
+for i in unit.modifiers:
+if i.name == name and (not caster or i.ability.caster == caster) and (not ability or i.ability == ability) and (not castersummoner or i.ability.caster.summoner == castersummoner):
+return i
+return False
+self.caster = caster
+self.data = self.caster.data['attack']
+self.dmg = caster.dmg()
+self.type = 'attack'
+self.orbEffects = tuple((i for i in self.caster.abilities if i.type == 'orb')) if not get_bit(self.caster.status, 4) else ()
+self.level = caster.level
+self.units = caster.units
+self.ticks = 0
+self.maxhits = int(self.caster.multishot * self.caster.super)
+self.targets = defaultdict(int)  self.angles = meleeaccuracy(self.caster.accuracy, self.data["top_angle"], self.data['bottom_angle'])  self.projectiles = []  self.done = False  res = False
+for i in self.orbEffects:
+unitcoll = i.onProjectileHit(projectile, unit)
+if unitcoll:
+res = unitcoll
+if not self.caster.team == unit.team and not unit.dead:
+self.level.runa.stats.hit(self.caster, unit)
+unit.applyDamage(self.caster, self.dmg)
+res = True
+return res
+for i in self.orbEffects:
+i.onProjectileCollide(projectile, blockpos)
+for i in self.orbEffects:
+i.onProjectileDestroy(projectile)
+self.projectiles.remove(projectile)
+if not self.projectiles:
+self.destroy()
+pass
+self.ticks += 1
+self.caster.abilities.remove(self)
+self.level.runa.stats.shoot(self.caster)
+dvx = (mouse_active(self.level, self.caster)[0] - self.level.mp[0]) / self.level.tile_size - self.caster.cords.x + self.data["spawn_offset"][0]
+self.caster.flip = True if dvx < 0 else False
+ang = self.angles[0] - (self.angles[0] - self.angles[1]) * curframe / aframes
+if 'fromBottom' in self.data and self.data['fromBottom']:
+ang = self.angles[1] - ang
+ang = ang * math.pi / 180
+if self.caster.flip:
+ang = math.pi - ang
+spos = self.caster.cords
+epos = self.caster.cords + Vector(math.cos(ang) * self.data['radius'], -1 * math.sin(ang) * self.data['radius'])
+minx, maxx = (spos.x, epos.x) if spos.x < epos.x else (epos.x, spos.x)
+miny, maxy = (spos.y, epos.y) if spos.y < epos.y else (epos.y, spos.y)
+box = (minx, maxx, miny, maxy)
+for unit in self.units:
+if self.targets[unit] < self.maxhits and unit.boxcollide(box):
+unitcoll = self.onProjectileHit(None, unit)
+if unitcoll:
+self.targets[unit] += 1
+if self.done or curframe*anim_speed < self.data["attack_frame"]:
+return
+self.level.runa.stats.shoot(self.caster)
+spawn_point = Vector(self.caster.cords.x + self.data["spawn_offset"][0], self.caster.cords.y + self.data["spawn_offset"][1])
+pos = mouse_active(self.level, self.caster)
+ppos = Vector((pos[0] - self.level.mp[0]) / self.level.tile_size, (pos[1] - self.level.mp[1]) / self.level.tile_size)
+dv = ppos - spawn_point
+ang = dv.angle()
+self.caster.flip = True if dv.x < 0 else False
+if self.caster.flip:
+if ang < math.pi - self.data["top_angle"] * math.pi / 180:
+ang = math.pi - self.data["top_angle"] * math.pi / 180
+if ang > math.pi - self.data["bottom_angle"] * math.pi / 180:
+ang = math.pi - self.data["bottom_angle"] * math.pi / 180
+else:
+if ang > self.data["top_angle"] * math.pi / 180:
+ang = self.data["top_angle"] * math.pi / 180
+if ang < self.data["bottom_angle"] * math.pi / 180:
+ang = self.data["bottom_angle"] * math.pi / 180
+ang = accuracy(self.caster.accuracy, ang)
+for shot in range(self.maxhits):
+ang2 = ang
+if shot > 0:
+ang2 += (random.randint(0, 60) - 30) / 100 * math.pi
+nvector = Vector(math.cos(ang2) * self.data["speed"] / FPS, -1 * math.sin(ang2) * self.data["speed"] / FPS)
+p = Projectile(self.caster, self, spawn_point, nvector, self.data["projectile"], **self.data)
+self.level.projectiles.append(p)
+self.projectiles.append(p)
+self.done = True
+self.caster = caster
+self.type = 'None'
+self.name = 'None'
+self.level = caster.level
+self.units = caster.units
+self.ticks = 0
+self.intervalThink = 0
+self.ultimate = False
+self.breaked = False  self.strength = self.caster.strength
+self.radius = self.caster.radius
+self.aduration = self.caster.aduration
+self.manacost = self.caster.manacost
+self.castspeed = self.caster.castspeed
+self.reduction = self.caster.reduction
+self.super = self.caster.super
+pass
+pass
+pass
+pass
+return False
+pass
+pass
+pass
+if self.intervalThink and self.ticks % self.intervalThink == 0:
+self.onIntervalThink()
+self.ticks += 1
+self.caster.abilities.remove(self)
+self.breaked = True
+self.breaked = False
+self.owner = unit
+self.ability = ability
+self.duration = duration
+self.baseduration = self.duration
+self.ticks = 0
+self.name = 'None'
+self.provides = None
+self.hidden = False
+self.debuff = False
+self.purgable = True
+self.removeOnDeath = True
+self.stackable = 1 self.strength = self.ability.strength
+self.radius = self.ability.radius
+self.aduration = self.ability.aduration
+self.manacost = self.ability.manacost
+self.castspeed = self.ability.castspeed
+self.reduction = self.ability.reduction
+self.super = self.ability.super
+self.ticks += 1
+if self.duration and self.ticks >= self.duration*FPS:
+self.destroy()
+self.owner.modifiers.remove(self)
+if r:
+self.owner.recount(self.provides)
+pass
+pass
+pass
+pass
+data = {i.split('.txt')[0]: ast.literal_eval(open(f'items\\{i}', 'r', encoding='utf-8').read()) for i in os.listdir('items') if i.endswith('.txt')}
+icons = {i.split('.png')[0]: pygame.image.load(f'items\\{i}') for i in os.listdir('items') if i.endswith('.png')}
+self.name = name
+self.data = Item.data[name]
+self.provides = None
+self.count = count
+self.level = level
+self.icon = pygame.transform.scale(Item.icons[name], (int(level.tile_size*0.7), int(level.tile_size*0.7)))
+@classmethod
+for i in cls.icons.values():
+i.convert_alpha()
+return self.name, self.count
+@classmethod
+if isinstance(data, Item):
+return data
+return Item(data[0], level, data[1])
+self.speed = kwargs['speed'] if 'speed' in kwargs else 1.0
+if 'frame_rate' in kwargs:
+self.speed *= kwargs['frame_rate'] / FPS
+self.count = kwargs['count'] if 'count' in kwargs else 0
+self.spawn_count = kwargs['spawn'] if 'spawn' in kwargs else 1.0
+kwargs['lifetime'] = FPS if 'lifetime' not in kwargs else int(kwargs['lifetime'] * FPS)
+self.lifetime = kwargs['lifetime']
+if 'folder' not in kwargs:
+kwargs['folder'] = f'textures\\particles\\{name.split(".")[0]}'
+self.changexy = kwargs['changexy'] if 'changexy' in kwargs else None
+if isinstance(self.changexy, str):
+self.changexy = eval(self.changexy)
+self.rotate = kwargs['rotate'] if 'rotate' in kwargs else None
+self.kwargs = kwargs
+self.particles = []
+self.unit_binding = kwargs['unit_binding'] if 'unit_binding' in kwargs else False
+spawn = int(self.spawn_count)
+spawn = spawn + 1 if self.spawn_count % 1 and chance((self.spawn_count % 1) * 1000, 1000) else spawn
+offset = 0, 0
+for i in range(spawn):
+pos = args[0]
+if 'pos' in self.kwargs:
+if self.kwargs['pos'] == 'mouse_attach':
+pos = kwargs['pos']
+else:
+pos = self.kwargs['pos']
+if 'random_offset' in self.kwargs:
+offset = self.kwargs['random_offset']
+offset = random.randint(offset[0]*100, offset[1]*100)/100, random.randint(offset[2]*100, offset[3]*100)/100
+pos = (pos[0]+offset[0], pos[1]+offset[1])
+speed = random.randint(self.kwargs['random_speed'][0] * 1000, self.kwargs['random_speed'][1] * 1000) * self.speed / 1000 if 'random_speed' in self.kwargs else self.speed
+folder = self.kwargs['folder'] if 'single' in self.kwargs else self.kwargs['folder'] + '\\' + random.choice(os.listdir(self.kwargs["folder"]))
+cycle = os.listdir(folder)
+frames = [pygame.image.load(f'{folder}\\{frame}').convert_alpha() for frame in cycle]
+frames = longsplit(frames, self.kwargs['lifetime'])
+if 'start' in self.kwargs:
+frames = frames[self.kwargs['start']:] + frames[:self.kwargs['start']]
+if 'scale' in self.kwargs:
+if self.kwargs['scale'][0] == 0:
+frames = [pygame.transform.scale(i, (int(i.get_width() / i.get_height() * self.kwargs['scale'][1]), self.kwargs['scale'][1])) for i in frames]
+elif self.kwargs['scale'][1] == 0:
+frames = [pygame.transform.scale(i, (self.kwargs['scale'][0], int(i.get_height() / i.get_width() * self.kwargs['scale'][0]))) for i in frames]
+else:
+frames = [pygame.transform.scale(i, self.kwargs['scale']) for i in frames]
+scale = 1
+if 'random_scale' in self.kwargs:
+scale = random.randint(self.kwargs['random_scale'][0] * 100, self.kwargs['random_scale'][1] * 100) / 100
+if 'level_scale' in kwargs:
+scale *= kwargs['level_scale']
+if scale != 1:
+frames = [pygame.transform.scale(i, (int(i.get_width() * scale), int(i.get_height() * scale))) for i in frames]
+rotate = 0
+if 'random_rotate' in self.kwargs:
+rotate = random.randint(self.kwargs['random_rotate'][0] * 100, self.kwargs['random_rotate'][1] * 100) / 100
+frames = [pygame.transform.rotate(i, rotate) for i in frames]
+frame_idx = 0
+pos_idx = 0
+speed_repeats = 0
+particle = (frames, pos, scale, rotate, speed, frame_idx, pos_idx, speed_repeats, offset)
+self.particles.append(particle)
+newpos = args[0]
+trash = []
+res = []
+for i,p in enumerate(self.particles):
+frames, pos, scale, rotate, speed, frame_idx, pos_idx, speed_repeats, offset = p
+if pos_idx >= self.lifetime:
+trash.append(p)
+continue
+if frame_idx >= len(frames):
+while frame_idx >= len(frames):
+frame_idx -= len(frames)
+frame = kwargs['img'] if 'img' in kwargs else frames[frame_idx]
+if self.unit_binding:
+pos = newpos[0]+offset[0], newpos[1]+offset[1]
+x, y = pos
+if self.changexy:
+pos = self.changexy(frame, x, y, pos_idx)
+res.append([frame, pos])
+if speed == 1.0:
+frame_idx += 1
+elif speed > 1.0:
+frame_idx += int(speed)
+mod = speed % 1
+if mod and chance(mod*100):
+frame_idx += 1
+else:
+subspeed = 1 / speed
+subspeedmod = subspeed % 1
+speed_repeats += 1
+if speed_repeats >= subspeed:
+speed_repeats = 0
+frame_idx += 1
+elif speed_repeats == int(subspeed) and chance(subspeedmod*100):
+speed_repeats = 0
+frame_idx += 1
+pos_idx += 1
+self.particles[i] = (frames, pos, scale, rotate, speed, frame_idx, pos_idx, speed_repeats, offset)
+for i in trash:
+del self.particles[self.particles.index(i)]
+return res
+self.name = anim.asset
+self.prs_name = kwargs['prs_name'] if 'prs_name' in kwargs else anim.asset
+self.folder = kwargs['folder'] if 'folder' in kwargs else f'textures\\animated_assets'
+filename = f'{self.folder}\\{self.prs_name}'
+self.img = pygame.image.load(filename).convert_alpha()
+pil_img = Image.open(filename).convert('RGBA')
+self.pixels = pil_img.load()
+self.size = pil_img.size
+self.trigger = kwargs['trigger'] if 'trigger' in kwargs else 'mb1'
+self.particles = kwargs['particles'] if 'particles' in kwargs else []
+self.kwargs = kwargs
+frame, pos, pos_idx = args
+mpos = kwargs['pos']
+actions = {}
+if 0 < mpos[0] - pos[0] < self.size[0] and 0 < mpos[1] - pos[1] < self.size[1]:
+if not self.pixels[mpos[0] - pos[0], mpos[1] - pos[1]] == (0, 0, 0, 0):
+frame = self.img
+self.press(actions, **kwargs)
+if self.particles:
+for p in self.particles:
+p.spawn(*[pos], **kwargs)
+if self.particles:
+actions['blit'] = []
+for p in self.particles:
+actions['blit'] += p.act(*[pos], **kwargs)
+return frame, actions
+if self.trigger == 'mb1' and kw2['pressed'][0]:
+if 'change_mode' in self.kwargs:
+option = self.kwargs['changelevel'] if 'changelevel' in self.kwargs else 0
+res['change_mode'] = {'mode': self.kwargs['change_mode'], 'changelevel': option}
+self.speed = kwargs['speed'] if 'speed' in kwargs else 1.0
+if 'frame_rate' in kwargs:
+self.speed *= kwargs['frame_rate'] / FPS
+self.mod = self.speed % 1
+self.subspeed = 1/self.speed
+self.subspeedmod = self.subspeed % 1
+self.speed_repeats = 0
+self.asset = asset
+if 'folder' not in kwargs:
+kwargs['folder'] = f'textures\\animated_assets\\{asset.split(".")[0]}'
+self.cycle = os.listdir(f'{kwargs["folder"]}') if not 'single' in kwargs else [asset]
+frames = int(FPS*kwargs['duration']) if 'duration' in kwargs else len(self.cycle)
+self.frames = [pygame.image.load(f'{kwargs["folder"]}\\{frame}').convert_alpha() for frame in self.cycle]
+if frames < 0:
+self.inf = True
+else:
+self.inf = False
+self.frames = longsplit(self.frames, frames)
+if 'start' in kwargs:
+self.frames = self.frames[kwargs['start']:] + self.frames[:kwargs['start']]
+if 'scale' in kwargs:
+if kwargs['scale'][0] == 0:
+self.frames = [pygame.transform.scale(i, (int(i.get_width() / i.get_height() * kwargs['scale'][1]), kwargs['scale'][1])) for i in self.frames]
+elif kwargs['scale'][1] == 0:
+self.frames = [pygame.transform.scale(i, (kwargs['scale'][0], int(i.get_height() / i.get_width() * kwargs['scale'][0]))) for i in self.frames]
+else:
+self.frames = [pygame.transform.scale(i, kwargs['scale']) for i in self.frames]
+self.frame_idx = 0
+self.pos_idx = 0
+self.pos = pos
+self.changexy = kwargs['changexy'] if 'changexy' in kwargs else None
+self.rotate = kwargs['rotate'] if 'rotate' in kwargs else None
+self.particles = kwargs['particles'] if 'particles' in kwargs else []
+self.button = Button(self, **kwargs['button']) if 'button' in kwargs else None
+if self.frame_idx >= len(self.frames):
+if self.inf:
+while self.frame_idx >= len(self.frames):
+self.frame_idx -= len(self.frames)
+else:
+return False
+frame = kwargs['img'] if 'img' in kwargs else self.frames[self.frame_idx]
+frame = pygame.transform.rotate(frame, -1 * self.rotate * self.pos_idx) if self.rotate else frame
+if self.changexy:
+x, y = self.pos
+self.pos = self.changexy(frame, x, y, self.pos_idx)
+actions = {}
+if self.button:
+frame, actions = self.button.act(*[frame, self.pos, self.pos_idx], **kwargs)
+sc.blit(frame, self.pos)
+if self.particles:
+for p in self.particles:
+p.spawn(*[self.pos], **kwargs)
+if 'blit' not in actions:
+actions['blit'] = []
+for p in self.particles:
+actions['blit'] += p.act(*[self.pos], **kwargs)
+if 'blit' in actions:
+for x, p in actions['blit']:
+sc.blit(x, p)
+if self.speed == 1.0:
+self.frame_idx += 1
+elif self.speed > 1.0:
+self.frame_idx += int(self.speed)
+if self.mod and chance(self.mod*100):
+self.frame_idx += 1
+else:
+self.speed_repeats += 1
+if self.speed_repeats >= self.subspeed:
+self.speed_repeats = 0
+self.frame_idx += 1
+elif self.speed_repeats == int(self.subspeed) and chance(self.subspeedmod*100):
+self.speed_repeats = 0
+self.frame_idx += 1
+self.pos_idx += 1
+return actions
+self.unit = unit
+self.act_radius = 12
+self.ranged_attack_radius = 7
+self.target = None
+self.mode = 'idle'
+enemies = [i for i in self.unit.level.visions[self.unit.team] if self.unit.team != i.team and not i.dead]
+minrange = 0
+minrangeunit = None
+for i in enemies:
+ur = self.unit.unitrange(i)
+if (not minrangeunit or ur < minrange) and ur < self.act_radius:
+minrange = ur
+minrangeunit = i
+if minrangeunit:
+if self.unit.melee:
+attack_radius = self.unit.data['attack']['radius']
+else:
+attack_radius = self.ranged_attack_radius
+if minrange < attack_radius:
+self.target = minrangeunit
+self.mode = 'attack'
+else:
+self.target = minrangeunit
+self.mode = 'move'
+if self.target and self.target.dead:
+self.target = None
+self.mode = 'idle'
+if self.mode == 'move':
+if self.target.cords.x < self.unit.cords.x:
+if not self.unit.level.find_left_space(self.unit):
+self.unit.jump()
+self.unit.moveleft()
+else:
+if not self.unit.level.find_right_space(self.unit):
+self.unit.jump()
+self.unit.moveright()
+elif self.mode == 'attack':
+self.unit.attack()
+if self.target:
+return self.target.cords.x*self.unit.level.tile_size+self.unit.level.mp[0], self.target.cords.y*self.unit.level.tile_size+self.unit.level.mp[1]
+return pygame.mouse.get_pos()
+if level.selected_unit is unit:
+return pygame.mouse.get_pos()
+if unit.mousepos:
+return unit.mousepos[0]+level.mp[0], unit.mousepos[1]+level.mp[1]
+return unit.ai.choosepos()
+name = 'cast4'
+object = 'Zalgo'
+folder = 'units\\heroes\\Zalgo'
+pygame.init()
+sc = pygame.display.set_mode(WINDOW, pygame.FULLSCREEN)
+clock = pygame.time.Clock()
+font = pygame.font.SysFont('calibri', 30)
+font2 = pygame.font.SysFont('calibri', 36)
+font3 = pygame.font.SysFont('calibri', 22)
+font4 = pygame.font.SysFont('calibri', 12)
+text_parts = font2.render(f'In Folder', True, (0, 0, 0))
+text_curparts = font2.render(f'Parts', True, (0, 0, 0))
+text_poses = font2.render(f'Poses', True, (0, 0, 0))
+text_bones = font.render('Bones [F]', True, (0, 0, 0))
+text_tbones = font.render('Toggle bones [G]', True, (0, 0, 0))
+text_save = font.render('Saved', True, (0, 0, 0))
+text_point_move_bind = font.render('Point Move Binding [H]', True, (0, 0, 0))
+text_save_frames = 0
+TILE_SCALE = 7
+TILE_SIZE_SCALED = TILE_SIZE * TILE_SCALE
+X_OFFSET, Y_OFFSET = 400, 250
+AMAP_SIZE_X, AMAP_SIZE_Y = 3, 2
+SCALING_POINT = (X_OFFSET + TILE_SIZE_SCALED * AMAP_SIZE_X // 2, Y_OFFSET + TILE_SIZE_SCALED * AMAP_SIZE_Y)
+X_OFFSET_MINI, Y_OFFSET_MINI = 1590, 800
+SCALING_POINT_MINI = (X_OFFSET_MINI + TILE_SIZE * AMAP_SIZE_X // 2, Y_OFFSET_MINI + TILE_SIZE * AMAP_SIZE_Y)
+parts = [i for i in os.listdir(folder) if i.endswith('.png')]
+cur_ic = pygame.image.load(f'textures\\GUI\\firesm.png').convert_alpha()
+sec_ic = pygame.image.load(f'textures\\GUI\\watersm.png').convert_alpha()
+plus_ic = pygame.image.load(f'textures\\GUI\\plus.png').convert_alpha()
+play_ic = pygame.image.load(f'textures\\GUI\\aplay.png').convert_alpha()
+playon_ic = pygame.image.load(f'textures\\GUI\\aplayon.png').convert_alpha()
+bonetool = False
+bonesmode = True
+boneline = None
+point_move_bind = False
+cur_idx = -1
+sec_idx = -1
+curparts = []
+bones = []
+points = {}
+obj_lock = None
+point_lock = None
+list_lock = None
+pose_lock = None
+frame_lock = None
+cur_pose = -1
+log = []
+frames = {}
+poses = []
+temp_pose = {}
+cur_frame = -1
+play = -1
+while ang > 360:
+ang -= 360
+while ang < -360:
+ang += 360
+if ang > 180:
+ang = -(360-ang)
+if ang < -180:
+ang = 360+ang
+return ang
+while ang > 2 * math.pi:
+ang -= 2 * math.pi
+while ang < -2 * math.pi:
+ang += 2 * math.pi
+if ang > math.pi:
+ang = -(2 * math.pi-ang)
+if ang < -math.pi:
+ang = 2 * math.pi+ang
+return ang
+self.pp = pp
+self.pd = pd
+self.length = math.sqrt((points[pp].pos[0] - points[pd].pos[0]) ** 2 + (points[pp].pos[1] - points[pd].pos[1]) ** 2)
+self.ang = ang
+self.id = id
+self.obj = obj
+self.parent = parent
+self.daughters = daughters if daughters else []
+self.pos = pos
+self.lastpos = pos
+if self.parent and checkparent:
+if points[self.parent].parent or ps or pi:
+self.push(self.parent, ps)
+points[self.parent].move(daughterid=self.id, ps=ps)
+else:
+self.pull(self.parent, ps)
+points[self.parent].move(checkparent=False, ps=ps)
+for i in self.daughters:
+if not i == daughterid:
+self.push(i, ps)
+points[i].move(checkparent=False, ps=ps)
+self.lastpos = self.pos
+l = 0
+for i in bones:
+if i.pp == self.id and i.pd == p or i.pp == p and i.pd == self.id:
+l = i.length
+if l == 0:
+return
+newlen = math.sqrt((self.pos[0] - points[p].pos[0]) ** 2 + (self.pos[1] - points[p].pos[1]) ** 2)
+diff = newlen - l
+newv = ((self.lastpos[0] - points[p].pos[0]) / newlen, (self.lastpos[1] - points[p].pos[1]) / newlen)
+lp = points[p].pos
+points[p].pos = (points[p].pos[0] + diff * newv[0], points[p].pos[1] + diff * newv[1])
+if ps:
+return
+ang, ang2 = 0, 0
+for i in range(len(curparts)):
+if curparts[i][6] == points[p].obj:
+for b in bones:
+if b.pp == p and b.pd == self.id:
+w, h = points[b.pd].pos[0] - points[b.pp].pos[0], points[b.pp].pos[1] - points[b.pd].pos[1]
+ang = math.asin(h / math.sqrt(h ** 2 + w ** 2))
+ang = math.pi - ang if w < 0 else ang
+ang2 = curparts[i][4]
+curparts[i][4] = ang / math.pi * 180 - b.ang
+ang2 = curparts[i][4] - ang2
+for pp in curparts[i][7]:
+curparts[i][7][pp][1] += ang2 * math.pi / 180
+rad, ang3 = curparts[i][7][p]
+curparts[i][2] = (int(points[p].pos[0] + rad * math.cos(ang3)), int(points[p].pos[1] - rad * math.sin(ang3)))
+elif b.pp == self.id and b.pd == p:
+rad, ang3 = curparts[i][7][p]
+curparts[i][2] = (int(points[p].pos[0] + rad * math.cos(ang3)), int(points[p].pos[1] - rad * math.sin(ang3)))
+for i in range(len(curparts)):
+if curparts[i][6] == self.obj:
+rad, ang3 = curparts[i][7][self.id]
+curparts[i][2] = (int(self.pos[0] + rad * math.cos(ang3 + ang2 - ang)), int(self.pos[1] - rad * math.sin(ang3 + ang2 - ang)))
+self.pos = self.lastpos
+l = 0
+for i in bones:
+if i.pp == self.id and i.pd == p or i.pp == p and i.pd == self.id:
+l = i.length
+if l == 0:
+return
+newlen = math.sqrt((self.pos[0] - points[p].pos[0]) ** 2 + (self.pos[1] - points[p].pos[1]) ** 2)
+diff = newlen - l
+newv = ((points[p].pos[0] - self.lastpos[0]) / newlen, (points[p].pos[1] - self.lastpos[1]) / newlen)
+lp = self.pos
+self.pos = (self.pos[0] + diff * newv[0], self.pos[1] + diff * newv[1])
+if ps:
+return
+ang, ang2 = 0, 0
+for i in range(len(curparts)):
+if curparts[i][6] == self.obj:
+for b in bones:
+if b.pp == self.id and b.pd == p:
+w, h = points[b.pd].pos[0] - points[b.pp].pos[0], points[b.pp].pos[1] - points[b.pd].pos[1]
+ang = math.asin(h / math.sqrt(h ** 2 + w ** 2))
+ang = math.pi - ang if w < 0 else ang
+ang2 = curparts[i][4]
+curparts[i][4] = ang / math.pi * 180 - b.ang
+ang2 = curparts[i][4] - ang2
+for pp in curparts[i][7]:
+curparts[i][7][pp][1] += ang2 * math.pi / 180
+rad, ang3 = curparts[i][7][self.id]
+curparts[i][2] = (int(self.pos[0] + rad * math.cos(ang3)), int(self.pos[1] - rad * math.sin(ang3)))
+elif b.pp == p and b.pd == self.id:
+rad, ang3 = curparts[i][7][self.id]
+curparts[i][2] = (int(self.pos[0] + rad * math.cos(ang3)), int(self.pos[1] - rad * math.sin(ang3)))
+for j in points:
+i = points[j].pos
+if abs(i[0]-pos[0]) <= 10 and abs(i[1]-pos[1]) <= 10:
+return (i[0], i[1])
+return False
+w, h = p[0] - SCALING_POINT[0], SCALING_POINT[1] - p[1]
+rad = math.sqrt(w ** 2 + h ** 2)
+ang = math.asin(h / rad)
+ang = math.pi - ang if w < 0 else ang
+rad /= TILE_SCALE
+spos = (int(SCALING_POINT_MINI[0] + rad * math.cos(ang)), int(SCALING_POINT_MINI[1] - rad * math.sin(ang)))
+if forshow:
+return spos
+else:
+return (spos[0] - SCALING_POINT_MINI[0], spos[1] - SCALING_POINT_MINI[1])
+global text_save
+global text_save_frames
+try:
+save = {'frames': frames, 'poses': []}
+if cur_pose > -1:
+poses[cur_pose] = {'name': poses[cur_pose]['name'], 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+for pose in poses:
+s_points = {p:(pose['points'][p].pos, pose['points'][p].id, pose['points'][p].obj, pose['points'][p].parent, pose['points'][p].daughters) for p in pose['points']}
+s_bones = [(b.pp, b.pd, b.ang) for b in pose['bones']]
+s_parts = [(p[0], p[2], p[3], p[4], p[6], p[7]) for p in pose['parts']]
+save['poses'].append({'name': pose['name'], 'parts': s_parts, 'points': s_points, 'bones': s_bones})
+fone, ftwo = 0, 0
+for i in range(240):
+if i in frames:
+fone = i
+break
+for i in range(240):
+if i in frames and not i == fone:
+ftwo = i
+num = ftwo-fone+1 if ftwo else 0
+save['len'] = num
+file = open(folder + '\\' + name + '.txt', 'w', encoding='utf-8')
+file.write(str(save))
+text_save = font.render(f'Saved {len(save["poses"])} poses and {save["len"]} frames', True, (0, 0, 0))
+text_save_frames = 180
+except Exception as e:
+text_save = font.render(str(e), True, (0, 0, 0))
+text_save_frames = 180
+print(e)
+if type(iter) == list:
+return [mkcopy(i) for i in iter]
+if type(iter) == dict:
+return {i:mkcopy(iter[i]) for i in iter}
+if type(iter) == tuple:
+return tuple([mkcopy(i) for i in iter])
+if type(iter) == Point:
+return Point(iter.pos, iter.id, iter.obj, iter.parent, iter.daughters)
+if type(iter) == Bone:
+return Bone(iter.pp, iter.pd, iter.ang)
+return iter
+global frames
+global curparts
+global bones
+global points
+global poses
+if inter:
+data, parts = inter
+poses = []
+frames = data['frames']
+for pi,i in enumerate(data['poses']):
+curparts = []
+bones = []
+points = {}
+for p in i['points']:
+points[p] = Point(i['points'][p][0], i['points'][p][1], i['points'][p][2], i['points'][p][3], i['points'][p][4])
+for b in i['bones']:
+bones.append(Bone(b[0], b[1], b[2]))
+for p in i['parts']:
+curparts.append([p[0], parts[p[0]], p[1], p[2], p[3], None, p[4], p[5]])
+pose = {'name': i['name'], 'parts': curparts, 'points': points, 'bones': bones}
+data['poses'][pi] = pose
+poses.append(pose)
+elif os.path.exists(folder + '\\' + name + '.txt'):
+data = ast.literal_eval(open(folder + '\\' + name + '.txt', 'r', encoding='utf-8').read())
+frames = data['frames']
+for i in data['poses']:
+curparts = []
+bones = []
+points = {}
+for p in i['points']:
+points[p] = Point(i['points'][p][0], i['points'][p][1], i['points'][p][2], i['points'][p][3], i['points'][p][4])
+for b in i['bones']:
+bones.append(Bone(b[0], b[1], b[2]))
+for p in i['parts']:
+curparts.append([p[0], pygame.image.load(f'{folder}\\{p[0]}').convert_alpha(), p[1], p[2], p[3], Image.open(f'{folder}\\{p[0]}').convert('RGBA').load(), p[4], p[5]])
+poses.append({'name': i['name'], 'parts': curparts, 'points': points, 'bones': bones})
+for i, p in enumerate(curparts):
+for pp in poses[frames[two]]['parts']:
+if pp[6] == p[6]:
+if not pp[3] == p[3]:
+diff = (pp[3] - p[3]) * kef
+old = p[3]
+curparts[i][3] = p[3] + diff
+for po in curparts[i][7]:
+curparts[i][7][po][0] = curparts[i][7][po][0] / old * curparts[i][3]
+for p in points:
+if p in poses[frames[two]]['points'] and not points[p].pos == poses[frames[two]]['points'][p].pos:
+pos1 = points[p].pos
+pos2 = poses[frames[two]]['points'][p].pos
+diff = ((pos2[0] - pos1[0]) * kef, (pos2[1] - pos1[1]) * kef)
+points[p].pos = (points[p].pos[0] + diff[0], points[p].pos[1] + diff[1])
+for p in points:
+points[p].move(ps=True)
+for i, p in enumerate(curparts):
+for pp in poses[frames[two]]['parts']:
+if not pp[7]:
+continue
+if pp[6] == p[6]:
+pFlag = False
+for pt in p[7]:
+for b in bones:
+if b.pp == pt and b.pd in poses[frames[one]]['points']:
+w, h = poses[frames[one]]['points'][b.pd].pos[0] - poses[frames[one]]['points'][b.pp].pos[0], poses[frames[one]]['points'][b.pp].pos[1] - poses[frames[one]]['points'][b.pd].pos[1]
+ang = math.asin(h / math.sqrt(w ** 2 + h ** 2))
+ang = math.pi - ang if w < 0 else ang
+w, h = points[b.pd].pos[0] - points[b.pp].pos[0], points[b.pp].pos[1] - points[b.pd].pos[1]
+ang2 = math.asin(h / math.sqrt(w ** 2 + h ** 2))
+ang2 = math.pi - ang2 if w < 0 else ang2
+curparts[i][7][pt][1] += ang2 - ang
+pFlag = True
+break
+if pFlag:
+break
+if not pFlag:
+if pt in pp[7]:
+if not p[7][pt][1] == pp[7][pt][1]:
+ang = corrangpi(pp[7][pt][1] - p[7][pt][1])
+diff = ang * kef
+curparts[i][7][pt][1] = p[7][pt][1] + diff
+for i, p in enumerate(curparts):
+for pt in p[7]:
+pFlag = False
+for b in bones:
+if b.pp == pt:
+w, h = points[b.pd].pos[0] - points[b.pp].pos[0], points[b.pp].pos[1] - points[b.pd].pos[1]
+ang = math.asin(h / math.sqrt(h ** 2 + w ** 2))
+ang = math.pi - ang if w < 0 else ang
+ang = ang / math.pi * 180 - b.ang
+curparts[i][4] = ang
+pFlag = True
+if pFlag is False:
+for pp in poses[frames[two]]['parts']:
+if pp[6] == p[6]:
+ang = corrang(pp[4]-p[4])
+diff = ang * kef
+curparts[i][4] = p[4] + diff
+for i, p in enumerate(curparts):
+for pp in poses[frames[two]]['parts']:
+if pp[6] == p[6]:
+pFlag = False
+for po in curparts[i][7]:
+for b in bones:
+if b.pd == po:
+rad, ang = curparts[i][7][po]
+curparts[i][2] = (int(points[po].pos[0] + rad * math.cos(ang)), int(points[po].pos[1] - rad * math.sin(ang)))
+pFlag = po
+if pFlag is False:
+if not curparts[i][7]:
+diff = ((pp[2][0] - p[2][0]) * kef, (pp[2][1] - p[2][1]) * kef)
+curparts[i][2] = (p[2][0] + diff[0], p[2][1] + diff[0])
+else:
+for po in curparts[i][7]:
+rad, ang = curparts[i][7][po]
+curparts[i][2] = (int(points[po].pos[0] + rad * math.cos(ang)), int(points[po].pos[1] - rad * math.sin(ang)))
+break
+return curparts, points, bones
+global curparts
+global bones
+global points
+res = {}
+fone, ftwo = 0, 0
+for i in range(240):
+if i in frames:
+fone = i
+break
+for i in range(240):
+if i in frames and not i == fone:
+ftwo = i
+if not ftwo:
+return res
+for play in range(fone, ftwo + 1):
+if play in frames:
+curparts = mkcopy(poses[frames[play]]['parts'])
+points = mkcopy(poses[frames[play]]['points'])
+bones = mkcopy(poses[frames[play]]['bones'])
+else:
+one, two = None, None
+for i in range(240):
+if i < play:
+if i in frames:
+one = i
+for i in range(240):
+if i > play:
+if i in frames:
+two = i
+break
+if two is None:
+for i in range(240):
+if i in frames:
+one = i
+break
+curparts = mkcopy(poses[frames[one]]['parts'])
+points = mkcopy(poses[frames[one]]['points'])
+bones = mkcopy(poses[frames[one]]['bones'])
+else:
+curparts = mkcopy(poses[frames[one]]['parts'])
+points = mkcopy(poses[frames[one]]['points'])
+bones = mkcopy(poses[frames[one]]['bones'])
+kef = (play - one) / (two - one)
+posesplit(one, two, kef)
+res[play] = [(p[0], p[2], p[3], p[4]) for p in curparts]
+return res
+if __name__ == "__main__":
+load()
+while True:
+sc.fill(pygame.Color('white'))
+pos = pygame.mouse.get_pos()
+pressed = pygame.mouse.get_pressed()
+magnet = magnetify(pos)
+for event in pygame.event.get():
+if event.type == pygame.QUIT:
+exit()
+if event.type == pygame.KEYDOWN:
+if event.key == pygame.K_f:
+bonetool = False if bonetool else True
+if event.key == pygame.K_g:
+bonesmode = False if bonesmode else True
+if event.key == pygame.K_u:
+parts = [i for i in os.listdir(folder) if i.endswith('.png')]
+if event.key == pygame.K_s:
+save(sc)
+if event.key == pygame.K_h:
+point_move_bind = False if point_move_bind else True
+if event.key == pygame.K_z:
+dl = log[-1]
+if dl[0] == 'newpart':
+for i, p in enumerate(curparts):
+if curparts[i][6] == dl[1]:
+delbones = []
+delp = []
+del curparts[i]
+for j in points:
+if points[j].obj == dl[1]:
+for bdx, b in enumerate(bones):
+if b.pp == j or b.pd == j:
+delbones.append(bdx)
+delp.append(j)
+for j in delp:
+for pp in points:
+if j in pp.daughters:
+del pp.daughters[pp.daughters.index(j)]
+if j == pp.parent:
+pp.parent = None
+del points[j]
+for j in delbones:
+del bones[j]
+if i == cur_idx:
+cur_idx = -1
+if i == sec_idx:
+sec_idx = -1
+break
+elif dl[0] == 'partdrag':
+new_cur_idx, new_sec_idx = cur_idx, sec_idx
+llpart = curparts[dl[2]]
+if dl[2] == cur_idx:
+new_cur_idx = dl[1]
+if dl[2] == sec_idx:
+new_sec_idx = dl[1]
+if dl[1] < dl[2]:
+for j in range(dl[1], dl[2])[::-1]:
+curparts[j + 1] = curparts[j]
+if j == cur_idx:
+new_cur_idx = j + 1
+if j == sec_idx:
+new_sec_idx = j + 1
+else:
+for j in range(dl[2], dl[1]):
+curparts[j] = curparts[j + 1]
+if j + 1 == cur_idx:
+new_cur_idx = j
+if j + 1 == sec_idx:
+new_sec_idx = j
+curparts[dl[1]] = llpart
+cur_idx, sec_idx = new_cur_idx, new_sec_idx
+elif dl[0] == 'bonecr':
+for bdx, b in enumerate(bones):
+if b.pp == dl[1][0] and b.pd == dl[1][1]:
+del bones[bdx]
+break
+for p in dl[1]:
+delp = False
+for b in bones:
+if b.pp == p or b.pd == p:
+delp = True
+break
+if not delp:
+for i in range(len(curparts)):
+if curparts[i][6] == points[p].obj:
+del curparts[i][7][p]
+break
+del points[p]
+elif dl[0] == 'motion':
+for pr in dl[1]['parts']:
+dld = dl[1]['parts'][pr]
+for p in range(len(curparts)):
+if curparts[p][6] == pr:
+curparts[p][4] = dld[4]
+curparts[p][2] = dld[2]
+curparts[p][3] = dld[3]
+curparts[p][7] = dld[7]
+for p in dl[1]['points']:
+points[p].pos = dl[1]['points'][p]
+points[p].move()
+elif dl[0] == 'newpos':
+for i in poses:
+if i['name'] == dl[1]:
+for j in range(240):
+if j in frames:
+if frames[j] == dl[1]:
+del frames[j]
+del poses[poses.index(i)]
+break
+elif dl[0] == 'setpos':
+if dl[2] == None:
+del frames[dl[1]]
+else:
+frames[dl[1]] = dl[2]
+del log[-1]
+if event.key == pygame.K_ESCAPE:
+exit()
+if event.type == pygame.MOUSEMOTION:
+if not point_lock == None:
+points[point_lock].pos = (points[point_lock].pos[0] + event.rel[0], points[point_lock].pos[1] + event.rel[1])
+for b in bones:
+if b.pd == point_lock:
+b.length = math.sqrt((points[b.pp].pos[0] - points[b.pd].pos[0]) ** 2 + (points[b.pp].pos[1] - points[b.pd].pos[1]) ** 2)
+for i,p in enumerate(curparts):
+if p[6] == points[point_lock].obj:
+for pp in p[7]:
+if pp == point_lock:
+w, h = curparts[i][2][0] - points[point_lock].pos[0], points[point_lock].pos[1] - curparts[i][2][1]
+rad = math.sqrt(h ** 2 + w ** 2)
+ang = math.asin(h / rad)
+ang = math.pi - ang if w < 0 else ang
+curparts[i][7][point_lock] = [rad, ang]
+break
+if point_move_bind:
+points[point_lock].move()
+else:
+points[point_lock].move(pi=True)
+elif not obj_lock == None:
+if event.buttons[0]:
+opos = curparts[obj_lock][2]
+pFlag = False
+logdict = {'parts': {}, 'points': {}}
+logdict['parts'][curparts[obj_lock][6]] = {4: curparts[obj_lock][4], 2: curparts[obj_lock][2], 7: curparts[obj_lock][7], 3: curparts[obj_lock][3]}
+for p in curparts[obj_lock][7]:
+for b in bones:
+if b.pd == p:
+rad, ang = curparts[obj_lock][7][p]
+w, h = pos[0] - points[p].pos[0], points[p].pos[1] - pos[1]
+rad2 = math.sqrt(w ** 2 + h ** 2)
+ang2 = math.asin(h / rad2)
+ang2 = math.pi - ang2 if w < 0 else ang2
+curparts[obj_lock][4] += (ang2 - ang)*180/math.pi
+curparts[obj_lock][7][p][1] = ang2
+pos1 = (int(points[p].pos[0] + rad * math.cos(ang2)), int(points[p].pos[1] - rad * math.sin(ang2)))
+if rad*2 < rad2:
+curparts[obj_lock][2] = pos1
+else:
+pos2 = (int(points[p].pos[0] + rad2 * math.cos(ang2)), int(points[p].pos[1] - rad2 * math.sin(ang2)))
+offset = (pos2[0] - pos1[0], pos2[1] - pos1[1])
+curparts[obj_lock][2] = pos1
+logdict['points'][p] = points[p].pos
+points[p].pos = (points[p].pos[0] + offset[0], points[p].pos[1] + offset[1])
+points[p].move()
+pFlag = p
+break
+if pFlag:
+break
+if pFlag:
+for p in curparts[obj_lock][7]:
+rad, ang3 = curparts[obj_lock][7][p]
+ang3 += math.pi
+logdict['points'][p] = points[p].pos
+points[p].pos = (int(curparts[obj_lock][2][0] + rad * math.cos(ang3)), int(curparts[obj_lock][2][1] - rad * math.sin(ang3)))
+points[p].move()
+for b in bones:
+if b.pp == p:
+ang = (curparts[obj_lock][4] + b.ang) * math.pi / 180
+points[b.pd].pos = (int(points[b.pp].pos[0] + b.length * math.cos(ang)), int(points[b.pp].pos[1] - b.length * math.sin(ang)))
+points[b.pd].move()
+elif not curparts[obj_lock][7]:
+p = curparts[obj_lock]
+part = p[1]
+if not p[3] == 1:
+part = pygame.transform.scale(part, (int(part.get_width() * p[3]), int(part.get_height() * p[3])))
+if p[4]:
+part = pygame.transform.rotate(part, p[4])
+rad = (part.get_width() + part.get_height()) / 8
+w, h = pos[0] - curparts[obj_lock][2][0], curparts[obj_lock][2][1] - pos[1]
+rad2 = math.sqrt(w ** 2 + h ** 2)
+if rad2 > rad:
+ang2 = math.asin(h / rad2)
+ang2 = math.pi - ang2 if w < 0 else ang2
+ang2 += math.pi/2
+curparts[obj_lock][4] = ang2/math.pi*180
+else:
+curparts[obj_lock][2] = (opos[0] + event.rel[0], opos[1] + event.rel[1])
+else:
+curparts[obj_lock][2] = (opos[0] + event.rel[0], opos[1] + event.rel[1])
+for i in curparts[obj_lock][7]:
+logdict['points'][i] = points[i].pos
+points[i].pos = (points[i].pos[0] + event.rel[0], points[i].pos[1] + event.rel[1])
+points[i].move()
+for b in bones:
+if b.pp == i:
+points[b.pd].pos = (points[b.pd].pos[0] + event.rel[0], points[b.pd].pos[1] + event.rel[1])
+points[b.pd].move(pi=True)
+laFlag = True
+if log and log[-1][0] == 'motion':
+laFlag = False
+for pr in logdict['parts']:
+if pr not in log[-1][1]['parts']:
+laFlag = True
+for p in logdict['points']:
+if p not in log[-1][1]['points']:
+laFlag = True
+if laFlag:
+log.append(('motion', logdict))
+if event.type == pygame.MOUSEBUTTONDOWN:
+if event.button < 4:
+if bonetool and pos[0] < 1535 and pos[1] < 950 and cur_idx > -1 and sec_idx > -1:
+p = curparts[cur_idx]
+part = p[1]
+if not p[3] == 1:
+part = pygame.transform.scale(part, (int(part.get_width() * p[3]), int(part.get_height() * p[3])))
+if p[4]:
+part = pygame.transform.rotate(part, p[4])
+if p[2][0] - part.get_width() // 2 < pos[0] < p[2][0] + part.get_width() // 2 and p[2][1] - part.get_height() // 2 < pos[1] < p[2][1] + part.get_height() // 2:
+mpos = magnet if magnet else pos
+boneline = mpos
+if not bonetool and pos[0] < 1535 and pos[1] < 950:
+if event.button == 1 or event.button == 3:
+for i in range(len(curparts))[::-1]:
+p = curparts[i]
+part = p[1]
+if not p[3] == 1:
+part = pygame.transform.scale(part, (int(part.get_width() * p[3]), int(part.get_height() * p[3])))
+if p[4]:
+part = pygame.transform.rotate(part, p[4])
+if p[2][0] - part.get_width()//2 < pos[0] < p[2][0] + part.get_width()//2 and p[2][1] - part.get_height()//2 < pos[1] < p[2][1] + part.get_height()//2:
+obj_lock = i
+break
+elif event.button == 2:
+if magnet:
+for j in points:
+if magnet == points[j].pos:
+point_lock = j
+for i, p in enumerate(curparts):
+if 1535 < pos[0] < 1750 and 50 + 25 * i < pos[1] < 75 + 25 * i:
+if event.button == 2:
+id = curparts[i][6]
+delbones = []
+delp = []
+del curparts[i]
+for j in points:
+if points[j].obj == id:
+for bdx, b in enumerate(bones):
+if b.pp == j or b.pd == j:
+delbones.append(bdx)
+delp.append(j)
+for j in delp:
+for pp in points:
+if j in pp.daughters:
+del pp.daughters[pp.daughters.index(j)]
+if j == pp.parent:
+pp.parent = None
+del points[j]
+for j in delbones:
+del bones[j]
+if i == cur_idx:
+cur_idx = -1
+if i == sec_idx:
+sec_idx = -1
+break
+list_lock = i
+posesplus = 25 if temp_pose else 0
+for i, p in enumerate(poses):
+if 50 < pos[0] < 125 and 50 + posesplus + 25 * i < pos[1] < 75 + posesplus + 25 * i:
+pose_lock = i
+obj_lock = None
+if pos[1] > 970:
+for i in range(240):
+if i in frames:
+fyoffset = 0 if i < 120 else 55
+if 16 + i%120 * 15 < pos[0] < 28 + i%120 * 15 and 970 + fyoffset < pos[1] < 994 + fyoffset:
+frame_lock = frames[i]
+break
+elif not obj_lock == None:
+if event.button == 4 or event.button == 5:
+logdict = {'parts': {}, 'points': {}}
+logdict['parts'][curparts[obj_lock][6]] = {4: curparts[obj_lock][4], 2: curparts[obj_lock][2], 7: curparts[obj_lock][7], 3: curparts[obj_lock][3]}
+if event.button == 5:
+curparts[obj_lock][3] *= 0.9
+else:
+curparts[obj_lock][3] /= 0.9
+for p in curparts[obj_lock][7]:
+curparts[obj_lock][7][p][0] = curparts[obj_lock][7][p][0]/logdict['parts'][curparts[obj_lock][6]][3]*curparts[obj_lock][3]
+for p in curparts[obj_lock][7]:
+for b in bones:
+if b.pd == p:
+rad, ang = curparts[obj_lock][7][p]
+curparts[obj_lock][2] = (int(points[p].pos[0] + rad * math.cos(ang)), int(points[p].pos[1] - rad * math.sin(ang)))
+for p in curparts[obj_lock][7]:
+for b in bones:
+if not b.pd == p:
+rad, ang = curparts[obj_lock][7][p]
+ang += math.pi
+points[p].pos = (int(curparts[obj_lock][2][0] + rad * math.cos(ang)), int(curparts[obj_lock][2][1] - rad * math.sin(ang)))
+points[p].move()
+log.append(('motion', logdict))
+if event.type == pygame.MOUSEBUTTONUP:
+if boneline:
+if cur_idx > -1 and sec_idx > -1:
+p = curparts[sec_idx]
+part = p[1]
+if not p[3] == 1:
+part = pygame.transform.scale(part, (int(part.get_width() * p[3]), int(part.get_height() * p[3])))
+if p[4]:
+part = pygame.transform.rotate(part, p[4])
+if p[2][0] - part.get_width() // 2 < pos[0] < p[2][0] + part.get_width() // 2 and p[2][1] - part.get_height() // 2 < pos[1] < p[2][1] + part.get_height() // 2:
+p1, p2 = None, None
+mpos = magnet if magnet else pos
+for i in points:
+if points[i].pos == boneline:
+p1 = i
+if points[i].pos == mpos:
+p2 = i
+if p1 is None:
+p1 = curparts[cur_idx][6]
+while p1 in points:
+p1 += 100
+points[p1] = Point(boneline, p1, curparts[cur_idx][6])
+w, h = curparts[cur_idx][2][0] - boneline[0], boneline[1] - curparts[cur_idx][2][1]
+rad = math.sqrt(h ** 2 + w ** 2)
+ang = math.asin(h / rad)
+ang = math.pi - ang if w < 0 else ang
+curparts[cur_idx][7][p1] = [rad, ang]
+if p2 is None:
+p2 = curparts[sec_idx][6]
+while p2 in points:
+p2 += 100
+points[p2] = Point(mpos, p2, curparts[sec_idx][6])
+w, h = curparts[sec_idx][2][0] - mpos[0], mpos[1] - curparts[sec_idx][2][1]
+rad = math.sqrt(h ** 2 + w ** 2)
+ang = math.asin(h / rad)
+ang = math.pi - ang if w < 0 else ang
+curparts[sec_idx][7][p2] = [rad, ang]
+w, h = mpos[0] - boneline[0], boneline[1] - mpos[1]
+ang = math.asin(h / math.sqrt(h ** 2 + w ** 2))
+ang = math.pi - ang if w < 0 else ang
+ang = ang/math.pi*180 - curparts[cur_idx][4]
+points[p1].daughters.append(p2)
+points[p2].parent = p1
+bones.append(Bone(p1, p2, ang))
+cur_idx = sec_idx
+sec_idx = -1
+log.append(('bonecr', (p1, p2)))
+boneline = None
+elif 110 < pos[0] < 145 and 15 < pos[1] < 50:
+pose = {'name': len(poses)+1, 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+poses.append(pose)
+log.append(('newpos', pose['name']))
+elif 1830 < pos[0] < 1880 and 970 < pos[1] < 1020:
+if play < 0:
+if len(frames) > 1:
+if cur_pose > -1:
+poses[cur_pose] = {'name': poses[cur_pose]['name'], 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+for i in range(240):
+if i in frames:
+play = i
+break
+else:
+play = -1
+if cur_pose > -1:
+curparts = mkcopy(poses[cur_pose]['parts'])
+points = mkcopy(poses[cur_pose]['points'])
+bones = mkcopy(poses[cur_pose]['bones'])
+elif pos[1] >= 970:
+for i in range(240):
+fyoffset = 0 if i < 120 else 55
+if 16 + i%120 * 15 < pos[0] < 28 + i%120 * 15 and 970 + fyoffset < pos[1] < 994 + fyoffset:
+if event.button == 3:
+if i in frames:
+f = frames[i]
+log.append(('setpos', i, f))
+del frames[i]
+elif not frame_lock == None:
+if i in frames:
+f = frames[i]
+else:
+f = None
+log.append(('setpos', i, f))
+frames[i] = frame_lock
+elif not pose_lock == None:
+if i in frames:
+f = frames[i]
+else:
+f = None
+log.append(('setpos', i, f))
+frames[i] = pose_lock
+elif i in frames:
+if cur_pose > -1:
+poses[cur_pose] = {'name': poses[cur_pose]['name'], 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+elif curparts:
+temp_pose = {'name': 'temp', 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+cur_pose = frames[i]
+curparts = mkcopy(poses[cur_pose]['parts'])
+points = mkcopy(poses[cur_pose]['points'])
+bones = mkcopy(poses[cur_pose]['bones'])
+elif temp_pose:
+if 50 < pos[0] < 125 and 50 < pos[1] < 75:
+if cur_pose > -1:
+poses[cur_pose] = {'name': poses[cur_pose]['name'], 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+cur_pose = -1
+curparts = mkcopy(temp_pose['parts'])
+points = mkcopy(temp_pose['points'])
+bones = mkcopy(temp_pose['bones'])
+temp_pose = {}
+elif not pose_lock == None:
+for i, p in enumerate(poses):
+if 50 < pos[0] < 125 and 75 + 25 * i < pos[1] < 100 + 25 * i:
+if event.button == 1 or event.button == 3:
+if cur_pose > -1:
+poses[cur_pose] = {'name': poses[cur_pose]['name'], 'parts': mkcopy(curparts),
+'points': mkcopy(points), 'bones': mkcopy(bones)}
+cur_pose = i
+curparts = mkcopy(poses[cur_pose]['parts'])
+points = mkcopy(poses[cur_pose]['points'])
+bones = mkcopy(poses[cur_pose]['bones'])
+elif event.button == 2:
+for f in range(240):
+if f in frames:
+if frames[f] == i:
+del frames[f]
+elif frames[f] > i:
+frames[f] -= 1
+del poses[i]
+for pi in range(i, len(poses)):
+poses[pi]['name'] -= 1
+elif not pose_lock == None:
+for i, p in enumerate(poses):
+if 50 < pos[0] < 125 and 50 + 25 * i < pos[1] < 75 + 25 * i:
+if event.button == 1 or event.button == 3:
+if cur_pose > -1:
+poses[cur_pose] = {'name': poses[cur_pose]['name'], 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+elif curparts:
+temp_pose = {'name': 'temp', 'parts': mkcopy(curparts), 'points': mkcopy(points), 'bones': mkcopy(bones)}
+cur_pose = i
+curparts = mkcopy(poses[cur_pose]['parts'])
+points = mkcopy(poses[cur_pose]['points'])
+bones = mkcopy(poses[cur_pose]['bones'])
+elif event.button == 2:
+for f in range(240):
+if f in frames:
+if frames[f] == i:
+del frames[f]
+elif frames[f] > i:
+frames[f] -= 1
+del poses[i]
+for pi in range(i, len(poses)):
+poses[pi]['name'] -= 1
+elif obj_lock == None and pose_lock == None:
+for i, p in enumerate(curparts):
+if 1535 < pos[0] < 1750 and 50 + 25 * i < pos[1] < 75 + 25 * i:
+if not list_lock == None and not i == list_lock:
+log.append(('partdrag', list_lock, i))
+new_cur_idx, new_sec_idx = cur_idx, sec_idx
+llpart = curparts[list_lock]
+if list_lock == cur_idx:
+new_cur_idx = i
+if list_lock == sec_idx:
+new_sec_idx = i
+if i < list_lock:
+for j in range(i, list_lock)[::-1]:
+curparts[j+1] = curparts[j]
+if j == cur_idx:
+new_cur_idx = j+1
+if j == sec_idx:
+new_sec_idx = j+1
+else:
+for j in range(list_lock, i):
+curparts[j] = curparts[j+1]
+if j+1 == cur_idx:
+new_cur_idx = j
+if j+1 == sec_idx:
+new_sec_idx = j
+curparts[i] = llpart
+cur_idx, sec_idx = new_cur_idx, new_sec_idx
+else:
+if event.button == 1:
+if cur_idx == i:
+cur_idx = -1
+else:
+cur_idx = i
+if sec_idx == i:
+sec_idx = -1
+if event.button == 3:
+if sec_idx == i:
+sec_idx = -1
+else:
+sec_idx = i
+if cur_idx == i:
+cur_idx = -1
+break
+for i, p in enumerate(parts):
+if 1750 < pos[0] < 1950 and 50 + 25 * i < pos[1] < 75 + 25 * i:
+max = 0
+for i in curparts:
+if i[6] > max:
+max = i[6]
+curparts.append([p, pygame.image.load(f'{folder}\\{p}').convert_alpha(), (1000, 500), 1, 0, Image.open(f'{folder}\\{p}').convert('RGBA').load(), max+1, {}])
+log.append(('newpart', max+1))
+if not event.button == 4 and not event.button == 5:
+obj_lock = None
+point_lock = None
+list_lock = None
+pose_lock = None
+frame_lock = None
+for i in range(AMAP_SIZE_X-1):
+pygame.draw.aaline(sc, YELLANGE, (i * TILE_SIZE_SCALED + TILE_SIZE_SCALED + X_OFFSET, Y_OFFSET), (i * TILE_SIZE_SCALED + TILE_SIZE_SCALED + X_OFFSET, Y_OFFSET + TILE_SIZE_SCALED * AMAP_SIZE_Y))
+for i in range(AMAP_SIZE_Y):
+pygame.draw.aaline(sc, YELLANGE, (X_OFFSET, i * TILE_SIZE_SCALED + TILE_SIZE_SCALED + Y_OFFSET), (X_OFFSET + TILE_SIZE_SCALED * AMAP_SIZE_X, i * TILE_SIZE_SCALED + TILE_SIZE_SCALED + Y_OFFSET))
+pygame.draw.aaline(sc, YELLOW, (X_OFFSET, (i - 0.25) * TILE_SIZE_SCALED + TILE_SIZE_SCALED + Y_OFFSET), (X_OFFSET + TILE_SIZE_SCALED * AMAP_SIZE_X, (i - 0.25) * TILE_SIZE_SCALED + TILE_SIZE_SCALED + Y_OFFSET))
+pygame.draw.circle(sc, DARK_RED, SCALING_POINT, 1)
+sc.blit(font.render(str((pos[0]-SCALING_POINT[0], pos[1]-SCALING_POINT[1])), True, (0, 0, 0)), (200, 15))
+for i in range(AMAP_SIZE_X - 1):
+pygame.draw.aaline(sc, YELLANGE, (i * TILE_SIZE + TILE_SIZE + X_OFFSET_MINI, Y_OFFSET_MINI), (i * TILE_SIZE + TILE_SIZE + X_OFFSET_MINI, Y_OFFSET_MINI + TILE_SIZE * AMAP_SIZE_Y))
+for i in range(AMAP_SIZE_Y):
+pygame.draw.aaline(sc, YELLANGE, (X_OFFSET_MINI, i * TILE_SIZE + TILE_SIZE + Y_OFFSET_MINI), (X_OFFSET_MINI + TILE_SIZE * AMAP_SIZE_X, i * TILE_SIZE + TILE_SIZE + Y_OFFSET_MINI))
+pygame.draw.aaline(sc, YELLOW, (X_OFFSET_MINI, (i - 0.25) * TILE_SIZE + TILE_SIZE + Y_OFFSET_MINI), (X_OFFSET_MINI + TILE_SIZE * AMAP_SIZE_X, (i - 0.25) * TILE_SIZE + TILE_SIZE + Y_OFFSET_MINI))
+pygame.draw.circle(sc, DARK_RED, SCALING_POINT_MINI, 1)
+for i,p in enumerate(curparts):
+if i == cur_idx:
+sc.blit(cur_ic, (1535, 50 + 25 * i))
+pygame.draw.rect(sc, BLUE, (1550, 50 + 25 * i, 180, 25))
+if i == sec_idx:
+sc.blit(sec_ic, (1535, 55 + 25 * i))
+pygame.draw.rect(sc, DARK_RED, (1550, 50 + 25 * i, 180, 25))
+sc.blit(font.render(p[0].split('.png')[0], True, (0, 0, 0)), (1550, 50+25*i))
+part = p[1]
+if not p[3] == 1:
+part = pygame.transform.scale(part, (int(part.get_width()*p[3]), int(part.get_height()*p[3])))
+if p[4]:
+part = pygame.transform.rotate(part, p[4])
+if i == cur_idx:
+pygame.draw.rect(sc, BLUE, (p[2][0]-part.get_width()//2, p[2][1]-part.get_height()//2, part.get_width(), part.get_height()), 1)
+if i == sec_idx:
+pygame.draw.rect(sc, DARK_RED, (p[2][0]-part.get_width()//2, p[2][1]-part.get_height()//2, part.get_width(), part.get_height()), 1)
+sc.blit(part, (p[2][0]-part.get_width()//2, p[2][1]-part.get_height()//2))
+pygame.draw.circle(sc, BLUE, p[2], 5)
+minipart = pygame.transform.scale(p[1], (int(p[1].get_width() * p[3] / TILE_SCALE), int(p[1].get_height() * p[3] / TILE_SCALE)))
+if p[4]:
+minipart = pygame.transform.rotate(minipart, p[4])
+minipos = unscale(p[2], True)
+sc.blit(minipart, (minipos[0] - minipart.get_width() // 2, minipos[1] - minipart.get_height() // 2))
+if not obj_lock == None:
+pFlag = False
+for p in curparts[obj_lock][7]:
+for b in bones:
+if b.pd == p:
+rad = curparts[obj_lock][7][p][0]*2
+pygame.draw.circle(sc, GREY, curparts[obj_lock][2], rad, 1)
+pFlag = True
+if not pFlag and not curparts[obj_lock][7]:
+p = curparts[obj_lock]
+part = p[1]
+if not p[3] == 1:
+part = pygame.transform.scale(part, (int(part.get_width() * p[3]), int(part.get_height() * p[3])))
+if p[4]:
+part = pygame.transform.rotate(part, p[4])
+rad = (part.get_width() + part.get_height()) / 8
+pygame.draw.circle(sc, GREY, curparts[obj_lock][2], rad, 1)
+if bonesmode:
+for i in bones:
+pygame.draw.aaline(sc, YELLOW, points[i.pp].pos, points[i.pd].pos)
+pygame.draw.circle(sc, LIGHT_GREEN, points[i.pp].pos, 8, 2)
+pygame.draw.circle(sc, LIGHT_BLUE, points[i.pd].pos, 5)
+if play > -1:
+if play in frames:
+curparts = mkcopy(poses[frames[play]]['parts'])
+points = mkcopy(poses[frames[play]]['points'])
+bones = mkcopy(poses[frames[play]]['bones'])
+else:
+one, two = None, None
+for i in range(240):
+if i < play:
+if i in frames:
+one = i
+for i in range(240):
+if i > play:
+if i in frames:
+two = i
+break
+if two is None:
+for i in range(240):
+if i in frames:
+one = i
+break
+curparts = mkcopy(poses[frames[one]]['parts'])
+points = mkcopy(poses[frames[one]]['points'])
+bones = mkcopy(poses[frames[one]]['bones'])
+play = one
+else:
+curparts = mkcopy(poses[frames[one]]['parts'])
+points = mkcopy(poses[frames[one]]['points'])
+bones = mkcopy(poses[frames[one]]['bones'])
+kef = (play - one) / (two - one)
+posesplit(one, two, kef)
+play += 1
+sc.blit(text_parts, (1750, 15))
+for i, p in enumerate(parts):
+sc.blit(font.render(p.split('.png')[0], True, (0, 0, 0)), (1750, 50 + 25 * i))
+sc.blit(text_curparts, (1550, 15))
+sc.blit(text_poses, (15, 15))
+if text_save_frames:
+text_save_frames -= 1
+sc.blit(text_save, (600, 15))
+sc.blit(plus_ic, (110, 15))
+posesplus = 0
+if temp_pose:
+sc.blit(font.render(str(temp_pose['name']), True, (0, 0, 0)), (50, 50))
+posesplus = 25
+for i, p in enumerate(poses):
+if i == cur_pose:
+pygame.draw.rect(sc, YELLOW, (40, 50 + posesplus + 25 * i, 40, 25))
+sc.blit(font.render(str(p['name']), True, (0, 0, 0)), (50, 50 + posesplus + 25 * i))
+sc.blit(text_bones, (1250, 20))
+sc.blit(text_tbones, (1250, 50))
+color = GREEN if bonetool else RED
+sc.blit(font.render(str(bonetool), True, color), (1370, 20))
+sc.blit(text_point_move_bind, (880, 50))
+color = GREEN if point_move_bind else RED
+sc.blit(font.render(str(point_move_bind), True, color), (1170, 50))
+pygame.draw.aaline(sc, DARK_RED, (1535, 0), (1535, 950))
+pygame.draw.aaline(sc, DARK_RED, (0, 950), (2000, 950))
+for i in range(240):
+fyoffset = 0 if i < 120 else 55
+if i == play-1:
+pygame.draw.rect(sc, DARK_RED, (16 + i%120 * 15, 970+fyoffset, 12, 24))
+else:
+pygame.draw.rect(sc, DARK_RED, (16+i%120*15, 970+fyoffset, 12, 24), 1)
+if i in frames:
+pygame.draw.circle(sc, BLACK, (22 + i%120 * 15, 988+fyoffset), 4)
+sc.blit(font3.render(str(poses[frames[i]]['name']), True, (0, 0, 0)), (17 + i%120 * 15, 995+fyoffset))
+if i % 5 == 4:
+sc.blit(font4.render(str(i+1), True, (0, 0, 0)), (17 + i % 120 * 15, 958 + fyoffset))
+if play > -1:
+sc.blit(playon_ic, (1830, 970))
+else:
+sc.blit(play_ic, (1830, 970))
+if boneline:
+mpos = magnet if magnet else pos
+pygame.draw.aaline(sc, YELLOW, boneline, mpos)
+pygame.draw.circle(sc, LIGHT_GREEN, boneline, 8, 2)
+pygame.draw.circle(sc, LIGHT_BLUE, mpos, 5)
+pygame.display.flip()
+clock.tick(FPS)
+WINDOW = 1900, 1000
+FULL_WINDOW = 1920, 1080
+HALF_WINDOW = tuple((i//2 for i in FULL_WINDOW))
+FPS = 60
+TILE_SIZE = 47
+MAP_X_OFFSET = 116
+MAP_Y_OFFSET = 259
+MAP_SIZE_X = 36
+MAP_SIZE_Y = 16
+TEST_MAP_SIZE_X = 500
+TEST_MAP_SIZE_Y = 250
+CAMERA_SPEED = 20/TILE_SIZE
+GRAVITY = 1 / FPS / 3
+JUMP_SPEED = -0.11
+FLYING_ACCEL_TO_SPEED = 0.1
+DAMAGE_VALUE_TIME = 60
+DAMAGE_VALUE_TRANSPARENT_START = 45
+DAMAGE_VALUE_TRANSPARENT_TIME = DAMAGE_VALUE_TIME - DAMAGE_VALUE_TRANSPARENT_START
+DAMAGE_VALUE_VSPEED = 150/FPS
+DAMAGE_BAR_TIME = 180
+DAMAGE_BAR_FRESH_START = 60
+DAMAGE_BAR_FRESH_END = 120
+DAMAGE_BAR_FRESH_TIME = DAMAGE_BAR_FRESH_END - DAMAGE_BAR_FRESH_START
+DAMAGE_BAR_TRANSPARENT_TIME = 20
+DAMAGE_BAR_TRANSPARENT_START = DAMAGE_BAR_TIME - DAMAGE_BAR_TRANSPARENT_TIME
+UNIT_BAR_SIZE = (300, 55)
+YELLOW = (255, 255, 0)
+YELLANGE = (255, 192, 0)
+ORANGE = (255, 128, 0)
+BLUE = (0, 0, 225)
+LIGHT_BLUE = (135, 208, 250)
+RED = (255, 0, 0)
+DARK_RED = (128, 0, 0)
+GREEN = (64, 255, 64)
+LIGHT_GREEN = (128, 255, 128)
+BLACK = (0, 0, 0)
+BROWN = (96, 38, 0)
+GREY = (128, 128, 128)
+GREEN_MASK = (0, 255, 29)
+DMGCOLORS = {'n': (0, 0, 0), 'a': (128, 128, 128), 'w': (28, 56, 128), 'f': (224, 60, 30), 'e': (60, 224, 60), 'd': (96, 38, 220), 'l': (240, 240, 60), 'h': (118, 255, 122)}
+INGAME_GUI = ((0, 60), (132, 0), (1016, 0), (516, 966))
+MAIN_GUI = (175, 300)
+MAIN_CIRCLE = (MAIN_GUI[0]+316, MAIN_GUI[1]+316, 316)
+NAME_POS = (47, 24)
+NAME_SIZES = (856, 276)
+MAIN_CIRCLE_RSPEED = 22/60
+MAIN_ELEMENTS_RSPEED = MAIN_CIRCLE_RSPEED*math.pi/180
+BUTTON_PLAY = (322, 300)
+BUTTON_PLAY_CIRCLE = (200,)
+GUI_ICON_SIZE = (101, 101)
+GUI_SMALL_ICON_SIZE = (50, 51)
+GUI_CUR_AVATAR = (7, 172)
+GUI_SKILLS = ((7, 367), (7, 476), (7, 585), (7, 694))
+GUI_ITEMS = ((4, 816), (59, 816), (4, 871), (59, 871), (4, 926), (59, 926))
+GUI_ALLIES = ((184, 7), (293, 7), (402, 7), (511, 7), (620, 7), (729, 7), (838, 7))
+GUI_ENEMIES = ((1066, 7), (1175, 7), (1284, 7), (1393, 7), (1502, 7), (1611, 7), (1720, 7))
+GUI_BAR_POSES = ((7, 282), (7, 307), (7, 332))
+GUI_BAR_SIZE = (101, 22)
+GUI_BAR_TRIANGLE = ((0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9), (0, 10), (0, 11), (0, 12), (0, 13), (0, 14), (0, 15), (0, 16), (0, 17), (0, 18), (0, 19), (0, 20), (0, 21), (1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19), (1, 20), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18), (3, 0), (3, 1), (3, 2), (3, 3), (3, 4), (3, 5), (3, 6), (3, 7), (3, 8), (3, 9), (3, 10), (3, 11), (3, 12), (3, 13), (3, 14), (3, 15), (3, 16), (3, 17), (4, 0), (4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7), (4, 8), (4, 9), (4, 10), (4, 11), (4, 12), (4, 13), (4, 14), (4, 15), (5, 0), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (5, 6), (5, 7), (5, 8), (5, 9), (5, 10), (5, 11), (5, 12), (5, 13), (6, 0), (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (6, 7), (6, 8), (6, 9), (6, 10), (6, 11), (7, 0), (7, 1), (7, 2), (7, 3), (7, 4), (7, 5), (7, 6), (7, 7), (7, 8), (7, 9), (7, 10), (8, 0), (8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (8, 8), (9, 0), (9, 1), (9, 2), (9, 3), (9, 4), (9, 5), (9, 6), (10, 0), (10, 1), (10, 2), (10, 3), (10, 4), (11, 0), (11, 1), (11, 2), (11, 3), (12, 0), (12, 1))
+GUI_BAR_TRIANGLE_RIGHT = ((88, 21), (89, 19), (89, 20), (89, 21), (90, 18), (90, 19), (90, 20), (90, 21), (91, 16), (91, 17), (91, 18), (91, 19), (91, 20), (91, 21), (92, 14), (92, 15), (92, 16), (92, 17), (92, 18), (92, 19), (92, 20), (92, 21), (93, 12), (93, 13), (93, 14), (93, 15), (93, 16), (93, 17), (93, 18), (93, 19), (93, 20), (93, 21), (94, 11), (94, 12), (94, 13), (94, 14), (94, 15), (94, 16), (94, 17), (94, 18), (94, 19), (94, 20), (94, 21), (95, 9), (95, 10), (95, 11), (95, 12), (95, 13), (95, 14), (95, 15), (95, 16), (95, 17), (95, 18), (95, 19), (95, 20), (95, 21), (96, 7), (96, 8), (96, 9), (96, 10), (96, 11), (96, 12), (96, 13), (96, 14), (96, 15), (96, 16), (96, 17), (96, 18), (96, 19), (96, 20), (96, 21), (97, 5), (97, 6), (97, 7), (97, 8), (97, 9), (97, 10), (97, 11), (97, 12), (97, 13), (97, 14), (97, 15), (97, 16), (97, 17), (97, 18), (97, 19), (97, 20), (97, 21), (98, 4), (98, 5), (98, 6), (98, 7), (98, 8), (98, 9), (98, 10), (98, 11), (98, 12), (98, 13), (98, 14), (98, 15), (98, 16), (98, 17), (98, 18), (98, 19), (98, 20), (98, 21), (99, 2), (99, 3), (99, 4), (99, 5), (99, 6), (99, 7), (99, 8), (99, 9), (99, 10), (99, 11), (99, 12), (99, 13), (99, 14), (99, 15), (99, 16), (99, 17), (99, 18), (99, 19), (99, 20), (99, 21), (100, 0), (100, 1), (100, 2), (100, 3), (100, 4), (100, 5), (100, 6), (100, 7), (100, 8), (100, 9), (100, 10), (100, 11), (100, 12), (100, 13), (100, 14), (100, 15), (100, 16), (100, 17), (100, 18), (100, 19), (100, 20), (100, 21))
+GUI_BAR_RECTANGLE_OFFSET = 13
+GUI_MBARS_ALLIES = ((187, 117), (187, 131), (187, 145)), ((296, 117), (296, 131), (296, 145)), ((405, 117), (405, 131), (405, 145)), ((514, 117), (514, 131), (514, 145)), ((623, 117), (623, 131), (623, 145)), ((732, 117), (732, 131), (732, 145)), ((841, 117), (841, 131), (841, 145))
+GUI_MBARS_ENEMIES = ((1069, 117), (1069, 131), (1069, 145)), ((1178, 117), (1178, 131), (1178, 145)), ((1287, 117), (1287, 131), (1287, 145)), ((1396, 117), (1396, 131), (1396, 145)), ((1505, 117), (1505, 131), (1505, 145)), ((1614, 117), (1614, 131), (1614, 145)), ((1723, 117), (1723, 131), (1723, 145))
+GUI_MBAR_SIZE = (95, 11)
+GUI_MBAR_TRIANGLE = ((0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (3, 0), (3, 1), (3, 2), (3, 3), (4, 0), (4, 1))
+GUI_MBAR_TRIANGLE_RIGHT = ((89, 9), (89, 10), (90, 7), (90, 8), (90, 9), (90, 10), (91, 5), (91, 6), (91, 7), (91, 8), (91, 9), (91, 10), (92, 4), (92, 5), (92, 6), (92, 7), (92, 8), (92, 9), (92, 10), (93, 2), (93, 3), (93, 4), (93, 5), (93, 6), (93, 7), (93, 8), (93, 9), (93, 10), (94, 1), (94, 2), (94, 3), (94, 4), (94, 5), (94, 6), (94, 7), (94, 8), (94, 9), (94, 10))
+GUI_MBAR_RECTANGLE_OFFSET = 6
+RUNESTONE_SIZE = 1196, 1038
+RUNESTONE_RUNE = 16, 12
+RUNESTONE_MAP = 21, 17
+RUNESTONE_PIECES = 1285, 12
+RUNESTONE_PIECES_END = 1902, 1070
+RUNESTONE_PIECE_FIRST = 1320, 50
+RUNESTONE_PIECE = 100, 100
+RUNESTONE_PIECE_GAP = 17
+FILTER_ALLIES = [1]
+FILTER_ENEMIES = [2]
+FILTER_SELF = [3]
+FILTER_SUMMONS = [4]
+FILTER_WALKING = [5]
+FILTER_FLYING = [6]
+FILTER_SWIMMING = [7]
+FILTER_WALLS = [8]
+FILTER_CAVES = [9]
+FILTER_MELEE = [10]
+FILTER_RANGED = [11]
+FILTER_UNITS = [12]
+MIN_HP = 1
+MIN_MANA = 1
+MIN_SPEED = 1
+MIN_SIGHT = 1
+MIN_ATTACK_SPEED = 30
+MIN_SIZE_PERCENT = 0.1
+PROVIDE_DMG = 0b00100010
+PROVIDE_DMG_PERCENT = 0b00100011
+PROVIDE_ATTACK_SPEED = 0b00100100
+PROVIDE_ATTACK_SPEED_PERCENT = 0b00100101
+PROVIDE_ACCURACY = 0b00101000
+PROVIDE_ACCURACY_PERCENT = 0b00101001
+PROVIDE_MULTISHOT = 0b00100110
+PROVIDE_MULTISHOT_PERCENT = 0b00100111
+PROVIDE_ATTACK_TYPE = 0b00101010
+PROVIDE_ATTACK = 0b00101100
+PROVIDE_HP = 0b01000010
+PROVIDE_HP_PERCENT = 0b01000011
+PROVIDE_MANA = 0b01000100
+PROVIDE_MANA_PERCENT = 0b01000101
+PROVIDE_ARMOR = 0b01000110
+PROVIDE_ARMOR_PERCENT = 0b01000111
+PROVIDE_SPEED = 0b01001000
+PROVIDE_SPEED_PERCENT = 0b01001001
+PROVIDE_SIZE = 0b01001010
+PROVIDE_SIZE_PERCENT = 0b01001011
+PROVIDE_SIGHT = 0b01001100
+PROVIDE_SIGHT_PERCENT = 0b01001101
+PROVIDE_STRENGTH = 0b01100010
+PROVIDE_STRENGTH_PERCENT = 0b01100011
+PROVIDE_RADIUS = 0b01100110
+PROVIDE_RADIUS_PERCENT = 0b01100111
+PROVIDE_ADURATION = 0b01100100
+PROVIDE_ADURATION_PERCENT = 0b01100101
+PROVIDE_MANACOST = 0b01101000
+PROVIDE_MANACOST_PERCENT = 0b01101001
+PROVIDE_CASTSPEED = 0b01101010
+PROVIDE_CASTSPEED_PERCENT = 0b01101011
+PROVIDE_REDUCTION = 0b01101100
+PROVIDE_REDUCTION_PERCENT = 0b01101101
+PROVIDE_SUPER = 0b01101110
+PROVIDE_SUPER_PERCENT = 0b01101111
+PROVIDE_STATUS = 0b11100010
+PROVIDE_SPELL_CASTING = 0b11100100
+PROVIDE_SPELL_STARTING = 0b11100110
+STATUS_DEAD = 0b1111101
+STATUS_STUN = 0b1111000
+STATUS_ROOT = 0b0100001
+STATUS_SILENCE = 0b0010000
+STATUS_DISARM = 0b0001000
+STATUS_BREAK = 0b0000101
+STATUS_INVISIBLE = 0b0000010
+STATUS_VISIBLE = 0b0000001
+STATUS_PSYCHOSIS = 0b0011101
+return value >> n & 1
+return value | (1 << n)
+return value & ~(1 << n)
+mes = [i for i in mes]
+l = len(mes)
+if l <= n:
+return mes[:n]
+c = math.ceil(l/n)
+res = []
+for i in range(c-1):
+res += mes[:n]
+mes = mes[n:]
+res += mes
+return res
+@njit(fastmath=True)
+if random.randint(1, b) <= a:
+return True
+return False
+for i in os.listdir('units'):
+if data in os.listdir(f'units\\{i}'):
+return f'units\\{i}\\{data}'
+level.selected_unit.mousepos = (pos[0]-level.mp[0], pos[1]-level.mp[1])
+rolls = 1
+idx = level.units.index(level.selected_unit) + 1
+idx = 0 if idx == len(level.units) else idx
+while not level.units[idx].canbecontrolled or level.units[idx].dead and rolls <= len(level.units):
+idx += 1
+idx = 0 if idx == len(level.units) else idx
+rolls += 1
+level.selected_unit = level.units[idx]
+level.camera_bind = level.selected_unit
+level.camera_bind_offset = (0, 0)
+level.selected_skill = None
+level.selected_item = None
+level.selected_unit.mousepos = (pos[0]-level.mp[0], pos[1]-level.mp[1])
+rolls = 1
+idx = level.units.index(level.selected_unit) - 1
+idx = len(level.units) - 1 if idx == -1 else idx
+while not level.units[idx].canbecontrolled or level.units[idx].dead and rolls <= len(level.units):
+idx -= 1
+idx = len(level.units) - 1 if idx == -1 else idx
+rolls += 1
+level.selected_unit = level.units[idx]
+level.camera_bind = level.selected_unit
+level.camera_bind_offset = (0, 0)
+level.selected_skill = None
+level.selected_item = None
+@njit(fastmath=True)
+if a >= 100:
+return ang
+if chance(a):
+return ang
+b = random.randint(0, 100-a)/100*math.pi
+c = random.randint(0, 1)
+ang = ang+b if c else ang-b
+return ang
+@njit(fastmath=True)
+if a >= 100:
+return top, bot
+if chance(a):
+return top, bot
+b = random.randint(0, 100-a)/100*math.pi
+c = random.randint(0, 1)
+top = top+b if c else top-b
+bot = bot+b if c else bot-b
+return top, bot
+@njit(fastmath=True)
+ax, ay = axy
+bx, by = bxy
+return math.sqrt((bx-ax)**2+(by-ay)**2)
+s, sp = {}, {}
+for i in unit.modifiers:
+if prv in i.provides:
+if i.name in s:
+if i.stackable:
+s[i.name] += i.provides[prv]
+elif i.provides[prv] > s[i.name]:
+s[i.name] = i.provides[prv]
+else:
+s[i.name] = i.provides[prv]
+for i in unit.modifiers:
+if prvp in i.provides:
+if i.name in sp:
+if i.stackable:
+sp[i.name] += i.provides[prvp]
+elif i.provides[prvp] > sp[i.name]:
+sp[i.name] = i.provides[prvp]
+else:
+sp[i.name] = i.provides[prvp]
+return s, sp
+@njit(fastmath=True)
+if rad < 0:
+return False
+tx, ty = center
+tx = box[0] if tx < box[0] else box[1] if tx > box[1] else tx
+ty = box[2] if ty < box[2] else box[3] if ty > box[3] else ty
+return (center[0]-tx)**2+(center[1]-ty)**2 < rad**2
+for tx, ty, r in centers_rads:
+c = tx, ty
+tx = box[0] if tx < box[0] else box[1] if tx > box[1] else tx
+ty = box[2] if ty < box[2] else box[3] if ty > box[3] else ty
+if (c[0]-tx)**2+(c[1]-ty)**2 < r**2:
+return True
+return False
+t = time.perf_counter()
+a = func(*args, **kwargs)
+print(time.perf_counter()-t)
+return a
+return wr
+s = items[0]
+for i in items[1:]:
+s += i
+return s
+s = items[0]
+for i in items[1:]:
+if i > s:
+s = i
+return s
+letters_and_digits = string.ascii_letters + string.digits
+rand_string = ''.join(random.sample(letters_and_digits, length))
+return rand_string
+if not os.path.exists('temp'):
+os.mkdir('temp')
+code = alphanum_random(5)
+np.save(f'temp\\{code}', map)
+os.replace(f'temp\\{code}.npy', fname+'.npy')
+if not os.path.exists('temp'):
+os.mkdir('temp')
+code = alphanum_random(5)
+file = open(f'temp\\{code}.txt', 'w', encoding='utf-8')
+file.write(str(data))
+file.close()
+os.replace(f'temp\\{code}.txt', fname)
+noise1 = PerlinNoise(octaves=3)
+noise2 = PerlinNoise(octaves=6)
+noise3 = PerlinNoise(octaves=12)
+noise4 = PerlinNoise(octaves=24)
+xpix, ypix = x, y
+pic = []
+for i in range(ypix):
+row = []
+for j in range(xpix):
+noise_val = noise1([i / xpix, j / ypix])
+noise_val += 0.5 * noise2([i / xpix, j / ypix])
+noise_val += 0.25 * noise3([i / xpix, j / ypix])
+noise_val += 0.125 * noise4([i / xpix, j / ypix])
+row.append(noise_val)
+pic.append(row)
+return pic
+texd = {i.split('.png')[0]: pygame.image.load(f'textures\\GUI\\{i}') for i in os.listdir('textures\\GUI') if i.endswith('.png')}
+for i in GUI.texd.values():
+i.convert_alpha()
+self.level = None
+self.panel = GUI.texd['game1']
+self.hpbar = GUI.texd['hpbar']
+self.hpbar_mask = GUI.texd['hpbar_mask']
+self.hpbarsize = self.hpbar.get_width(), self.hpbar.get_height()
+self.hpbaroffset = 0, 0
+self.manabar = GUI.texd['manabar']
+self.manabar_mask = GUI.texd['manabar_mask']
+self.manabarsize = self.manabar.get_width(), self.manabar.get_height()
+self.manabaroffset = 0, self.hpbarsize[1]+7
+self.color = (0, 0, 0)
+self.color_panel()
+self.selected_unit = None
+self.selected_unit_menu = ''
+self.selected_unit_menu_pos = (0,0)
+self.bigmenu = None
+self.level = level
+pass
+sc.blit(self.panel, (0, 100))
+if self.selected_unit:
+sc.blit(self.panel, self.selected_unit_menu_pos)
+bar = pygame.Surface(UNIT_BAR_SIZE, pygame.SRCALPHA, 32)
+hpvalue = pygame.Surface((int(self.hpbarsize[0]*unit.hp/unit.maxhp), self.hpbarsize[1]), pygame.SRCALPHA, 32)
+hpvalue.set_colorkey(GREEN_MASK)
+hpvalue.fill(RED)
+hpvalue.blit(self.hpbar_mask, (0, 0))
+manavalue = pygame.Surface((int(self.manabarsize[0] * unit.mana / unit.maxmana), self.manabarsize[1]), pygame.SRCALPHA, 32)
+manavalue.set_colorkey(GREEN_MASK)
+manavalue.fill(BLUE)
+manavalue.blit(self.manabar_mask, (0, 0))
+bar.blit(hpvalue, self.hpbaroffset)
+bar.blit(manavalue, self.manabaroffset)
+bar.blit(self.hpbar, self.hpbaroffset)
+bar.blit(self.manabar, self.manabaroffset)
+return bar
+if kef < 0:
+return bar
+freshvalue = pygame.Surface((int(self.hpbarsize[0] * (unit.lasthp[1]-unit.hp) / unit.maxhp * kef), self.hpbarsize[1]), pygame.SRCALPHA, 32)
+freshvalue.set_colorkey(GREEN_MASK)
+freshvalue.fill(YELLANGE)
+xoffset = int(self.hpbarsize[0]*unit.hp/unit.maxhp)
+freshvalue.blit(self.hpbar_mask, (-xoffset, 0))
+bar.blit(freshvalue, (self.hpbaroffset[0]+xoffset, self.hpbaroffset[1]))
+bar.blit(self.hpbar, self.hpbaroffset)
+return bar
+if self.level.sp.sum() == 0:
+self.color = (0, 0, 0)
+else:
+count = 0
+color = [0, 0, 0]
+for k, v in self.level.sp:
+if v > 0:
+count += 1
+color[0] += DMGCOLORS[k][0]
+color[1] += DMGCOLORS[k][1]
+color[2] += DMGCOLORS[k][2]
+color[0] //= count
+color[1] //= count
+color[2] //= count
+self.color = tuple(color)
+self.color_panel()
+w, h = self.panel.get_size()
+pos = (mpos[0]-self.level.mp[0])/self.level.tile_size, (mpos[1]-self.level.mp[1])/self.level.tile_size
+menuActivateFlag = False
+for u in self.level.units:
+if u.cords.x + u.size.x / 2 > pos[0] > u.cords.x - u.size.x / 2 and u.cords.y > pos[1] > u.cords.y - u.size.y:
+if button == 3:
+if u.canbecontrolled and not u.dead:
+self.level.selected_unit.mousepos = (pos[0] - self.level.mp[0], pos[1] - self.level.mp[1])
+self.level.selected_unit = u
+self.level.camera_bind = u
+self.level.camera_bind_offset = (0, 0)
+self.level.selected_skill = None
+self.level.selected_item = None
+elif button == 2:
+menuActivateFlag = True
+self.selected_unit = u
+self.selected_unit_menu = 'main'
+self.selected_unit_menu_pos = mpos
+if not menuActivateFlag:
+self.selected_unit = None
+self.selected_unit_menu = ''
+self.selected_unit_menu_pos = (0,0)
+self.level = None
+self.level = level
+pygame.init()
+sc = pygame.display.set_mode(FULL_WINDOW)
+clock = pygame.time.Clock()
+font30 = pygame.font.SysFont('calibri', 30)
+font36 = pygame.font.SysFont('calibri', 36)
+runa = Runa()
+gui = GUI()
+dialogs = Dialogs()
+level = Level(1001001, runa, gui, dialogs, editor=True).load()
+cur_block_id = 1
+while True:
+sc.fill(pygame.Color('white'))
+pos = pygame.mouse.get_pos()
+pressed = pygame.mouse.get_pressed()
+keys = pygame.key.get_pressed()
+for event in pygame.event.get():
+if event.type == pygame.QUIT:
+exit()
+if event.type == pygame.KEYDOWN:
+if event.key == pygame.K_ESCAPE:
+exit()
+if event.type == pygame.MOUSEBUTTONDOWN:
+if event.button == 5:
+if level.camera_scale > 0.2:
+level.camera_scale *= 0.9
+level.tile_size = int(TILE_SIZE * level.camera_scale)
+level.chunk_size_px = level.tile_size * level.chunk_size
+chunksize = int(level.nsc[0][0].get_width() * level.camera_scale)
+level.sc = [[pygame.transform.scale(j, (chunksize, chunksize)) for j in i] for i in level.nsc]
+elif event.button == 4:
+if level.camera_scale < 5:
+level.camera_scale /= 0.9
+level.tile_size = int(TILE_SIZE * level.camera_scale)
+level.chunk_size_px = level.tile_size * level.chunk_size
+chunksize = int(level.nsc[0][0].get_width() * level.camera_scale)
+level.sc = [[pygame.transform.scale(j, (chunksize, chunksize)) for j in i] for i in level.nsc]
+bcords = int((pos[0] - level.mp[0]) / level.tile_size), int((pos[1] - level.mp[1]) / level.tile_size)
+if pressed[0] or pressed[2]:
+if 0 <= bcords[0] < level.size.y and 0 <= bcords[1] < level.size.x:
+level.tilemap[bcords[0]][bcords[1]] = cur_block_id if pressed[0] else 0
+level.update_chunk(bcords)
+level.move_camera(pos)
+level.tick()
+level.paint(sc, (), ())
+sc.blit(font30.render(str(bcords), True, (0, 0, 0)), (1680, 10))
+sc.blit(font30.render(str(int(clock.get_fps())), True, (0, 0, 0)), (1850, 10))
+pygame.display.flip()
+clock.tick(FPS)
+part = pygame.image.load(f'blocks\\{i}.png')
+part = pygame.transform.scale(part, (TILE_SIZE, TILE_SIZE))
+data['tex'] = part
+return data['id'], data
+maxlptime = 0
+maxlplevel = 0
+with open('leveldata\\levels.txt', 'r', encoding='utf-8') as levels:
+levels = ast.literal_eval(levels.read())
+for i in levels:
+if levels[i]['last_played'] > maxlptime:
+maxlptime = levels[i]['last_played']
+maxlplevel = i
+return maxlplevel
+@njit(fastmath=True)
+cbox, cboy = camera_bind_offset
+if camera_bind:
+if pos[0] < 100:
+cbox -= CAMERA_SPEED
+if cbox < -HALF_WINDOW[0] / tile_size:
+cbox = -HALF_WINDOW[0] / tile_size
+if pos[1] < 100:
+cboy -= CAMERA_SPEED
+if cboy < -HALF_WINDOW[1] / tile_size:
+cboy = -HALF_WINDOW[1] / tile_size
+if pos[0] > FULL_WINDOW[0] - 100:
+cbox += CAMERA_SPEED
+if cbox > HALF_WINDOW[0] / tile_size:
+cbox = HALF_WINDOW[0] / tile_size
+if pos[1] > FULL_WINDOW[1] - 100:
+cboy += CAMERA_SPEED
+if cboy> HALF_WINDOW[1] / tile_size:
+cboy = HALF_WINDOW[1] / tile_size
+camera = (camera_bind_cords[0] + cbox, camera_bind_cords[1] + cboy)
+else:
+one, two = camera
+if pos[0] < 200:
+one = camera[0] - CAMERA_SPEED
+if one < 0:
+one = 0
+if pos[1] < 200:
+two = camera[1] - CAMERA_SPEED
+if two < 0:
+two = 0
+if pos[0] > FULL_WINDOW[0] - 200:
+one = camera[0] + CAMERA_SPEED
+if one > map_size[0]:
+one = map_size[0]
+if pos[1] > FULL_WINDOW[1] - 200:
+two = camera[1] + CAMERA_SPEED
+if two > map_size[1]:
+two = map_size[0]
+if not camera == (one, two):
+camera = (one, two)
+mp = (int(HALF_WINDOW[0] - camera[0] * tile_size), int(HALF_WINDOW[1] - camera[1] * tile_size))
+if mp[0] > 0:
+mp = 0, mp[1]
+if mp[1] > 0:
+mp = mp[0], 0
+if mp[0] < -map_size[0] * tile_size + FULL_WINDOW[0]:
+mp = -map_size[0] * tile_size + FULL_WINDOW[0], mp[1]
+if mp[1] < -map_size[1] * tile_size + FULL_WINDOW[1]:
+mp = mp[0], -map_size[1] * tile_size + FULL_WINDOW[1]
+mchunks = [(i, j, mp[0] + chunk_size_px * i, mp[1] + chunk_size_px * j)
+for i in range(chunkmap_size[0]) if -chunk_size_px <= mp[0] + chunk_size_px * i < FULL_WINDOW[0]
+for j in range(chunkmap_size[1]) if -chunk_size_px <= mp[1] + chunk_size_px * j < FULL_WINDOW[1]]
+return camera, (cbox, cboy),  mp, mchunks
+tilemap = tilemap.copy()
+size = tilemap.shape
+res = []
+for x, y in sizes:
+dst = 0
+while True:
+dirs = []
+for i in range(dst):
+dirs += [(place[0]-(dst-i), place[1]+i), (place[0]+(dst-i), place[1]-i), (place[0]+i, place[1]+(dst-i)), (place[0]-i, place[1]-(dst-i))]
+dirs = [place] if not dirs else dirs[::-1]
+breakFlag = False
+for i,j in dirs:
+flag = True
+for iy in range(y):
+if not flag:
+break
+if not 0 <= i - iy < size[1]:
+flag = False
+break
+for jx in range(x):
+if not 0 <= j + jx < size[0] or tilemap[i+iy][j+jx]:
+flag = False
+break
+if flag:
+ri = random.randint(0, 50) / 50
+res.append((i+ri, j))
+for iy in range(y):
+for jx in range(x):
+tilemap[i+iy][j+jx] = -1
+breakFlag = True
+dst += 1
+if breakFlag or dst > size[0]:
+break
+return res
+tilemap = tilemap.copy()
+size = tilemap.shape
+res = []
+dirs = [place]
+for dst in range(1, radius+1):
+for i in range(dst):
+dirs += [(place[0] - (dst - i), place[1] + i), (place[0] + (dst - i), place[1] - i),
+(place[0] + i, place[1] + (dst - i)), (place[0] - i, place[1] - (dst - i))]
+for x, y in sizes:
+v = 0
+while v < len(dirs):
+i, j = random.choice(dirs)
+flag = True
+for iy in range(y):
+if not flag:
+break
+if not 0 <= i - iy < size[1]:
+flag = False
+break
+for jx in range(x):
+if not 0 <= j + jx < size[0] or tilemap[i + iy][j + jx]:
+flag = False
+break
+if flag:
+ri = random.randint(0, 50) / 50
+res.append((i + ri, j))
+for iy in range(y):
+for jx in range(x):
+tilemap[i + iy][j + jx] = -1
+break
+v += 1
+return res
+blocks = {}
+blocks_offset = {}
+with open('blocks\\blocks.txt', 'r', encoding='utf-8') as blocksfile:
+blocksfile = ast.literal_eval(blocksfile.read())
+for i in blocksfile:
+blockid, block = load_block(i, blocksfile[i])
+blocks[blockid] = block
+if 'offset' in block:
+blocks_offset[blockid] = block['offset']
+self.id = id
+self.bck = pygame.image.load('textures\\bck.png').convert_alpha() self.bck = pygame.transform.scale(self.bck, FULL_WINDOW)
+if id == 0: self.id = search_last_level()
+self.kwargs = kwargs
+self.size = Vector(TEST_MAP_SIZE_X, TEST_MAP_SIZE_Y)
+self.chunk_size = 20
+self.chunkmap_size = Vector(math.ceil(TEST_MAP_SIZE_X/self.chunk_size), math.ceil(TEST_MAP_SIZE_Y/self.chunk_size))
+self.tilemap = np.zeros((self.size.x, self.size.y), 'int')
+self.block_data = {}
+self.spawn = tuple((Vector(10+2*i, 10) for i in range(7)))
+self.enemy_spawn = tuple((Vector(30+i, 10) for i in range(7)))
+self.camera = (0, 0)
+self.camera_bind = None
+self.camera_bind_offset = (0, 0)
+self.camera_scale = 1
+self.tile_size = TILE_SIZE
+self.chunk_size_px = TILE_SIZE * self.chunk_size
+self.nsc = [[pygame.Surface((self.chunk_size * TILE_SIZE, self.chunk_size * TILE_SIZE), pygame.SRCALPHA, 32) for _ in range(self.chunkmap_size.y)] for _ in range(self.chunkmap_size.x)]
+self.sc = [[j for j in i] for i in self.nsc]
+self.projectiles = []
+self.ticks = 0
+self.mp = (0,0)
+self.mchunks = ()
+self.selected_unit = None
+self.selected_skill = None
+self.selected_item = None
+self.allvision = False
+self.units = []
+self.sp = DamageTable()
+self.gui = gui
+self.runa = runa
+self.dialogs = dialogs
+self.dropped = []
+self.teams = ['ally', 'enemy']
+self.visions = {i: () for i in self.teams}
+self.levelmap_tex = None
+self.runa.load(self)
+self.gui.load(self)
+self.dialogs.load(self)
+if self.id == 0:
+return self
+level = self.id // 1000
+var = self.id % 1000
+fn = f'{level}-{var}'
+if 'editor' in self.kwargs and self.kwargs['editor']:
+fn += 'editor'
+if f'{fn}.npy' not in os.listdir(f'leveldata') or regen:
+self.generate_terrain()
+self.save_terrain()
+else:
+self.tilemap = np.load(f'leveldata\\{fn}.npy')
+self.render_terrain()
+allies = self.runa.load_units()
+self.spawn = tuple((Vector(i) for i in findClearSpaceForUnits(self.tilemap, [i.size.cort() for i in allies], (10, 10))))
+enemies = [Unit('Rock', self, e=True) for _ in range(50)]
+self.enemy_spawn = tuple((Vector(i) for i in findRandomSpaceForUnits(self.tilemap, [i.size.cort() for i in enemies], (40, 10), 10)))
+self.units[:] = allies + enemies
+return self
+if self.allvision:
+return self.units
+crs = [(u.cords.x, u.cords.y-u.size.y/2, u.sight) for u in self.units if u.team == team and not u.dead]
+return [i for i in self.units if i.team == team or i.dead or not get_bit(i.status, 1) and circleCollMany(crs, i.hitbox()) or get_bit(i.status, 0)]
+[sc.blit(self.sc[i][j], (x,y)) for i, j, x, y in self.mchunks]
+v = self.visions['ally']
+for b in v:
+b.blit(sc)
+projectiles_trash = []
+for i, a in enumerate(self.projectiles):
+anim = a.animate(sc)
+if anim is False:
+projectiles_trash.append(a)
+self.projectiles[:] = [a for a in self.projectiles if a not in projectiles_trash]
+sc.blits(((d.icon, (cords.x * self.tile_size + self.mp[0] - d.icon.get_width() // 2, cords.y * self.tile_size + self.mp[1] - d.icon.get_height())) for d,cords in self.dropped))
+for b in v:
+b.blit_dmgvs(sc)
+self.gui.blit(sc)
+if self.camera_bind:
+self.camera, self.camera_bind_offset, self.mp, self.mchunks = getmp(pos, self.camera,
+True, self.camera_bind.cords.cort(), self.camera_bind_offset,
+self.tile_size, self.chunk_size_px, self.size.cort(), self.chunkmap_size.cort())
+else:
+self.camera, self.camera_bind_offset, self.mp, self.mchunks = getmp(pos, self.camera,
+False, (0,0), self.camera_bind_offset, self.tile_size, self.chunk_size_px,
+self.size.cort(), self.chunkmap_size.cort())
+sc.blit(self.bck, (0,0))
+if self.id == 0:
+return
+aidx, eidx = 0, 0
+self.selected_unit = self.units[0] if self.units else None
+self.camera_bind = self.selected_unit if self.selected_unit else None
+self.camera_bind_offset = (0, 0)
+self.selected_skill = None
+self.selected_item = None
+for i,u in enumerate(self.units):
+if u.team == 'ally':
+u.cords = self.spawn[aidx]()
+aidx += 1
+elif u.team == 'enemy':
+u.cords = self.enemy_spawn[eidx]()
+eidx += 1
+ycord = unit.cords.y-unit.size.y+ofs
+if ycord < 0:
+return False
+ycord = int(ycord)
+for i in range(int(unit.cords.x-unit.size.x/2+0.25), int(unit.cords.x+unit.size.x/2-0.25)+1):
+if not self.tilemap[i][ycord] == 0:
+return False
+return True
+ycord = int(unit.cords.y+ofs)
+if ycord >= self.size.y:
+return False
+for i in range(int(unit.cords.x-unit.size.x/2+0.25), int(unit.cords.x+unit.size.x/2-0.25)+1):
+if not self.tilemap[i][ycord] == 0:
+return False
+return True
+xcord = unit.cords.x-unit.size.x/2+ofs
+if xcord < 0:
+return False
+xcord = int(xcord)
+for j in range(int(unit.cords.y-unit.size.y+0.25), int(unit.cords.y-0.25)+1):
+if not self.tilemap[xcord][j] == 0:
+return False
+return True
+xcord = int(unit.cords.x+unit.size.x/2+ofs)
+if xcord >= self.size.x:
+return False
+for j in range(int(unit.cords.y-unit.size.y+0.25), int(unit.cords.y-0.25)+1):
+if not self.tilemap[xcord][j] == 0:
+return False
+return True
+self.ticks += 1
+if self.id > 0 and self.ticks % 360 == 0:
+self.save_terrain()
+if self.ticks % 5 == 0:
+for i in self.teams:
+self.visions[i] = self.vision(i)
+height = 60
+pic = perlin_noise(5, self.size.x)
+self.tilemap = np.concatenate((np.zeros((1, height), 'int'), np.ones((1, self.size.y - height), 'int')), axis=1)
+for i in range(1, self.size.x):
+height += int(pic[i][0]*5)
+col = np.concatenate((np.zeros((1, height), 'int'), np.ones((1, self.size.y - height), 'int')), axis=1)
+self.tilemap = np.concatenate((self.tilemap, col), axis=0)
+fn = f'leveldata\\{self.id // 1000}-{self.id % 1000}'
+if 'editor' in self.kwargs and self.kwargs['editor']:
+fn += 'editor'
+forcenpsave(fn, self.tilemap)
+leveldata = ast.literal_eval(open('leveldata\\levels.txt', 'r', encoding='utf-8').read())
+if 'editor' not in self.kwargs:
+if self.id in leveldata:
+leveldata[self.id]['last_played'] = int(time.time())
+else:
+leveldata[self.id] = {'last_played': int(time.time())}
+forcesave(f'leveldata\\levels.txt', str(leveldata))
+self.nsc = [[pygame.Surface((self.chunk_size * TILE_SIZE, self.chunk_size * TILE_SIZE), pygame.SRCALPHA, 32) for _ in range(self.chunkmap_size.y)] for _ in range(self.chunkmap_size.x)]
+for i in range(self.size.x):
+xcord = i % self.chunk_size * TILE_SIZE
+xchunk = i//self.chunk_size
+for j in range(self.size.y):
+ycord = j % self.chunk_size * TILE_SIZE
+ychunk = j // self.chunk_size
+self.nsc[xchunk][ychunk].blit(Level.blocks[self.tilemap[i][j]]['tex'], (xcord, ycord))
+self.sc = [[j for j in i] for i in self.nsc]
+xchunk, ychunk = cords[0]//self.chunk_size, cords[1]//self.chunk_size
+usc = pygame.Surface((self.chunk_size * TILE_SIZE, self.chunk_size * TILE_SIZE), pygame.SRCALPHA, 32)
+for i in range(self.chunk_size):
+xcord = i * TILE_SIZE
+xtile = i + xchunk * self.chunk_size
+for j in range(self.chunk_size):
+ycord = j * TILE_SIZE
+ytile = i + ychunk * self.chunk_size
+usc.blit(Level.blocks[self.tilemap[xtile][ytile]]['tex'], (xcord, ycord))
+self.nsc[xchunk][ychunk] = usc
+chunksize = int(self.chunk_size * TILE_SIZE * self.camera_scale)
+self.sc[xchunk][ychunk] = pygame.transform.scale(usc, (chunksize, chunksize))
+for i, _ in self.dropped:
+i.icon = pygame.transform.scale(Item.icons[i.name], (int(self.tile_size*0.7), int(self.tile_size*0.7)))
+if scale is not None:
+self.camera_scale = scale
+self.tile_size = int(TILE_SIZE * self.camera_scale)
+self.chunk_size_px = self.tile_size * self.chunk_size
+self.sc = [[pygame.transform.scale(j, (self.chunk_size_px, self.chunk_size_px)) for j in i] for i in self.nsc]
+self.drop_rescale()
+levelid = search_last_level() // 1000
+with open('leveldata\\maps.txt', 'r', encoding='utf-8') as mapsfile:
+data = ast.literal_eval(mapsfile.read())
+planet, part = 'Earth', 1
+self.levelmap_tex = pygame.image.load(f'textures\\maps\\{planet}{part}.png').convert_alpha()
+for i in data['levels']:
+if i[0] == levelid:
+planet, part = i[1:3]
+levels = [i for i in data['levels'] if i[1] == planet and i[2] == part]
+anims = []
+for lvl in levels:
+if lvl[0] in self.runa.unlocked_levels:
+anims.append(Animation('button_level.png', (lvl[3][0]-15, lvl[3][1]-15), speed=1 / 60, duration=-1, button={'prs_name': 'button_level_pressed.png', 'folder': 'textures\\GUI', 'change_mode': 'ingame', 'changelevel': 1000*lvl[0]+1, 'particles': [Particles('sparkle', changexy=lambda o, x, y, i: (x - 15 / (i + 1), y - i // 2), pos='mouse_attach', spawn=0.3, random_offset=(-20, 0, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2)), Particles('sparkle', changexy=lambda o, x, y, i: (x + 15 / (i + 1), y - i // 2), pos='mouse_attach', spawn=0.3, random_offset=(0, 20, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2))]}, folder='textures\\GUI', single=True))
+else:
+anims.append(Animation('button_level_locked.png', (lvl[3][0]-15, lvl[3][1]-15), speed=1 / 60, duration=-1, folder='textures\\GUI', single=True))
+return anims
+sc.blit(self.bck, (0,0))
+sc.blit(self.levelmap_tex, (0, 0))
+if self.id == 0:
+return
+pygame.init()
+sc = pygame.display.set_mode(FULL_WINDOW, pygame.SCALED)
+clock = pygame.time.Clock()
+font30 = pygame.font.SysFont('calibri', 30)
+font36 = pygame.font.SysFont('calibri', 36)
+Item.init()
+runa = Runa()
+gui = GUI()
+dialogs = Dialogs()
+level = Level(0, runa, gui, dialogs).load()
+animations = []
+game_mode = ''
+global animations
+global game_mode
+global level
+if game_mode == 'runestone':
+runa.save()
+if mode == 'mainmenu':
+animations = [Animation('name.png', NAME_POS, speed=1/54, start=random.randrange(6), scale=NAME_SIZES, duration=-1),
+Animation('main.png', MAIN_GUI, speed=1/60, duration=-1, rotate=MAIN_CIRCLE_RSPEED, changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2, MAIN_CIRCLE[1]-o.get_height()//2), folder='textures\\GUI', single=True),
+Animation('fire.png', MAIN_GUI, speed=1/60, duration=-1, scale=(0, 170), changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+MAIN_CIRCLE[2]*math.cos(i*MAIN_ELEMENTS_RSPEED-2*math.pi/3), MAIN_CIRCLE[1]-o.get_height()//2+MAIN_CIRCLE[2]*math.sin(i*MAIN_ELEMENTS_RSPEED-2*math.pi/3)), folder='textures\\GUI', single=True),
+Animation('dark.png', MAIN_GUI, speed=1/60, duration=-1, scale=(0, 130), changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+MAIN_CIRCLE[2]*math.cos(i*MAIN_ELEMENTS_RSPEED-math.pi/3), MAIN_CIRCLE[1]-o.get_height()//2+MAIN_CIRCLE[2]*math.sin(i*MAIN_ELEMENTS_RSPEED-math.pi/3)), folder='textures\\GUI', single=True),
+Animation('earth.png', MAIN_GUI, speed=1/60, duration=-1, scale=(0, 180), changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+MAIN_CIRCLE[2]*math.cos(i*MAIN_ELEMENTS_RSPEED), MAIN_CIRCLE[1]-o.get_height()//2+MAIN_CIRCLE[2]*math.sin(i*MAIN_ELEMENTS_RSPEED)), folder='textures\\GUI', single=True),
+Animation('water.png', MAIN_GUI, speed=1/60, duration=-1, scale=(0, 130), changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+MAIN_CIRCLE[2]*math.cos(i*MAIN_ELEMENTS_RSPEED+math.pi/3), MAIN_CIRCLE[1]-o.get_height()//2+MAIN_CIRCLE[2]*math.sin(i*MAIN_ELEMENTS_RSPEED+math.pi/3)), folder='textures\\GUI', single=True),
+Animation('light.png', MAIN_GUI, speed=1/60, duration=-1, scale=(0, 190), changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+MAIN_CIRCLE[2]*math.cos(i*MAIN_ELEMENTS_RSPEED+2*math.pi/3), MAIN_CIRCLE[1]-o.get_height()//2+MAIN_CIRCLE[2]*math.sin(i*MAIN_ELEMENTS_RSPEED+2*math.pi/3)), folder='textures\\GUI', single=True),
+Animation('air.png', MAIN_GUI, speed=1/60, duration=-1, scale=(180, 0), changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+MAIN_CIRCLE[2]*math.cos(i*MAIN_ELEMENTS_RSPEED+math.pi), MAIN_CIRCLE[1]-o.get_height()//2+MAIN_CIRCLE[2]*math.sin(i*MAIN_ELEMENTS_RSPEED+math.pi)), folder='textures\\GUI', single=True),
+Animation('button_play.png', MAIN_GUI, speed=1/60, duration=-1, changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+BUTTON_PLAY_CIRCLE[0]*math.cos(i*MAIN_ELEMENTS_RSPEED-2*math.pi/3), MAIN_CIRCLE[1]-o.get_height()//2+BUTTON_PLAY_CIRCLE[0]*math.sin(i*MAIN_ELEMENTS_RSPEED-2*math.pi/3)), button={'prs_name': 'button_play_pressed.png', 'folder': 'textures\\GUI', 'change_mode': 'levelmap', 'particles': [Particles('sparkle', changexy=lambda o,x,y,i: (x-15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(-20, 0, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2)), Particles('sparkle', changexy=lambda o,x,y,i: (x+15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(0, 20, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2))]}, folder='textures\\GUI', single=True),
+Animation('button_inventory.png', MAIN_GUI, speed=1/60, duration=-1, changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+BUTTON_PLAY_CIRCLE[0]*math.cos(i*MAIN_ELEMENTS_RSPEED-1*math.pi/3), MAIN_CIRCLE[1]-o.get_height()//2+BUTTON_PLAY_CIRCLE[0]*math.sin(i*MAIN_ELEMENTS_RSPEED-1*math.pi/3)), button={'prs_name': 'button_inventory_pressed.png', 'folder': 'textures\\GUI', 'change_mode': 'inventory', 'particles': [Particles('sparkle', changexy=lambda o,x,y,i: (x-15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(-20, 0, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2)), Particles('sparkle', changexy=lambda o,x,y,i: (x+15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(0, 20, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2))]}, folder='textures\\GUI', single=True),
+Animation('button_rune.png', MAIN_GUI, speed=1/60, duration=-1, changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+BUTTON_PLAY_CIRCLE[0]*math.cos(i*MAIN_ELEMENTS_RSPEED), MAIN_CIRCLE[1]-o.get_height()//2+BUTTON_PLAY_CIRCLE[0]*math.sin(i*MAIN_ELEMENTS_RSPEED)), button={'prs_name': 'button_rune_pressed.png', 'folder': 'textures\\GUI', 'change_mode': 'runestone', 'particles': [Particles('sparkle', changexy=lambda o,x,y,i: (x-15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(-20, 0, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2)), Particles('sparkle', changexy=lambda o,x,y,i: (x+15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(0, 20, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2))]}, folder='textures\\GUI', single=True),
+Animation('button_smith.png', MAIN_GUI, speed=1/60, duration=-1, changexy=lambda o,x,y,i: (MAIN_CIRCLE[0]-o.get_width()//2+BUTTON_PLAY_CIRCLE[0]*math.cos(i*MAIN_ELEMENTS_RSPEED+1*math.pi/3), MAIN_CIRCLE[1]-o.get_height()//2+BUTTON_PLAY_CIRCLE[0]*math.sin(i*MAIN_ELEMENTS_RSPEED+1*math.pi/3)), button={'prs_name': 'button_smith_pressed.png', 'folder': 'textures\\GUI', 'change_mode': 'smith', 'particles': [Particles('sparkle', changexy=lambda o,x,y,i: (x-15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(-20, 0, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2)), Particles('sparkle', changexy=lambda o,x,y,i: (x+15/(i+1), y-i//2), pos='mouse_attach', spawn=0.3, random_offset=(0, 20, -20, 20), random_scale=(0.6, 1.2), random_rotate=(0, 180), random_speed=(0.6, 1.2))]}, folder='textures\\GUI', single=True),
+]
+if mode == 'ingame':
+animations = []
+level = Level(option, runa, gui, dialogs).load()
+level.make_scale(0.81)
+level.play()
+if mode == 'levelmap':
+animations[:] = level.load_levelmap()
+if mode == 'inventory':
+animations = []
+if mode == 'runestone':
+animations = []
+if mode == 'smith':
+animations = []
+game_mode = mode
+change_mode('mainmenu')
+while True:
+sc.fill(pygame.Color('white'))
+pos = pygame.mouse.get_pos()
+pressed = pygame.mouse.get_pressed()
+keys = pygame.key.get_pressed()
+for event in pygame.event.get():
+if event.type == pygame.QUIT:
+exit()
+if event.type == pygame.KEYDOWN:
+if event.key == pygame.K_ESCAPE:
+if game_mode == 'ingame':
+change_mode('levelmap')
+elif game_mode == 'levelmap':
+change_mode('mainmenu')
+elif game_mode == 'inventory':
+change_mode('mainmenu')
+elif game_mode == 'runestone':
+change_mode('mainmenu')
+elif game_mode == 'smith':
+change_mode('mainmenu')
+elif game_mode == 'mainmenu':
+exit()
+if game_mode == 'ingame':
+if level.selected_unit:
+if event.key == pygame.K_SPACE:
+level.selected_unit.jump()
+if event.key == pygame.K_q:
+level.selected_unit.cast(1)
+if event.key == pygame.K_w:
+level.selected_unit.cast(2)
+if event.key == pygame.K_e:
+level.selected_unit.cast(3)
+if event.key == pygame.K_r:
+level.selected_unit.cast(4)
+if event.key == pygame.K_z:
+select_prev_unit(level, pos)
+if event.key == pygame.K_c:
+select_next_unit(level, pos)
+if not level.selected_unit and level.units:
+if event.key == pygame.K_z or event.key == pygame.K_c:
+level.selected_unit = level.units[0]
+level.selected_skill = None
+level.selected_item = None
+if event.type == pygame.MOUSEBUTTONDOWN:
+if game_mode == 'ingame':  if event.button == 5:
+if level.camera_scale > 0.2:
+level.camera_scale *= 0.9
+level.make_scale()
+elif event.button == 4:
+if level.camera_scale < 5:
+level.camera_scale /= 0.9
+level.make_scale()
+else:
+gui.fetch_click(event.button, pos)
+elif game_mode == 'runestone':
+if event.button == 1:
+runa.hold_piece(pos)
+if event.type == pygame.MOUSEBUTTONUP:
+if game_mode == 'runestone':
+if runa.piece_lock and event.button == 1:
+runa.place_piece(pos)
+if game_mode == 'mainmenu':
+level.paint_bckgr(sc)
+if game_mode == 'levelmap':
+level.paint_levelmap_bckgr(sc)
+if game_mode == 'runestone':
+level.paint_bckgr(sc)
+level.runa.paint_runestone(sc, pos)
+if game_mode == 'ingame':
+if level.selected_unit:
+if keys[pygame.K_a]:
+level.selected_unit.moveleft()
+if keys[pygame.K_d]:
+level.selected_unit.moveright()
+if keys[pygame.K_SPACE]:
+level.selected_unit.flyup()
+if keys[pygame.K_s]:
+level.selected_unit.flydown()
+if pressed[0]:
+level.selected_unit.attack()
+level.move_camera(pos)
+level.tick()
+for idx,u in enumerate(level.units):
+u.tick(sc, pos)
+level.paint(sc, (), ())
+sc.blit(font30.render(str(int(clock.get_fps())), True, (0, 0, 0)), (1850, 10))
+sc.blit(font30.render(str(round(level.camera_scale, 2)), True, (0, 0, 0)), (1750, 10))
+runa.tick()
+animations_trash = []
+for i,a in enumerate(animations):
+kw = {'pos': pos, 'pressed': pressed} if a.button else {}
+anim = a.animate(sc, **kw)
+if anim is False:
+animations_trash.append(a)
+elif anim:
+for k,v in anim.items():
+if k == 'change_mode':
+change_mode(v['mode'], v['changelevel'])
+animations[:] = [a for a in animations if a not in animations_trash]
+pygame.display.flip()
+clock.tick(FPS)
+textures = {i.split('.png')[0]: pygame.image.load(f'textures\\maps\\{i}') for i in os.listdir('textures\\maps') if i.endswith('.png')}
+pass
+planet = 'Earth'
+part = 1
+tex = pygame.image.load('textures\\maps\\Earth1.png')
+data = ast.literal_eval(open(f'leveldata\\maps.txt', 'r', encoding='utf-8').read())
+pygame.init()
+sc = pygame.display.set_mode(WINDOW)
+clock = pygame.time.Clock()
+cur_point = (0, 0)
+cur_num = 0
+log = []
+points = []
+lines = []
+new_mode = True
+font = pygame.font.SysFont('calibri', 36)
+text_mode = font.render('Last point binding [W]:', True, (0, 0, 0))
+text_save = font.render('Save [Ctrl+S]', True, (0, 0, 0))
+text_undo = font.render('Undo [Ctrl+Z]', True, (0, 0, 0))
+if planet in data['map_graphs'] and part in data['map_graphs'][planet]:
+ids_to_points = {}
+cur_id = 0
+for i in data['levels']:
+if i[1] == planet and i[2] == part:
+points.append(i[3])
+ids_to_points[i[0]] = cur_id
+cur_id += 1
+for i, j in data['map_graphs'][planet][part]:
+f1, f2 = False, False
+for k in data['levels']:
+if i == k[0] and k[1] == planet and k[2] == part:
+f1 = True
+if j == k[0] and k[1] == planet and k[2] == part:
+f2 = True
+if not f1 or not f2:
+continue
+lines.append((ids_to_points[i], ids_to_points[j]))
+load()
+for p in points:
+if abs(p[0]-pos[0]) <= 20 and abs(p[1]-pos[1]) <= 20:
+return p
+return False
+points_to_ids = {}
+maxid = 1
+for i in data['levels']:
+if i[0] >= maxid:
+maxid = i[0]+1
+for i, p in enumerate(points):
+level = [maxid, planet, part, p]
+data['levels'].append(level)
+points_to_ids[i] = maxid
+maxid += 1
+if not planet in data['map_graphs']:
+data['map_graphs'][planet] = {}
+data['map_graphs'][planet][part] = [(points_to_ids[i], points_to_ids[j]) for i,j in lines]
+forcesave('leveldata\\maps.txt', data)
+print('Saved!')
+while True:
+sc.fill(pygame.Color('white'))
+for event in pygame.event.get():
+if event.type == pygame.QUIT:
+exit()
+if event.type == pygame.KEYDOWN:
+if event.key == pygame.K_ESCAPE:
+exit()
+if event.key == pygame.K_w:
+new_mode = False if new_mode else True
+if points:
+if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+cur_num = points.index(cur_point)
+if cur_num == 0:
+cur_num = len(points)
+cur_point = points[-1]
+else:
+cur_point = points[cur_num - 1]
+new_mode = False
+if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+cur_num = points.index(cur_point) + 2
+if cur_num > len(points):
+cur_num = 1
+cur_point = points[0]
+else:
+cur_point = points[cur_num - 1]
+new_mode = False
+if event.key == pygame.K_z and pygame.KMOD_CTRL:
+if log[-1] == 2:
+del lines[-1]
+del points[-1]
+del log[-1]
+if not points:
+cur_point = (0, 0)
+cur_num = 0
+elif cur_point not in points:
+cur_num = len(points)
+cur_point = points[-1]
+if event.key == pygame.K_s and pygame.KMOD_CTRL:
+save()
+sc.blit(tex, (0, 0))
+pos = pygame.mouse.get_pos()
+pressed = pygame.mouse.get_pressed()
+magnet = magnetify(pos)
+if pressed[0]:
+if not magnet:
+points.append((pos[0], pos[1]))
+if cur_num:
+if new_mode:
+lines.append((points.index(points[-2]), points.index(pos)))
+else:
+lines.append((points.index(cur_point), points.index(pos)))
+log.append(2)
+else:
+log.append(1)
+if new_mode or not cur_num:
+cur_point = (pos[0], pos[1])
+cur_num = len(points)
+if cur_num:
+if new_mode:
+if magnet:
+pygame.draw.aaline(sc, YELLOW, points[-1], magnet)
+else:
+pygame.draw.aaline(sc, YELLOW, points[-1], pos)
+else:
+if magnet:
+pygame.draw.aaline(sc, YELLOW, cur_point, magnet)
+else:
+pygame.draw.aaline(sc, YELLOW, cur_point, pos)
+for l in lines:
+p1, p2 = points[l[0]], points[l[1]]
+pygame.draw.aaline(sc, YELLOW, p1, p2)
+for p in points:
+if (p == cur_point and not new_mode) or (p == points[-1] and new_mode):
+pygame.draw.circle(sc, GREEN, p, 10, 2)
+else:
+pygame.draw.circle(sc, YELLOW, p, 10, 2)
+if magnet:
+pygame.draw.rect(sc, BLUE, (magnet[0] - 10, magnet[1] - 10, 20, 20))
+else:
+pygame.draw.rect(sc, BLUE, (pos[0]-10, pos[1]-10, 20, 20))
+sc.blit(text_mode, (1000, 100))
+sc.blit(text_save, (1000, 150))
+sc.blit(text_undo, (1000, 200))
+text_mode_toogle_color = GREEN if new_mode else RED
+text_mode_toogle = font.render(str(new_mode), True, text_mode_toogle_color)
+sc.blit(text_mode_toogle, (1340, 100))
+pygame.display.flip()
+clock.tick(FPS)
+if isinstance(x, (list, tuple)):
+self.x, self.y = x
+return
+self.x = x
+self.y = y
+return Vector(self.x, self.y)
+return math.sqrt(self.x**2+self.y**2)
+self.normalize()
+self.x *= l
+self.y *= l
+l = self.getlen()
+self.x /= l
+self.y /= l
+return self.x, self.y
+self.x = int(self.x)
+self.y = int(self.y)
+return self
+nvec = self()
+nvec.normalize()
+ang = math.asin(-nvec.y)
+ang = math.pi - ang if nvec.x < 0 else ang
+return ang
+return Vector(self.x+other.x, self.y+other.y)
+return Vector(self.x-other.x, self.y-other.y)
+if self.x == other.x and self.y == other.y:
+return True
+return False
+if self.getlen() > other.getlen():
+return True
+return False
+return Vector(self.x*other, self.y*other)
+return Vector(self.x/other, self.y/other)
+return Vector(self.x//other, self.y//other)
+return f'({self.x}, {self.y})'
+self.provides, self.values = tuple(zip(*args)) or ((), ())
+if item in self.provides:
+return True
+return False
+return self.values[self.provides.index(item)]
+res = Provides()
+res.provides = self.provides
+res.values = self.values
+return res
+res = Provides()
+res.provides = self.provides
+res.values = tuple((i*other for i in self.values))
+return res
+bigkeys = ('normal', 'air', 'water', 'fire', 'earth', 'dark', 'light')
+keys = ('n', 'a', 'w', 'f', 'e', 'd', 'l')
+if isinstance(n, str):
+if n.isdigit():
+n = float(n)
+else:    dl = re.findall(r'\d+n|\d+a|\d+w|\d+f|\d+e|\d+d|\d+l', n)
+n = 0
+for i in dl:
+if 'n' in i:
+n = int(i.split('n')[0])
+if 'a' in i:
+a = int(i.split('a')[0])
+if 'w' in i:
+w = int(i.split('w')[0])
+if 'f' in i:
+f = int(i.split('f')[0])
+if 'e' in i:
+e = int(i.split('e')[0])
+if 'd' in i:
+d = int(i.split('d')[0])
+if 'l' in i:
+l = int(i.split('l')[0])
+self.values = (n, a, w, f, e, d, l)
+return DamageTable(*self.values)
+if item in DamageTable.keys:
+return self.values[DamageTable.keys.index(item)]
+return self.values[DamageTable.bigkeys.index(item)]
+self.a = -1
+return self
+if self.a < 6:
+self.a += 1
+return DamageTable.keys[self.a], self.values[self.a]
+else:
+raise StopIteration
+if isinstance(other, DamageTable):
+return DamageTable(*tuple((v+other[i] for i,v in self)))
+return DamageTable(*tuple((i+other for i in self.values)))
+if isinstance(other, DamageTable):
+return DamageTable(*tuple((v*other[i] for i,v in self)))
+return DamageTable(*tuple((i*other for i in self.values)))
+if isinstance(other, DamageTable):
+return DamageTable(*tuple((v/other[i] for i,v in self)))
+return DamageTable(*tuple((i/other for i in self.values)))
+if self.sum() > other.sum():
+return True
+return False
+return f'DamageTable{self.values}'
+return sum(self.values)
+values = list(self.values)
+if key in DamageTable.keys:
+values[DamageTable.keys.index(key)] += value
+else:
+values[DamageTable.bigkeys.index(key)] += value
+self.values = tuple(values)
+self.shoots = 0
+self.hits = 0
+self.received_hits = 0
+self.dist = 0
+self.flydist = 0
+self.jumps = 0
+self.kills = 0
+self.deaths = 0
+self.casts = 0
+self.ultimates = 0
+self.damage = 0
+self.raw_damage = 0
+self.blocked_damage = 0
+self.received_damage = 0
+return f'shoots={self.shoots}, hits={self.hits}, jumps={self.jumps}, dist={self.dist}, kills={self.kills}, casts={self.casts}, dmg={self.damage}, raw={self.raw_damage}'
+self.shoots = data[0]
+self.hits = data[1]
+self.received_hits = data[2]
+self.dist = data[3]
+self.flydist = data[4]
+self.jumps = data[5]
+self.kills = data[6]
+self.deaths = data[7]
+self.casts = data[8]
+self.ultimates = data[9]
+self.damage = data[10]
+self.raw_damage = data[11]
+self.blocked_damage = data[12]
+self.received_damage = data[13]
+return [self.shoots, self.hits, self.received_hits, self.dist, self.flydist, self.jumps, self.kills,
+self.deaths, self.casts, self.ultimates, self.damage, self.raw_damage, self.blocked_damage,
+self.received_damage]
+self.shoots = defaultdict(int)
+self.hits = defaultdict(int)
+self.received_hits = defaultdict(int)
+self.dist = defaultdict(int)
+self.flydist = defaultdict(int)
+self.jumps = defaultdict(int)
+self.kills = defaultdict(int)
+self.deaths = defaultdict(int)
+self.casts = defaultdict(int)
+self.ultimates = defaultdict(int)
+self.damage = defaultdict(int)
+self.raw_damage = defaultdict(int)
+self.blocked_damage = defaultdict(int)
+self.received_damage = defaultdict(int)
+team = 'ally'
+return f'shoots={self.shoots[team]}, hits={self.hits[team]}, jumps={self.jumps[team]}, dist={self.dist[team]}, kills={self.kills[team]}, casts={self.casts[team]}, dmg={self.damage[team]}, raw={self.raw_damage[team]}'
+for k, v in data.items():
+self.shoots[k] = v[0]
+self.hits[k] = v[1]
+self.received_hits[k] = v[2]
+self.dist[k] = v[3]
+self.flydist[k] = v[4]
+self.jumps[k] = v[5]
+self.kills[k] = v[6]
+self.deaths[k] = v[7]
+self.casts[k] = v[8]
+self.ultimates[k] = v[9]
+self.damage[k] = v[10]
+self.raw_damage[k] = v[11]
+self.blocked_damage[k] = v[12]
+self.received_damage[k] = v[13]
+return self
+return {k: [self.shoots[k], self.hits[k], self.received_hits[k], self.dist[k], self.flydist[k], self.jumps[k],
+self.kills[k], self.deaths[k], self.casts[k], self.ultimates[k], self.damage[k], self.raw_damage[k],
+self.blocked_damage[k], self.received_damage[k]] for k in self.dist.keys()}
+self.shoots[unit.team] += 1
+unit.stats.shoots += 1
+self.hits[unit_from.team] += 1
+unit_from.stats.hits += 1
+self.received_hits[unit_to.team] += 1
+unit_to.stats.received_hits += 1
+self.dist[unit.team] += dist
+unit.stats.dist += dist
+if unit.canfly:
+self.flydist[unit.team] += dist
+unit.stats.flydist += dist
+self.jumps[unit.team] += 1
+unit.stats.jumps += 1
+self.damage[unit_from.team] += value
+unit_from.stats.damage += value
+self.raw_damage[unit_from.team] += raw_value
+unit_from.stats.raw_damage += raw_value
+self.received_damage[unit_to.team] += value
+unit_to.stats.received_damage += value
+self.blocked_damage[unit_to.team] += raw_value - value
+unit_to.stats.blocked_damage += raw_value - value
+self.kills[unit_from.team] += 1
+unit_from.stats.kills += 1
+self.deaths[unit_to.team] += 1
+unit_to.stats.deaths += 1
+self.casts[unit.team] += 1
+unit.stats.casts += 1
+if ability.ultimate:
+self.ultimates[unit.team] += 1
+unit.stats.ultimates += 1
+textures = {i.split('.png')[0]: pygame.image.load('textures\\projectiles\\'+i).convert_alpha() for i in os.listdir('textures\\projectiles')}
+anims = {a: tuple((pygame.image.load(f'textures\\proj_anims\\{a}\\{i}').convert_alpha() for i in os.listdir(f'textures\\proj_anims\\{a}'))) for a in os.listdir(f'textures\\proj_anims')}
+self.caster = caster
+self.ability = ability
+self.level = self.caster.level
+self.units = self.caster.units
+self.spawn_point = spawn_point
+self.pos = spawn_point()
+self.distance = 0
+self.speed = fspeed
+self.accel = kwargs['accel'] if 'accel' in kwargs else Vector(0, GRAVITY)
+self.tex = Projectile.textures[tex].copy()
+self.ticks = 0
+self.collisions = []
+self.collision_cd = kwargs['collision_cd'] if 'collision_cd' in kwargs else FPS
+self.destroyed = False
+self.stopped = False
+if 'size' in kwargs:
+self.size = kwargs['size']*TILE_SIZE
+self.size.toint()
+self.tex = pygame.transform.scale(self.tex, self.size.cort())
+else:
+self.size = Vector(self.tex.get_width(), self.tex.get_height())
+self.duration = kwargs['duration'] if 'duration' in kwargs else 0
+self.baseduration = self.duration
+self.stopbyUnitCollisions = kwargs['stopbyUnitCollisions'] if 'stopbyUnitCollisions' in kwargs else 0
+self.stopbyMapCollisions = kwargs['stopbyMapCollisions'] if 'stopbyMapCollisions' in kwargs else 0
+self.destroybyUnitCollisions = kwargs['destroybyUnitCollisions'] if 'destroybyUnitCollisions' in kwargs else 0
+self.destroybyMapCollisions = kwargs['destroybyMapCollisions'] if 'destroybyMapCollisions' in kwargs else 0
+self.ricochetbyUnitCollisions = kwargs['ricochetbyUnitCollisions'] if 'ricochetbyUnitCollisions' in kwargs else 0
+self.ricochetbyMapCollisions = kwargs['ricochetbyMapCollisions'] if 'ricochetbyMapCollisions' in kwargs else 0
+self.destroyAnimation = []
+if 'destroyAnimation' in kwargs:
+self.destroyAnimation = Projectile.anims[kwargs['destroyAnimation']]
+if self.destroyed is False:
+tex = self.tex
+if not self.stopped:
+oldpos = self.pos
+self.speed += self.accel
+self.pos += self.speed
+dv = self.pos - oldpos
+self.distance += dv.getlen()
+if self.speed.x or self.speed.y:
+ang = math.asin(self.speed.y / self.speed.getlen())
+ang = math.pi - ang if self.speed.x < 0 else ang
+ang = ang/math.pi*180
+tex = pygame.transform.rotate(self.tex, ang)
+tex = pygame.transform.scale(tex, (int(tex.get_width() * self.level.camera_scale), int(tex.get_height() * self.level.camera_scale)))
+sc.blit(tex, (self.pos.x*self.level.tile_size+self.level.mp[0]-tex.get_width()//2, self.pos.y*self.level.tile_size+self.level.mp[1]-tex.get_height()//2))
+self.collide(tex)
+self.ticks += 1
+if self.duration > 0 and self.ticks > self.duration * FPS:
+self.destroyed = True
+else:
+if self.destroyed is True:
+self.destroyed = -1
+self.ability.onProjectileDestroy(self)
+self.destroyed += 1
+if self.destroyed >= len(self.destroyAnimation):
+return False
+if not self.stopped:
+oldpos = self.pos
+self.speed += self.accel
+self.pos += self.speed
+dv = self.pos - oldpos
+self.distance += dv.getlen()
+tex = self.destroyAnimation[self.destroyed]
+tex = pygame.transform.scale(tex, self.size.cort())
+self.collide(tex)
+self.ticks += 1
+tex = pygame.transform.scale(tex, (int(tex.get_width() * self.level.camera_scale), int(tex.get_height() * self.level.camera_scale)))
+sc.blit(tex, (self.pos.x * self.level.tile_size + self.level.mp[0] - tex.get_width() // 2, self.pos.y * self.level.tile_size + self.level.mp[1] - tex.get_height() // 2))
+box = (self.pos.x-tex.get_width()/4/TILE_SIZE, self.pos.x+tex.get_width()/4/TILE_SIZE, self.pos.y-tex.get_height()/4/TILE_SIZE, self.pos.y+tex.get_height()/4/TILE_SIZE)
+if box[0] < 0 or box[1] >= self.level.size.x or box[2] < 0 or box[3] >= self.level.size.y:
+if self.destroyed is False:
+self.destroyed = True
+self.stopped = True
+return
+if self.destroyed is False:
+for i in self.units:
+if box[0] < i.cords.x+i.size.x/2 and box[1] > i.cords.x-i.size.x/2 and box[2] < i.cords.y and box[3] > i.cords.y-i.size.y:
+f = True
+for u, t in self.collisions:
+if self.ticks - t < self.collision_cd and u == i:
+f = False
+break
+if not f:
+continue
+unitcoll = self.ability.onProjectileHit(self, i)
+if unitcoll:
+self.collisions.append((i, self.ticks))
+if self.stopbyUnitCollisions and len(self.collisions) >= self.stopbyUnitCollisions:
+self.stopped = True
+if self.ricochetbyUnitCollisions and len(self.collisions) % self.ricochetbyUnitCollisions == 0:
+self.ricochetbyUnitCollisions -= 1
+self.speed = Vector(-self.speed.x, -self.speed.y)
+if self.destroyed is False and self.destroybyUnitCollisions and len(self.collisions) >= self.destroybyUnitCollisions:
+self.destroyed = True
+break
+mapcollision = False
+if not self.level.tilemap[int(box[0])][int(box[2])] == 0:
+mapcollision = (int(box[0]), int(box[2]))
+if not self.level.tilemap[int(box[1])][int(box[2])] == 0:
+mapcollision = (int(box[1]), int(box[2]))
+if not self.level.tilemap[int(box[0])][int(box[3])] == 0:
+mapcollision = (int(box[0]), int(box[3]))
+if not self.level.tilemap[int(box[1])][int(box[3])] == 0:
+mapcollision = (int(box[1]), int(box[3]))
+if not mapcollision is False:
+self.ability.onProjectileCollide(self, mapcollision)
+if self.destroyed is False and self.destroybyMapCollisions:
+self.destroybyMapCollisions -= 1
+if self.destroybyMapCollisions == 0:
+self.destroyed = True
+if self.stopbyMapCollisions:
+self.stopbyMapCollisions -= 1
+if self.stopbyMapCollisions == 0:
+self.stopped = True
+if self.ricochetbyMapCollisions:
+self.ricochetbyMapCollisions -= 1
+self.speed = Vector(-self.speed.x, -self.speed.y)
+maxlptime = 0
+data = None
+name = None
+rune = None
+for p in os.listdir(f'saves'):
+if p.endswith('.txt') and p.split('.txt')[0] + '.npy' in os.listdir(f'saves'):
+file = ast.literal_eval(open(f'saves\\{p}', 'r', encoding='utf-8').read())
+lptime = file['last_played']
+if lptime > maxlptime:
+maxlptime = lptime
+data = file
+name = p.split('.txt')[0]
+rune = np.load(f'saves\\{p.split(".txt")[0]}.npy')
+if data is None:
+data = {'units': [], 'inventory': [[]], 'storage': [[]], 'player_exp': 0, 'last_played': int(time.time()), 'stats': {}, 'pieces': [], 'unlocked_levels': [1]}
+name = alphanum_random(6)
+forcesave(f'saves\\{name}.txt', str(data))
+rune = np.zeros((22, 22), 'int')
+forcenpsave(f'saves\\{name}', rune)
+return data, name, rune
+self.name = data[0]
+self.id = data[1]
+self.icon = pygame.image.load(f'pieces\\{self.id}.png')
+self.part = data[2]
+self.connections = data[3]
+if self.part == 'verb':
+self.text_name = data[4]
+pieces = {d[1]: Piece(d) for d in ast.literal_eval(open('pieces\\pieces.txt', 'r', encoding='utf-8').read())}
+checks = ((0, 1), (-1, 0), (0, -1), (1, 0), (-1, 1), (1, 1), (-1, -1), (1, -1))
+self.level = None
+self.runestone_rune = pygame.image.load(f'textures\\GUI\\runestone_rune.png').convert_alpha()
+self.runestone_pieces = pygame.image.load(f'textures\\GUI\\runestone_pieces.png').convert_alpha()
+data, self.name, self.runestone = search_last_player_data()
+self.size = self.runestone.shape
+self.tile_size = min([RUNESTONE_SIZE[1]//(self.size[0]-1), RUNESTONE_SIZE[0]//(self.size[1]-1)])
+self.sc = pygame.Surface((self.tile_size*(self.size[1]-1)+10, self.tile_size*(self.size[0]-1)+10), pygame.SRCALPHA, 32)
+self.runestone_rune_scaled = pygame.transform.scale(self.runestone_rune, (self.tile_size*(self.size[1]-1)+20, self.tile_size*(self.size[0]-1)+20))
+[pygame.draw.aaline(self.sc, BLACK, (0, (i+0.5)*self.tile_size+5), (self.sc.get_width(), (i+0.5)*self.tile_size+5)) for i in range(self.size[0])]
+[pygame.draw.aaline(self.sc, BLACK, ((i+0.5)*self.tile_size+5, 0), ((i+0.5)*self.tile_size+5, self.sc.get_height())) for i in range(self.size[1])]
+self.units = data['units']
+self.inventory = data['inventory']
+self.storage = data['storage']
+self.exp = data['player_exp']
+self.stats = GameStats().load(data['stats'])
+self.pieces = data['pieces']
+self.unlocked_levels = data['unlocked_levels']
+self.ticks = 0
+self.piece_lock = None
+self.piece_lock_return = None
+self.piece_lock_pos = None
+self.level = level
+self.inventory = [[Item.load(self.level, j) for j in i] for i in self.inventory]
+self.units = [u.save() for u in self.level.units if u.game_id]
+maxlpdata = {'units': self.units, 'inventory': [[j.save() for j in i] for i in self.inventory], 'storage': self.storage, 'player_exp': self.exp, 'last_played': int(time.time()), 'stats': self.stats.save(), 'pieces': self.pieces, 'unlocked_levels': self.unlocked_levels}
+forcesave(f'saves\\{self.name}.txt', str(maxlpdata))
+forcenpsave(f'saves\\{self.name}', self.runestone)
+sc.blit(self.runestone_rune_scaled, RUNESTONE_RUNE)
+sc.blit(self.runestone_pieces, RUNESTONE_PIECES)
+sc.blit(self.sc, RUNESTONE_MAP)
+for i, p in enumerate(self.pieces):
+piece = pygame.transform.scale(Runa.pieces[p].icon, RUNESTONE_PIECE)
+d, m = divmod(i, 5)
+sc.blit(piece, (RUNESTONE_PIECE_FIRST[0]+m*RUNESTONE_PIECE[0]+(m-1)*RUNESTONE_PIECE_GAP, RUNESTONE_PIECE_FIRST[1]+d*RUNESTONE_PIECE[0]+(d-1)*RUNESTONE_PIECE_GAP))
+for i in range(self.size[0]):
+for j in range(self.size[1]):
+if self.runestone[i][j] > 0:
+piece = pygame.transform.scale(Runa.pieces[self.runestone[i][j]].icon, (3*self.tile_size, 3*self.tile_size))
+sc.blit(piece, (RUNESTONE_MAP[0]+(j-1.5)*self.tile_size+5, RUNESTONE_MAP[1]+(i-1.5)*self.tile_size+5))
+if self.piece_lock:
+piece = pygame.transform.scale(Runa.pieces[self.piece_lock].icon, RUNESTONE_PIECE)
+sc.blit(piece, (pos[0]-piece.get_width()//2, pos[1]-piece.get_height()//2))
+if RUNESTONE_PIECES[0] < pos[0] < RUNESTONE_PIECES_END[0] and RUNESTONE_PIECES[1] < pos[1] < RUNESTONE_PIECES_END[1]:
+for i, p in enumerate(self.pieces):
+d, m = divmod(i, 5)
+cords = (RUNESTONE_PIECE_FIRST[0] + m * RUNESTONE_PIECE[0] + (m - 1) * RUNESTONE_PIECE_GAP, RUNESTONE_PIECE_FIRST[1] + d * RUNESTONE_PIECE[0] + (d - 1) * RUNESTONE_PIECE_GAP)
+if cords[0] < pos[0] < cords[0]+RUNESTONE_PIECE[0] and cords[1] < pos[1] < cords[1]+RUNESTONE_PIECE[1]:
+self.piece_lock = p
+self.piece_lock_return = True
+self.piece_lock_pos = True
+self.pieces.remove(self.piece_lock)
+return
+if RUNESTONE_MAP[0] < pos[0] < RUNESTONE_MAP[0]+self.tile_size*(self.size[1]-1)+10 and RUNESTONE_MAP[1] < pos[1] < RUNESTONE_MAP[1]+self.tile_size*(self.size[0]-1)+10:
+i, j = int(((pos[1]-RUNESTONE_MAP[1]-5)/self.tile_size)+0.5), int(((pos[0]-RUNESTONE_MAP[0]-5)/self.tile_size)+0.5)
+i, j = self.find_piece(i, j)
+if i is not False:
+self.piece_lock = self.runestone[i][j]
+self.piece_lock_return = True
+self.piece_lock_pos = i, j
+self.runestone[i][j] = 0
+for oi, oj in Runa.checks:
+si, sj = i + oi, j + oj
+self.runestone[si][sj] = 0
+if RUNESTONE_MAP[0] < pos[0] < RUNESTONE_MAP[0]+self.tile_size*(self.size[1]-1)+10 and RUNESTONE_MAP[1] < pos[1] < RUNESTONE_MAP[1]+self.tile_size*(self.size[0]-1)+10:
+i, j = int(((pos[1]-RUNESTONE_MAP[1]-5)/self.tile_size)+0.5), int(((pos[0]-RUNESTONE_MAP[0]-5)/self.tile_size)+0.5)
+i, j = self.check_place_for_piece(i, j)
+if i is not False:
+i, j = self.expand_runestone(i, j)
+self.runestone[i][j] = self.piece_lock
+self.piece_lock_return = False
+for oi, oj in Runa.checks:
+si, sj = i + oi, j + oj
+self.runestone[si][sj] = -1
+if self.piece_lock_return is True:
+if self.piece_lock_pos is True:
+self.pieces.append(self.piece_lock)
+else:
+i, j = self.piece_lock_pos
+i, j = self.expand_runestone(i, j)
+self.runestone[i][j] = self.piece_lock
+self.piece_lock_return = False
+for oi, oj in Runa.checks:
+si, sj = i + oi, j + oj
+self.runestone[si][sj] = -1
+self.piece_lock_return = None
+self.contract_runestone()
+self.piece_lock = None
+self.piece_lock_pos = None
+if self.runestone[i][j]:
+return False, False
+colls = []
+for oi, oj in Runa.checks:
+si, sj = i+oi, j+oj
+if si < 0 or sj < 0 or si >= self.size[0] or sj >= self.size[1]:
+continue
+if self.runestone[si][sj]:
+colls.append((si, sj))
+if colls:
+i, j = self.check_place_for_piece(colls[0][0], colls[0][1])
+return i, j
+if not self.runestone[i][j]:
+return False, False
+if self.runestone[i][j] > 0:
+return i, j
+for oi, oj in Runa.checks:
+si, sj = i + oi, j + oj
+if si < 0 or sj < 0 or si >= self.size[0] or sj >= self.size[1]:
+continue
+if self.runestone[si][sj] > 0:
+return si, sj
+return False, False
+oldsize = self.size
+if i < 2:
+self.runestone = np.concatenate((np.zeros((2 - i, self.size[1]), 'int'), self.runestone), axis=0)
+self.size = self.runestone.shape
+i = 2
+if j < 2:
+self.runestone = np.concatenate((np.zeros((self.size[0], 2 - j), 'int'), self.runestone), axis=1)
+self.size = self.runestone.shape
+j = 2
+if i > self.size[0]-3:
+self.runestone = np.concatenate((self.runestone, np.zeros((i - self.size[0] + 3, self.size[1]), 'int')), axis=0)
+self.size = self.runestone.shape
+if j > self.size[1]-3:
+self.runestone = np.concatenate((self.runestone, np.zeros((self.size[0], j - self.size[1] + 3), 'int')), axis=1)
+self.size = self.runestone.shape
+if self.size != oldsize:
+self.tile_size = min([RUNESTONE_SIZE[1] // (self.size[0] - 1), RUNESTONE_SIZE[0] // (self.size[1] - 1)])
+self.sc = pygame.Surface((self.tile_size * (self.size[1] - 1) + 10, self.tile_size * (self.size[0] - 1) + 10), pygame.SRCALPHA, 32)
+self.runestone_rune_scaled = pygame.transform.scale(self.runestone_rune, (self.tile_size * (self.size[1] - 1) + 20, self.tile_size * (self.size[0] - 1) + 20))
+[pygame.draw.aaline(self.sc, BLACK, (0, (i + 0.5) * self.tile_size + 5), (self.sc.get_width(), (i + 0.5) * self.tile_size + 5)) for i in range(self.size[0])]
+[pygame.draw.aaline(self.sc, BLACK, ((i + 0.5) * self.tile_size + 5, 0), ((i + 0.5) * self.tile_size + 5, self.sc.get_height())) for i in range(self.size[1])]
+return i, j
+oldsize = self.size
+if self.size[1] > 22 and not any((i[1] for i in self.runestone)):
+self.runestone = np.delete(self.runestone, 1, axis=1)
+self.size = self.runestone.shape
+self.contract_runestone(True)
+if self.size[0] > 22 and not any(self.runestone[1]):
+self.runestone = np.delete(self.runestone, 1, axis=0)
+self.size = self.runestone.shape
+self.contract_runestone(True)
+if self.size[1] > 22 and not any((i[-2] for i in self.runestone)):
+self.runestone = np.delete(self.runestone, -2, axis=1)
+self.size = self.runestone.shape
+self.contract_runestone(True)
+if self.size[0] > 22 and not any(self.runestone[-2]):
+self.runestone = np.delete(self.runestone, -2, axis=0)
+self.size = self.runestone.shape
+self.contract_runestone(True)
+if not rec and self.size != oldsize:
+self.tile_size = min([RUNESTONE_SIZE[1] // (self.size[0] - 1), RUNESTONE_SIZE[0] // (self.size[1] - 1)])
+self.sc = pygame.Surface((self.tile_size * (self.size[1] - 1) + 10, self.tile_size * (self.size[0] - 1) + 10), pygame.SRCALPHA, 32)
+self.runestone_rune_scaled = pygame.transform.scale(self.runestone_rune, (self.tile_size * (self.size[1] - 1) + 20, self.tile_size * (self.size[0] - 1) + 20))
+[pygame.draw.aaline(self.sc, BLACK, (0, (i + 0.5) * self.tile_size + 5), (self.sc.get_width(), (i + 0.5) * self.tile_size + 5)) for i in range(self.size[0])]
+[pygame.draw.aaline(self.sc, BLACK, ((i + 0.5) * self.tile_size + 5, 0), ((i + 0.5) * self.tile_size + 5, self.sc.get_height())) for i in range(self.size[1])]
+self.ticks += 1
+if self.ticks % 3600 == 0:
+self.save()
+return [Unit(u[0], self.level).load(*u[1:]) for u in self.units]
+for i in self.inventory:
+for j in i:
+if j.name == item.name:
+j.count += item.count
+return
+self.inventory[0].append(item)
+for i in os.listdir('abilities'):
+if i.endswith('.py'):
+pygame.init()
+DMGFONT = pygame.font.SysFont('calibri', 30)
+path = f'{folder}\\{file}'
+data = ast.literal_eval(open(path, 'r', encoding='utf-8').read())
+animator.load([data, parts])
+data['frames_ready'] = {}
+frames = animator.create_frames()
+center = (-1 * animator.X_OFFSET + TILE_SIZE * animator.TILE_SCALE, -1 * animator.Y_OFFSET + 3 * TILE_SIZE * animator.TILE_SCALE)
+for frame in frames:
+sc = pygame.Surface((TILE_SIZE * animator.TILE_SCALE * 5, TILE_SIZE * animator.TILE_SCALE * 5), pygame.SRCALPHA, 32)
+for i in frames[frame]:
+part = pygame.transform.scale(parts[i[0]], (int(parts[i[0]].get_width() * i[2]), int(parts[i[0]].get_height() * i[2])))
+if i[3]:
+part = pygame.transform.rotate(part, i[3])
+sc.blit(part, (center[0] + i[1][0] - part.get_width() // 2, center[1] + i[1][1] - part.get_height() // 2))
+sc = pygame.transform.scale(sc, (int(TILE_SIZE * 7.5), int(TILE_SIZE * 7.5)))
+data['frames_ready'][frame] = {False: sc, True: pygame.transform.flip(sc, True, False)}
+return data
+parts = {}
+animations = {}
+self.game_id = ''
+self.texture_folder = search_unit_folder(data)
+self.data = ast.literal_eval(open(f'{self.texture_folder}\\unit.txt', 'r', encoding='utf-8').read())
+self.id = self.data['id']
+self.name = self.data['name']
+self.element = self.data['element'] if 'element' in self.data else 'normal'
+self.avatar = pygame.image.load(f'{self.texture_folder}\\avatar.png').convert_alpha()
+self.avatar = pygame.transform.scale(self.avatar, GUI_ICON_SIZE)
+if self.name not in Unit.parts:
+Unit.parts[self.name] = {i: pygame.image.load(f'{self.texture_folder}\\{i}').convert_alpha() for i in
+os.listdir(self.texture_folder) if i.endswith('.png')}
+Unit.animations[self.name] = {i.split('.txt')[0]: load_anim(self.texture_folder, i, Unit.parts[self.name])
+for i in os.listdir(self.texture_folder) if i.endswith('.txt') and not i == 'unit.txt'}
+if 'attack' not in Unit.animations[self.name]:
+Unit.animations[self.name]['attack'] = Unit.animations[self.name]['idle']
+if 'jump' not in Unit.animations[self.name]:
+Unit.animations[self.name]['jump'] = Unit.animations[self.name]['idle']
+if 'fall' not in Unit.animations[self.name]:
+Unit.animations[self.name]['fall'] = Unit.animations[self.name]['idle']
+if 'die' not in Unit.animations[self.name]:
+Unit.animations[self.name]['die'] = Unit.animations[self.name]['idle']
+if 'move' not in Unit.animations[self.name]:
+Unit.animations[self.name]['move'] = Unit.animations[self.name]['idle']
+if 'cast1' not in Unit.animations[self.name]:
+Unit.animations[self.name]['cast1'] = Unit.animations[self.name]['attack']
+if 'cast2' not in Unit.animations[self.name]:
+Unit.animations[self.name]['cast2'] = Unit.animations[self.name]['cast1']
+if 'cast3' not in Unit.animations[self.name]:
+Unit.animations[self.name]['cast3'] = Unit.animations[self.name]['cast1']
+if 'cast4' not in Unit.animations[self.name]:
+Unit.animations[self.name]['cast4'] = Unit.animations[self.name]['cast1']
+self.cur_anim = 'idle'
+self.next_anim = 'idle'
+self.anim_idx = 0
+self.anim_speed = 1
+self.level = level
+self.units = level.units
+self.dialogs = []
+self.hp = self.data['stats']['hp']
+self.mana = self.data['stats']['mana']
+self.dmg = DamageTable(self.data['stats']['dmg'])
+self.armor = DamageTable(self.data['stats']['armor'])
+self.movespeed = self.data['stats']['speed']
+self.attack_speed = self.data['stats']['attack_speed']
+self.sight = self.data['stats']['sight']
+self.accuracy = self.data['stats']['accuracy']
+self.multishot = self.data['stats']['multishot']
+self.melee = self.data['melee']
+self.canattack = self.data['canattack'] if 'canattack' in self.data else True
+if self.canattack:
+if 'attack' in self.data:
+if not self.melee:
+self.data['attack']['size'] = Vector(self.data['attack']['size'])
+elif self.melee:
+self.data['attack'] = {"projectile": "sword.png", "radius": 1, "spawn_offset": (0, -1),
+"top_angle": 90, "bottom_angle": -45}
+else:
+self.data['attack'] = {"projectile": "orb.png", "speed": 40, "size": Vector(30, 30), "spawn_offset": (0, -1),
+"attack_frame": 40, "top_angle": 90, "bottom_angle": -45, "destroybyMapCollisions": 1,
+"stopbyMapCollisions": 1, "destroybyUnitCollisions": 1, "stopbyUnitCollisions": 1,
+"destroyAnimation": "orbDestroy"}
+if 'atability' not in self.data['attack']:
+self.data['attack']['atability'] = 'AttackAbility'
+self.size = Vector(self.data['stats']['size'])
+self.cords = Vector(kwargs['cords']) if 'cords' in kwargs else None
+self.team = 'enemy' if 'e' in kwargs and kwargs['e'] else kwargs['team'] if 'team' in kwargs else 'ally'
+self.flip = True if 'e' in kwargs else False
+self.particles = [Particles(**p) for p in self.data['particles']] if 'particles' in self.data else []
+self.canfly = self.data['canfly'] if 'canfly' in self.data else False
+self.canswim = self.data['canswim'] if 'canswim' in self.data else False
+self.speed = Vector()
+self.accel = Vector(0, GRAVITY) if not self.canfly else Vector()
+self.abilities = []
+self.ability_raws = self.data['abilities'] if 'abilities' in self.data else []
+self.ability_raw_examples = []
+if 'astats' not in self.data:
+self.data['astats'] = {"strength": 1, "radius": 1, "aduration": 1, "manacost": 1, "castspeed": 1, "reduction": 1, "super": 1}
+self.strength = self.data['astats']['strength']  self.radius = self.data['astats']['radius']  self.aduration = self.data['astats']['aduration']  self.manacost = self.data['astats']['manacost']  self.castspeed = self.data['astats']['castspeed']  self.reduction = self.data['astats']['reduction']  self.super = self.data['astats']['super']  self.exp = 0
+self.perks = []
+self.modifiers = []
+self.maxhp, self.maxmana = self.hp, self.mana
+self.lasthp = [0, self.hp, None]
+self.tasks = []
+self.dmgvs = []
+self.ticks = 0
+self.status = 0
+self.aiallowed = True
+self.ai = AI(self)
+self.dead = False
+self.summoner = kwargs['summoner'] if 'summoner' in kwargs else None
+self.duration = kwargs['duration'] if 'duration' in kwargs else 0
+self.baseduration = self.duration
+self.canbecontrolled = self.data['canbecontrolled'] if 'canbecontrolled' in self.data else True
+self.baroffset = self.data['baroffset'] if 'baroffset' in self.data else (0, -(self.size.y+0.3))
+self.baroffset = (self.baroffset[0], self.baroffset[1]+(random.randint(0,200)-100)/1000)
+self.mousepos = None
+self.stats = UnitStats()
+self.drop = self.data['drop'] if 'drop' in self.data else {}
+self.reward = self.data['reward'] if 'reward' in self.data else 0
+if not self.cur_anim in ['die', 'fall']:
+self.next_anim = anim
+self.anim_speed = speed
+if self.ticks == 0:
+for i in self.ability_raws:
+abl = {'self': self}
+exec(f'ab={i[0]}(self)', globals(), abl)
+ab = abl['ab']
+self.ability_raw_examples.append(ab)
+if i[5] in ('passive', 'orb'):
+self.abilities.append(ab)
+ab.onAbilityStart()
+if not get_bit(self.status, 6) and self.level.selected_unit is not self and self.aiallowed:
+if self.ticks % 20 == 0:
+self.ai.think()
+self.ai.act()
+spp = self.speed + self.accel
+dcords = self.cords()
+if not spp.y == 0:
+if spp.y < 0:
+if self.level.find_upper_space(self, spp.y):
+self.speed.y += self.accel.y
+self.cords.y += self.speed.y
+self.next_anim = 'jump'
+else:
+self.speed.y = 0
+elif self.level.find_under_space(self, spp.y):
+self.speed.y += self.accel.y
+self.cords.y += self.speed.y
+self.next_anim = 'fall'
+else:
+self.speed.y = 0
+if not spp.x == 0:
+if spp.x < 0:
+if self.level.find_left_space(self, spp.x):
+self.speed.x += self.accel.x
+self.cords.x += self.speed.x
+else:
+self.speed.x = 0
+elif self.level.find_right_space(self, spp.x):
+self.speed.x += self.accel.x
+self.cords.x += self.speed.x
+else:
+self.speed.x = 0
+if dcords != self.cords:
+dcords -= self.cords
+self.level.runa.stats.move(self, dcords.getlen())
+for i, task in enumerate(self.tasks):
+if task[0] == 'attack':
+aframes = Unit.animations[self.name]['attack']['len'] if Unit.animations[self.name]['attack']['len'] < task[2] else task[2]
+if task[1] < aframes:
+if Unit.animations[self.name]['attack']['len'] > task[2]:
+self.anim_speed = Unit.animations[self.name]['attack']['len'] / task[2]
+if self.melee:
+task[3].meleeAttack(task[1], aframes, self.anim_speed)
+else:
+task[3].rangedAttack(task[1], aframes, self.anim_speed)
+self.next_anim = 'attack'
+self.tasks[i][1] += 1
+elif task[1] < task[2]:
+self.tasks[i][1] += 1
+else:
+self.tasks.remove(task)
+if self.melee:
+task[3].destroy()
+continue
+if task[0].startswith('cast'):
+if task[1] == 0:
+task[5].onAbilityCastStart()
+for mod in self.modifiers:
+if PROVIDE_SPELL_CASTING in mod.provides:
+mod.onAbilityCastStart(task[5])
+if task[1] < task[2]:
+self.next_anim = task[8]
+self.anim_speed = Unit.animations[self.name][task[8]]['len']/task[2]
+self.tasks[i][1] += 1
+if self.mana < self.tasks[i][9] / self.manacost:
+self.tasks.remove(task)
+continue
+elif not task[7] and self.tasks[i][1] >= task[3]:
+self.abilities.append(task[5])
+self.tasks[i][7] = True
+task[5].onAbilityStart()
+self.level.runa.stats.cast(self, task[5])
+self.mana -= self.tasks[i][9] / self.manacost
+for mod in self.modifiers:
+if PROVIDE_SPELL_STARTING in mod.provides:
+mod.onAbilityStart(task[5])
+elif task[1] < task[4]:
+self.tasks[i][1] += 1
+else:
+self.tasks.remove(task)
+continue
+if task[0] == 'die':
+self.next_anim = 'die'
+if task[1] < task[2]:
+self.tasks[i][1] += 1
+else:
+self.anim_idx = task[2]
+if not self.next_anim == self.cur_anim:
+self.cur_anim = self.next_anim
+self.anim_idx = 0
+if self.anim_idx >= Unit.animations[self.name][self.cur_anim]['len']:
+self.anim_idx = 0
+self.pick_drop()
+self.ticks += 1
+for i in self.abilities:
+i.tick()
+for i in self.modifiers:
+i.tick()
+self.change_status()
+if self.duration and self.ticks > self.duration * FPS:
+self.die(self)
+mp, cs, ts = self.level.mp, self.level.camera_scale, self.level.tile_size
+if int(self.anim_idx) in Unit.animations[self.name][self.cur_anim]['frames_ready']:
+part = Unit.animations[self.name][self.cur_anim]['frames_ready'][int(self.anim_idx)][self.flip]
+part = pygame.transform.scale(part, (int(self.level.tile_size*5), int(self.level.tile_size*5)))
+sc.blit(part, (self.cords.x*ts + mp[0] - part.get_width() // 2, self.cords.y*ts + mp[1] - part.get_height()))
+if self.particles:
+pcds = self.cords.x * self.level.tile_size + self.level.mp[0], self.cords.y * self.level.tile_size + self.level.mp[1]
+for p in self.particles:
+p.spawn(pcds, level_scale=self.level.camera_scale)
+for x, p in p.act(pcds):
+sc.blit(x, p)
+self.anim_idx += self.anim_speed
+self.anim_speed = 1
+self.next_anim = 'idle'
+cs = self.level.camera_scale
+mp = self.level.mp
+if self.lasthp[0] >= DAMAGE_BAR_TIME:
+self.lasthp = [0, self.hp, None]
+elif self.hp != self.lasthp[1] or self.lasthp[0] >= DAMAGE_BAR_FRESH_END:
+self.lasthp[0] += 1
+if self.lasthp[2] is None:
+self.lasthp[2] = self.level.gui.make_unit_bar(self)
+bar = self.lasthp[2].copy()
+if self.lasthp[0] >= DAMAGE_BAR_TRANSPARENT_START:
+bar.set_alpha(255*(DAMAGE_BAR_TIME-self.lasthp[0])/DAMAGE_BAR_TRANSPARENT_TIME)
+elif self.lasthp[0] >= DAMAGE_BAR_FRESH_START:
+bar = self.level.gui.make_fresh_from_bar(self, bar, (DAMAGE_BAR_FRESH_END-self.lasthp[0])/DAMAGE_BAR_FRESH_TIME)
+else:
+bar = self.level.gui.make_fresh_from_bar(self, bar, 1)
+bar = pygame.transform.smoothscale(bar, (int(bar.get_width()*self.level.camera_scale//3), int(bar.get_height()*self.level.camera_scale//3)))
+sc.blit(bar, ((self.cords.x+self.baroffset[0])*self.level.tile_size+mp[0]-bar.get_width()//2, (self.cords.y+self.baroffset[1])*self.level.tile_size+mp[1]-bar.get_height()//2))
+for i, v in enumerate(self.dmgvs):
+if v[2] >= DAMAGE_VALUE_TIME:
+self.dmgvs.remove(v)
+else:
+if v[2] >= DAMAGE_VALUE_TRANSPARENT_START:
+v[0].set_alpha(255*(DAMAGE_VALUE_TIME-self.dmgvs[i][2])/DAMAGE_VALUE_TRANSPARENT_TIME)
+self.dmgvs[i][2] += 1
+sc.blit(v[0], ((self.cords.x*TILE_SIZE+v[1][0])*cs+mp[0]-v[0].get_width()//2, (self.cords.y*TILE_SIZE+v[1][1])*cs+mp[1]-v[0].get_height()//2-self.dmgvs[i][2]*DAMAGE_VALUE_VSPEED*cs))
+if self.dead:
+return
+n = dmg['n'] * 0.5 ** (self.armor['n'] / 25)
+a = dmg['a'] * (100-self.armor['a'])/100
+f = dmg['f'] * (100-self.armor['f'])/100
+w = dmg['w'] * (100-self.armor['w'])/100
+e = dmg['e'] * (100-self.armor['e'])/100
+d = dmg['d'] * (100-self.armor['d'])/100
+l = dmg['l'] * (100-self.armor['l'])/100
+dmgv = DamageTable(*(n, a, w, f, e, d, l))
+dmgs = dmgv.sum()
+if dmgs > 0:
+last = self.hp if self.lasthp[0] >= DAMAGE_BAR_FRESH_END else self.lasthp[1]
+self.lasthp = [0, last, None]
+self.hp -= dmgs
+self.level.runa.stats.dmg(caster, self, dmgs, dmg.sum())
+for i, v in dmgv:
+v = int(v)
+if v > 0:
+self.dmgvs.append([DMGFONT.render(str(v), True, DMGCOLORS[i]), (random.randint(0, 2*TILE_SIZE)-TILE_SIZE, random.randint(0, 2*TILE_SIZE)-TILE_SIZE-self.size.y*TILE_SIZE), 0])
+elif v < 0:
+self.dmgvs.append([DMGFONT.render(str(v), True, DMGCOLORS['h']), (random.randint(0, 2*TILE_SIZE)-TILE_SIZE, random.randint(0, 2*TILE_SIZE)-TILE_SIZE-self.size.y*TILE_SIZE), 0])
+if self.hp <= 0:
+self.die(caster)
+if self.dead:
+return
+self.level.runa.stats.dead(caster, self)
+if caster.team == 'ally' and self.team != 'ally':
+self.level.sp.add(int(caster.super), caster.element)
+self.level.gui.recolor()
+self.level.runa.exp += self.reward
+caster.exp += self.reward
+if self != caster:
+self.get_drop()
+self.hp = 0
+self.dead = True
+self.status = STATUS_DEAD
+if self.canfly:
+self.canfly = False
+self.accel.y += GRAVITY
+self.tasks = [['die', 0, Unit.animations[self.name]['die']['len']-1]]
+for i in self.abilities:
+i.onOwnerDied()
+for i in self.modifiers:
+if i.removeOnDeath:
+i.destroy()
+self.recount((), all=True)
+if self.level.selected_unit is self:
+select_next_unit(self.level, pygame.mouse.get_pos())
+if get_bit(self.status, 5):
+return False
+for i in self.tasks:
+if i[0] == 'attack':
+if i[1] < min((Unit.animations[self.name]['attack']['len'], i[2])):
+return False
+elif i[0].startswith('cast'):
+if i[1] < i[2]:
+return False
+return True
+if get_bit(self.status, 6):
+return False
+return True
+if not self.canattack or self.ticks < 60:
+return
+if get_bit(self.status, 3):
+return
+for i in self.tasks:
+if i[0] == 'attack':
+return
+elif i[0].startswith('cast') and i[1] < i[2]:
+return
+abl = {'self': self}
+exec(f'ab={self.data["attack"]["atability"]}(self)', globals(), abl)
+ab = abl['ab']
+self.tasks.append(['attack', 0, 200 * FPS // self.attack_speed, ab])
+self.abilities.append(ab)
+if get_bit(self.status, 4):
+return
+if num > len(self.ability_raws):
+return
+if self.mana < self.ability_raws[num-1][6] / self.manacost:
+return
+for i in self.tasks:
+if i[0] == 'attack' and i[1] < min((Unit.animations[self.name]['attack']['len'], i[2])):
+return
+elif i[0] == f'cast{num}':
+return
+elif i[0].startswith('cast') and i[1] < i[2]:
+return
+abl = {'self': self}
+exec(f'ab={self.ability_raws[num-1][0]}(self)', globals(), abl)
+ab = abl['ab']
+if ab.type not in ('passive', 'orb'):
+self.tasks.append([f'cast{num}', 0, self.ability_raws[num-1][2]*FPS//self.castspeed, self.ability_raws[num-1][3]*FPS//self.castspeed, self.ability_raws[num-1][1]*FPS//self.reduction, ab, num, 0, self.ability_raws[num-1][4], self.ability_raws[num-1][6]])
+if get_bit(self.status, 6):
+return
+if not self.level.find_under_space(self):
+self.speed.y += JUMP_SPEED
+self.level.runa.stats.jump(self)
+self.change_anim('jump')
+if not self.canfly or not self.canmove():
+return
+msps = -self.movespeed / FPS
+self.speed.y += msps * FLYING_ACCEL_TO_SPEED  if self.speed.y < msps:
+self.speed.y = msps
+self.change_anim('jump')
+if not self.canfly or not self.canmove():
+return
+msps = self.movespeed / FPS
+self.speed.y += msps * FLYING_ACCEL_TO_SPEED  if self.speed.y > msps:
+self.speed.y = msps
+self.change_anim('fall')
+if self.canmove():
+msps = self.movespeed / FPS
+if self.canfly:
+self.speed.x -= msps * FLYING_ACCEL_TO_SPEED
+if self.speed.x < -msps:
+self.speed.x = -msps
+elif self.level.find_left_space(self, -msps):
+self.cords.x -= msps
+self.level.runa.stats.move(self, msps)
+self.change_anim('move', self.movespeed / 6)
+if self.canflip():
+self.flip = True
+if self.canmove():
+msps = self.movespeed / FPS
+if self.canfly:
+self.speed.x += msps * FLYING_ACCEL_TO_SPEED
+if self.speed.x > msps:
+self.speed.x = msps
+elif self.level.find_right_space(self, msps):
+self.cords.x += msps
+self.level.runa.stats.move(self, msps)
+self.change_anim('move', self.movespeed / 6)
+if self.canflip():
+self.flip = False
+mdl = {'self': self, 'ability': ability, 'duration': duration}
+exec(f'md={mod}(self, ability, duration)', globals(), mdl)
+md = mdl['md']
+self.modifiers.append(md)
+self.recount(md.provides.provides)
+r = []
+for i in self.modifiers:
+if i.name == mod and i.ability.caster == caster:
+r += list(i.provides.provides)
+i.destroy(r=False)
+if single:
+break
+self.recount(r)
+if isinstance(prs, Provides):
+prs = prs.provides
+prs = [clear_bit(i, 0) for i in prs]
+if all or PROVIDE_HP in prs:
+s, sp = find_provides(self, PROVIDE_HP, PROVIDE_HP_PERCENT)
+hp = (self.data['stats']['hp'] + sum(s.values())) * (sum(sp.values())/100+1)
+oldmaxhp = self.maxhp
+self.maxhp = hp if hp > MIN_HP else MIN_HP
+self.hp = self.maxhp * self.hp / oldmaxhp
+if all or PROVIDE_MANA in prs:
+s, sp = find_provides(self, PROVIDE_MANA, PROVIDE_MANA_PERCENT)
+mana = (self.data['stats']['mana'] + sum(s.values())) * (sum(sp.values())/100+1)
+oldmaxmana = self.maxmana
+self.maxmana = mana if mana > MIN_MANA else MIN_MANA
+self.mana = self.maxmana * self.mana / oldmaxmana
+if all or PROVIDE_SPEED in prs:
+s, sp = find_provides(self, PROVIDE_SPEED, PROVIDE_SPEED_PERCENT)
+speed = (self.data['stats']['speed'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.movespeed = speed if speed > MIN_SPEED else MIN_SPEED
+if all or PROVIDE_SIGHT in prs:
+s, sp = find_provides(self, PROVIDE_SIGHT, PROVIDE_SIGHT_PERCENT)
+sight = (self.data['stats']['sight'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.sight = sight if sight > MIN_SIGHT else MIN_SIGHT
+if all or PROVIDE_ARMOR in prs:
+s, sp = find_provides(self, PROVIDE_ARMOR, PROVIDE_ARMOR_PERCENT)
+armor = DamageTable(self.data['stats']['armor']) + deepsum(list(s.values())) if s else DamageTable(self.data['stats']['armor'])
+self.armor = armor * (deepsum(list(sp.values())) / 100 + 1) if sp else armor
+if all or PROVIDE_SIZE in prs:
+s, sp = find_provides(self, PROVIDE_SIZE, PROVIDE_SIZE_PERCENT)
+size = deepmax(list(s.values())) if s else Vector(self.data['stats']['size'])
+kef = sum(sp.values()) / 100 + 1
+kef = kef if kef > MIN_SIZE_PERCENT else MIN_SIZE_PERCENT
+self.size = size * kef
+if all or PROVIDE_DMG in prs:
+s, sp = find_provides(self, PROVIDE_DMG, PROVIDE_DMG_PERCENT)
+dmg = DamageTable(self.data['stats']['dmg']) + deepsum(list(s.values())) if s else DamageTable(self.data['stats']['dmg'])
+self.dmg = dmg * (deepsum(list(sp.values())) / 100 + 1) if sp else dmg
+if all or PROVIDE_ATTACK_SPEED in prs:
+s, sp = find_provides(self, PROVIDE_ATTACK_SPEED, PROVIDE_ATTACK_SPEED_PERCENT)
+aspeed = (self.data['stats']['attack_speed'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.attack_speed = aspeed if aspeed > MIN_ATTACK_SPEED else MIN_ATTACK_SPEED
+if all or PROVIDE_ACCURACY in prs:
+s, sp = find_provides(self, PROVIDE_ACCURACY, PROVIDE_ACCURACY)
+accuracy = (self.data['stats']['accuracy'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.accuracy = accuracy
+if all or PROVIDE_MULTISHOT in prs:
+s, sp = find_provides(self, PROVIDE_MULTISHOT, PROVIDE_MULTISHOT_PERCENT)
+mshot = (self.data['stats']['multishot'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.multishot = mshot
+if all or PROVIDE_STRENGTH in prs:
+s, sp = find_provides(self, PROVIDE_STRENGTH, PROVIDE_STRENGTH_PERCENT)
+strength = (self.data['astats']['strength'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.strength = strength
+if all or PROVIDE_RADIUS in prs:
+s, sp = find_provides(self, PROVIDE_RADIUS, PROVIDE_RADIUS_PERCENT)
+radius = (self.data['astats']['radius'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.radius = radius
+if all or PROVIDE_ADURATION in prs:
+s, sp = find_provides(self, PROVIDE_ADURATION, PROVIDE_ADURATION_PERCENT)
+aduration = (self.data['astats']['aduration'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.aduration = aduration
+if all or PROVIDE_MANACOST in prs:
+s, sp = find_provides(self, PROVIDE_MANACOST, PROVIDE_MANACOST_PERCENT)
+manacost = (self.data['astats']['manacost'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.manacost = manacost
+if all or PROVIDE_CASTSPEED in prs:
+s, sp = find_provides(self, PROVIDE_CASTSPEED, PROVIDE_CASTSPEED_PERCENT)
+castspeed = (self.data['astats']['castspeed'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.castspeed = castspeed
+if all or PROVIDE_REDUCTION in prs:
+s, sp = find_provides(self, PROVIDE_REDUCTION, PROVIDE_REDUCTION_PERCENT)
+reduction = (self.data['astats']['reduction'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.reduction = reduction
+if all or PROVIDE_SUPER in prs:
+s, sp = find_provides(self, PROVIDE_SUPER, PROVIDE_SUPER_PERCENT)
+spr = (self.data['astats']['super'] + sum(s.values())) * (sum(sp.values()) / 100 + 1)
+self.super = spr
+if team is None:
+team = self.team
+if cords is None:
+cords = self.cords
+u = Unit(unit_name, self.level, summoner=self, duration=duration, team=team)
+u.cords = cords()
+if centercords:
+u.cords.y += u.size.y/2
+self.units.append(u)
+return u
+if self.dead:
+return
+status = 0
+for mod in self.modifiers:
+if PROVIDE_STATUS in mod.provides:
+status |= mod.provides[PROVIDE_STATUS]
+diff = self.status ^ status
+if get_bit(diff, 2):
+if get_bit(status, 2):           for i in self.abilities:
+if i.type == 'passive':
+i.ability_off()
+else:                            for i in self.abilities:
+if i.type == 'passive':
+i.ability_on()
+if get_bit(diff, 3):                 for i, task in enumerate(self.tasks):
+if task[0] == 'attack':
+if not task[3]:
+self.tasks.remove(task)
+if get_bit(diff, 4):                 for i, task in enumerate(self.tasks):
+if task[0].startswith('cast'):
+if not task[7]:
+if task[1] > 0:
+task[5].onAbilityCastInterrupted()
+self.tasks.remove(task)
+if get_bit(diff, 5):                 if self.canfly:
+self.speed /= 2
+self.status = status
+if box[0] < self.cords.x + self.size.x / 2 and box[1] > self.cords.x - self.size.x / 2 and box[2] < self.cords.y and box[3] > self.cords.y - self.size.y:
+return True
+return False
+return Vector(self.cords.x, self.cords.y - self.size.y / 2)
+return self.cords.x-self.size.x/2, self.cords.x+self.size.x/2, self.cords.y-self.size.y, self.cords.y
+return math.sqrt((unit.cords.x-self.cords.x)**2+(unit.cords.y-self.cords.y)**2)
+return self.name, self.game_id, self.exp, self.perks, self.stats.save(), self.aiallowed
+self.game_id = game_id
+self.exp = exp
+self.perks = perks
+self.stats.load(stats)
+self.aiallowed = aiallowed
+return self
+if self.team == 'ally':
+return
+for k, v in self.drop.items():
+count = v if type(v) == int else int(v) if '-' not in v else random.randint(*map(int, v.split('-')))
+if count:
+self.level.dropped.append([Item(k, self.level, count), self.cords])
+if get_bit(self.status, 6):
+return
+for i in self.level.dropped:
+d, cords = i
+if math.sqrt((cords.x-self.cords.x)**2+(cords.y-self.cords.y)**2) <= 1:
+self.level.runa.inventory_put(d)
+self.level.dropped.remove(i)
