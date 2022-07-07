@@ -1832,7 +1832,7 @@ async def rantime(ctx, *args):
 async def AkariCalculatingProcessor(message):
     t = message.content
     u = message.author
-    if not t or t.isdigit():  # or (not t[0].isdigit() and not t[0] == '(' and not t[0] == '#'):
+    if not t or t.isdigit() or t[0] == '`':  # or (not t[0].isdigit() and not t[0] == '(' and not t[0] == '#'):
         return
     for i in re.findall(r'[A-Za-z]+\.[A-Za-z]+', t):
         if all(j not in i for j in ['math.', 'random.', 'adb.']):
@@ -1861,7 +1861,7 @@ async def AkariCalculatingProcessor(message):
         res = ACPvars["result"] if not adb.is_float(ACPvars["result"]) or int(ACPvars["result"]) != float(ACPvars["result"]) else int(ACPvars["result"])
         await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {res}')
     except Exception as e:
-        if all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing']):
+        if all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
             await message.channel.send(f'{get_emoji("AgroMornyX")} {e}')
 
 
