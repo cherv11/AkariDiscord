@@ -404,7 +404,7 @@ async def daycheck():
 async def daymeme():
     if time.strftime("%H") == "18":
         mems = []
-        async for m in bot.get_channel(adb.bbagpics).history(limit=10000):
+        async for m in bot.get_channel(adb.mymemes).history(limit=10000):
             mems += [a.url for a in m.attachments]
         if mems:
             emb = discord.Embed(title='Мем дня')
@@ -1400,8 +1400,12 @@ async def bottledef(m, g=None, channel=None):
     expd[g][m].exp['bottles'] += 1
     expd[g][m].exp['lastbottle'] = time.strftime("%d.%m.%Y, %H:%M", time.localtime())
 
-    purl = await picfinder('$$$')
-    emb.set_image(url=purl)
+    # purl = await picfinder('$$$')
+    mems = []
+    async for message in bot.get_channel(adb.impconv).history(limit=10000):
+        mems += [a.url for a in message.attachments]
+    if mems:
+        emb.set_image(url=random.choice(mems))
     emb.set_footer(icon_url=mem.avatar_url, text=f'Опыт увеличен в {adb.ek_bottle} раза на сутки')
 
     for mm in expd[g]:
@@ -1832,8 +1836,12 @@ async def rantime(ctx, *args):
 async def AkariCalculatingProcessor(message):
     t = message.content
     u = message.author
+    errFlag = False
     if not t or t.isdigit() or t[0] == '`':  # or (not t[0].isdigit() and not t[0] == '(' and not t[0] == '#'):
         return
+    if t.endswith("-err"):
+        errFlag = True
+        t = t.split("-err")[0]
     for i in re.findall(r'[A-Za-z]+\.[A-Za-z]+', t):
         if all(j not in i for j in ['math.', 'random.', 'adb.']):
             if 'os.' in i or 'system.' in i:
@@ -1861,7 +1869,7 @@ async def AkariCalculatingProcessor(message):
         res = ACPvars["result"] if not adb.is_float(ACPvars["result"]) or int(ACPvars["result"]) != float(ACPvars["result"]) else int(ACPvars["result"])
         await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {res}')
     except Exception as e:
-        if all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
+        if errFlag or all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
             await message.channel.send(f'{get_emoji("AgroMornyX")} {e}')
 
 
