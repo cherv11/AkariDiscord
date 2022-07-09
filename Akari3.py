@@ -1919,6 +1919,23 @@ async def quit(ctx):
     os.abort()
 
 
+@bot.command()
+async def sayd(ctx):
+    m = ctx.message
+    file = None
+    if m.attachments:
+        a = m.attachments[0]
+        if a.filename.endswith((".png", ".jpg", ".gif")):
+            pic = requests.get(a.url)
+            pf = open(f'{a.filename}', 'wb')
+            pf.write(pic.content)
+            pf.close()
+            file = discord.File(fp=a.filename)
+    await ctx.send(m.content)
+    if file:
+        await ctx.send(file=file)
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Blackout
 async def whiteoutdef(ctx):
