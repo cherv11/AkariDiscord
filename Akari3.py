@@ -1920,8 +1920,9 @@ async def quit(ctx):
 
 
 @bot.command()
-async def sayd(ctx):
+async def sayd(ctx, *args):
     m = ctx.message
+    text = ' '.join(args)
     file = None
     if m.attachments:
         a = m.attachments[0]
@@ -1931,7 +1932,8 @@ async def sayd(ctx):
             pf.write(pic.content)
             pf.close()
             file = discord.File(fp=a.filename)
-    await ctx.send(m.content)
+    if text:
+        await ctx.send(text)
     if file:
         await ctx.send(file=file)
 
