@@ -1,7 +1,7 @@
 from math import *
 from random import *
 from functools import *
-from AkariDB import stacks, mceil
+from AkariDB import stacks, mceil, perc
 import discord
 from discord.ext import commands, tasks
 import sqlite3
@@ -32,6 +32,7 @@ if adb.tensor_on:
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
 #        добаивить сообщения ВК в стату и общую стату
 # TODO: словари для описания команд и микрохелпа (списки на случай если нужно много страниц), ревизия команд
+# TODO: ники бутылок на нейросетях и мемы про никто абсолютно никто
 
 # Contents:
 # Vehicle class

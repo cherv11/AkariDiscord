@@ -533,6 +533,10 @@ def stacks(x):
     return x // 64, x % 64
 
 
+def perc(x, p):
+    return x*p/100
+
+
 # Файлы и прочее
 if os.path.exists('pips'):
     errorpic = discord.File(fp='pips/error.jpg')
