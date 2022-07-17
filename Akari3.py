@@ -26,6 +26,10 @@ from PIL import ImageDraw
 from bs4 import BeautifulSoup
 from pyppeteer import launch
 import logging
+from wordcloud import WordCloud, ImageColorGenerator
+import numpy as np
+from nltk.corpus import stopwords
+
 if adb.tensor_on:
     from rnnmorph.predictor import RNNMorphPredictor
 
@@ -509,6 +513,24 @@ async def voice_disconnect():
     voice = discord.utils.get(bot.voice_clients, guild=bbag)
     if voice and voice.is_connected() and not voice.is_playing():
         await voice.disconnect()
+
+
+@tasks.loop(hours=1)
+async def weeklyword():
+    if time.strftime("%w") == "6" and time.strftime("%H") == "21":
+        trans_time = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+        words = []
+        russian_stopwords = stopwords.words("russian")
+        async for mes in mainchannel.history(after=trans_time):
+            sp = re.sub(r'<[\S]+>|https*|://[\S]+', '', mes.content).lstrip()
+            sp = re.sub(r'[^\s\w-]', '', re.sub(r'[\n_ ]+', ' ', sp)).split(' ')
+            words += [i for i in sp if i and i not in russian_stopwords]
+        mask = np.array(Image.open("pips/caban.png"))
+        wordcloud = WordCloud(background_color="white", mask=mask, max_font_size=40).generate(' '.join(words))
+
+        wordcloud.recolor(color_func=ImageColorGenerator(mask))
+        wordcloud.to_file("pips/wordcloud.png")
+        await mainchannel.send(file=discord.File(fp="pips/wordcloud.png"))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -999,6 +1021,7 @@ async def on_ready():
     bbag_reminder.start()
     voice_disconnect.start()
     nexus_daily.start()
+    weeklyword.start()
     gr = random.choice(adb.greets)
     await logchannel.send(gr, delete_after=30)
     print(gr)
