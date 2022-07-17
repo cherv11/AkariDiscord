@@ -517,7 +517,7 @@ async def voice_disconnect():
 
 @tasks.loop(hours=1)
 async def weeklyword():
-    if time.strftime("%w") == "6" and time.strftime("%H") == "21":
+    if time.strftime("%w") == "0" and time.strftime("%H") == "21":
         trans_time = datetime.datetime.utcnow() - datetime.timedelta(days=7)
         words = []
         russian_stopwords = stopwords.words("russian")
