@@ -2140,7 +2140,7 @@ async def AkariExp(mes):
             await expd[g][u].addexp(adb.e_men, mes.channel, 'role_mention')
             expd[g][u].exp['mentions'] += 1
             flags['mentions'] = True
-        smiles = Counter(re.findall(r'<:\S{,10}:\S{,20}>', mes.content))
+        smiles = Counter(re.findall(r'<:\S{,15}:\S{,20}>', mes.content))
         if smiles:
             for u in expd[g]:
                 if u == m:
