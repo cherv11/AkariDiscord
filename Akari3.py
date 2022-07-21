@@ -34,7 +34,7 @@ if adb.tensor_on:
     from rnnmorph.predictor import RNNMorphPredictor
 
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
-#        добаивить сообщения ВК в стату и общую стату
+#        добавить сообщения ВК в стату и общую стату
 # TODO: словари для описания команд и микрохелпа (списки на случай если нужно много страниц), ревизия команд
 # TODO: ники бутылок на нейросетях и мемы про никто абсолютно никто
 
@@ -1412,7 +1412,7 @@ async def bottledef(m, g=None, channel=None):
         role = bbag.get_role(adb.bottle_role)
         bottlecolor = random.choice(list(adb.colnames.values()))
         bottlecolor = discord.Colour.from_rgb(*bottlecolor)
-        await role.edit(name=adb.randomnick(), color=bottlecolor)
+        await role.edit(name=adb.randomnick_nlp(), color=bottlecolor)
 
     if g == adb.bbag and not adb.if_host:
         emb = discord.Embed(title='Бутылка дня', description=f'На бутылку c {bottle} сегодня садится {rolemention(expd[g][m])}\n:champagne: {fil} {fil} {fil} :champagne:\nЕму присуждается звание {role.mention}')
@@ -1472,7 +1472,7 @@ async def bottleregen(ctx):
         role = bbag.get_role(adb.bottle_role)
         bottlecolor = random.choice(list(adb.colnames.values()))
         bottlecolor = discord.Colour.from_rgb(*bottlecolor)
-        await role.edit(name=adb.randomnick(), color=bottlecolor)
+        await role.edit(name=adb.randomnick_nlp(), color=bottlecolor)
 
 
 @bot.command()
@@ -1916,7 +1916,7 @@ async def AkariMetrics(message):
             a.append(reg[0])
     res = predictor.predict(tl)
     for i,s in enumerate(res):
-        if s.pos == 'NOUN' and 'Case=Gen' in s.tag:
+        if s.pos == 'NOUN' and 'Case=Gen' in s.tag and 'Number=Plur' in s.tag:
             await message.channel.send(f'{num} {tl[i]} тебе в жопу, {rolemention(expd[u.guild.id][u.id])}')
             return
 
@@ -1934,6 +1934,29 @@ async def nlp(ctx, *args):
     res = [adb.pretty_nlp_tag(a[i], s) for i, s in enumerate(res)]
     for i in adb.longsplit_lines(res):
         await ctx.channel.send('```py\n'+i+'```')
+
+
+@bot.command()
+async def make_nlp_dict(ctx, filename):
+    if not adb.tensor_on:
+        return
+    file = open(f'pips/{filename}.txt', 'r', encoding='utf-8').readlines()
+    data = adb.longsplit(file, 1000)
+    nlpdict = defaultdict(list)
+    counter = 0
+    for i in data:
+        a = [j.split('\n')[0] for j in i]
+        res = predictor.predict(a)
+        for j, word in enumerate(res):
+            nlpdict[word.pos].append({'word': a[j], 'nform': word.normal_form})
+            if word.tag != '_':
+                for tag in word.tag.split('|'):
+                    key, value = tag.split('=')
+                    nlpdict[word.pos][-1][key] = value
+        counter += 1000
+        print(f"\033[33m\033[4mParsing {filename}.txt: {counter * 100 // len(file)}% done ({counter}/{len(file)})\033[0m")
+    file2 = open(f'pips/{filename}nlp.txt', 'w', encoding='utf-8')
+    file2.write(str(nlpdict))
 
 
 @bot.command()
@@ -2057,7 +2080,7 @@ async def colorout(ctx, timedef=None):
     embedi = 1
     resti = 1
     await ctx.send(random.choice(adb.blackouts), delete_after=10)
-    rans = adb.randomnicks(nicks=len(ctx.guild.members))
+    rans = [adb.randomnick_nlp() for _ in range(len(ctx.guild.members))]
     for mem in ctx.guild.members:
         u = mem.id
         whiteoutlist[u] = mem.display_name

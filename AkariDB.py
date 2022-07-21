@@ -174,10 +174,12 @@ import os
 import time
 import re
 import functools
+import ast
 
 if os.path.exists('pips'):
     rusdict = open('pips/engwords.txt', 'r', encoding='utf-8').read().split('\n')
     engdict = open('pips/ruswords.txt', 'r', encoding='utf-8').read().split('\n')
+    rusnlpdict = ast.literal_eval(open('pips/ruswordsnlp.txt', 'r', encoding='utf-8').read())
 
 
 def ti(func):
@@ -286,6 +288,44 @@ def randomnicks(type=0, c=None, nicks=2):
         else:
             rn.append(f'{a[i]} {p[i]}{n[i].lower()} {e[i]}')
     random.shuffle(rn)
+    return rn
+
+
+def randomnick_nlp(type=0, c=None):
+    if not c:
+        c = [35, 35, 25, 5]
+    if type == 0:
+        type = chancelist([1, 2, 3, 4], c)
+
+    noun = random.choice(rusnlpdict['NOUN'])
+    n = noun['nform']
+    if noun['Gender'] == 'Masc':
+        while True:
+            adj = random.choice(rusnlpdict['ADJ'])
+            a = adj['word']
+            if 'Gender' not in adj or adj['Gender'] == 'Masc':
+                break
+    else:
+        while True:
+            adj = random.choice(rusnlpdict['ADJ'])
+            a = adj['word']
+            if 'Gender' not in adj or adj['Gender'] != 'Masc':
+                break
+    p = random.choice(prefs)
+    while True:
+        end = random.choice(rusnlpdict['NOUN'])
+        e = end['word']
+        if end['Case'] == 'Gen':
+            break
+
+    if type == 1:
+        rn = f'{p.capitalize()}{n.lower()} {e.capitalize()}'
+    elif type == 2:
+        rn = f'{a.capitalize()} {p.capitalize()}{n.lower()}'
+    elif type == 3:
+        rn = f'{a.capitalize()} {n.capitalize()} {e.capitalize()}'
+    else:
+        rn = f'{a.capitalize()} {p.capitalize()}{n.lower()} {e.capitalize()}'
     return rn
 
 
