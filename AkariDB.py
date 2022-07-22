@@ -305,11 +305,17 @@ def randomnick_nlp(type=0, c=None):
             a = adj['word']
             if 'Gender' not in adj or adj['Gender'] == 'Masc':
                 break
+    if noun['Gender'] == 'Fem':
+        while True:
+            adj = random.choice(rusnlpdict['ADJ'])
+            a = adj['word']
+            if 'Gender' not in adj or adj['Gender'] == 'Fem':
+                break
     else:
         while True:
             adj = random.choice(rusnlpdict['ADJ'])
             a = adj['word']
-            if 'Gender' not in adj or adj['Gender'] != 'Masc':
+            if 'Gender' not in adj or adj['Gender'] == 'Neut':
                 break
     p = random.choice(prefs)
     while True:
