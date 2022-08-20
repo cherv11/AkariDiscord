@@ -178,6 +178,7 @@ import functools
 import ast
 
 if os.path.exists('pips'):
+    print('Waiting for dicts to be loaded...')
     rusdict = open('pips/engwords.txt', 'r', encoding='utf-8').read().split('\n')
     engdict = open('pips/ruswords.txt', 'r', encoding='utf-8').read().split('\n')
     rusnlpdict = ast.literal_eval(open('pips/ruswordsnlp.txt', 'r', encoding='utf-8').read())
