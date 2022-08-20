@@ -36,7 +36,6 @@ if adb.tensor_on:
 # TODO: обновить иконки ачивок, сделать их одинакового размера, ачивки в профиле, обновить профиль
 #        добавить сообщения ВК в стату и общую стату
 # TODO: словари для описания команд и микрохелпа (списки на случай если нужно много страниц), ревизия команд
-# TODO: ники бутылок на нейросетях и мемы про никто абсолютно никто
 
 # Contents:
 # Vehicle class
@@ -498,7 +497,7 @@ async def bbag_reminder():
 
 @tasks.loop(hours=1)
 async def all_guilds_save():
-    if time.strftime("%d") == "24" and time.strftime("%H") == "11":
+    if time.strftime("%d") == "24" and time.strftime("%H") == "22":
         if adb.if_host:
             for g in bot.guilds:
                 savepics = 'False' if g.id in adb.guildsave_pic_blacklist else ''
@@ -1320,6 +1319,7 @@ async def AkariCatch(mes):
                 if k[0] == 'vek': await vekdef(mes.channel)
                 if k[0] == 'sleep': await mes.channel.send(
                     f'{random.choice(adb.sleep)}, {rolemention(expd[mes.guild.id][mes.author.id])}')
+                if k[0] == 'sleepp': await mes.channel.send(file=adb.sleeppic)
                 if k[0] == 'stol': await mes.channel.send(random.choice(adb.stoliki))
                 if k[0] == 'beda': await mes.channel.send(f'Беды с башкой, {rolemention(expd[mes.guild.id][mes.author.id])}')
                 if k[0] == 'iq': await mes.channel.send(file=adb.iqpic)
@@ -1893,8 +1893,9 @@ async def AkariCalculatingProcessor(message):
         res = ACPvars["result"] if not adb.is_float(ACPvars["result"]) or int(ACPvars["result"]) != float(ACPvars["result"]) else int(ACPvars["result"])
         await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {res}')
     except Exception as e:
-        if errFlag or all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
-            await message.channel.send(f'{get_emoji("AgroMornyX")} {e}', delete_after=10)
+        # if errFlag or all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
+        #     await message.channel.send(f'{get_emoji("AgroMornyX")} {e}', delete_after=10)
+        pass
 
 
 async def AkariMetrics(message):

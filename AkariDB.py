@@ -59,6 +59,7 @@ colnames = {'бирюзовый': (0, 128, 128), 'розовый': (255, 20, 147
 # phrases
 catch = (('vek', '100', 'вечность'),
          ('sleep', '70', 'спать', 'сплю', 'спишь'),
+         ('sleepp', '10', 'спать', 'сплю', 'спишь'),
          ('stol', '20', 'пиздец'),
          ('beda', '70', 'голова', 'дурка'),
          ('iq', '80', 'iq', 'айкью'),
@@ -305,7 +306,7 @@ def randomnick_nlp(type=0, c=None):
             a = adj['word']
             if 'Gender' not in adj or adj['Gender'] == 'Masc':
                 break
-    if noun['Gender'] == 'Fem':
+    elif noun['Gender'] == 'Fem':
         while True:
             adj = random.choice(rusnlpdict['ADJ'])
             a = adj['word']
@@ -590,6 +591,7 @@ if os.path.exists('pips'):
     cannon = discord.File(fp='pips/uranus.mp4')
     mischat = discord.File(fp='pips/mischat.png')
     iqpic = discord.File(fp='pips/iqpic.png')
+    sleeppic = discord.File(fp='pips/sleeppic.png')
     streetracing = discord.File(fp='pips/streetracing.png')
     phrasestxt = open('pips/phrases.txt', encoding='utf-8').readlines()
 
