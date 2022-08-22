@@ -1867,7 +1867,7 @@ async def AkariCalculatingProcessor(message):
         errFlag = True
         t = t.split("-err")[0]
     for i in re.findall(r'[A-Za-z]+\.[A-Za-z]+', t):
-        if all(j not in i for j in ['math.', 'random.', 'adb.']):
+        if all(j not in i for j in ['math.', 'random.', 'adb.', 're.']):
             if 'os.' in i or 'system.' in i:
                 await message.channel.send('ТЫ АХУЕЛ?', delete_after=10)
             return
@@ -1893,8 +1893,8 @@ async def AkariCalculatingProcessor(message):
         res = ACPvars["result"] if not adb.is_float(ACPvars["result"]) or int(ACPvars["result"]) != float(ACPvars["result"]) else int(ACPvars["result"])
         await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {res}')
     except Exception as e:
-        # if errFlag or all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
-        #     await message.channel.send(f'{get_emoji("AgroMornyX")} {e}', delete_after=10)
+        if errFlag or all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
+            await message.channel.send(f'{get_emoji("AgroMornyX")} {e}', delete_after=10)
         pass
 
 
