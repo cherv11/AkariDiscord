@@ -174,7 +174,7 @@ class Vehicle:
             roles = [i.id for i in mem.roles]
             if adb.congrats in roles:
                 eadd = int(eadd * adb.ek_congrats)
-        if self.bottle:
+        if self.bottle and not adb.sleepmode:
             eadd = int(eadd * adb.ek_bottle)
         lvl = adb.levelget(self.exp['exp'])
         self.exp['exp'] += eadd
@@ -422,9 +422,9 @@ async def daymeme():
 
 @tasks.loop(hours=1)
 async def daybottle():
-    if time.strftime("%H") == "20" and not adb.sleepmode:
+    if time.strftime("%H") == "20":
         mem = random.choice([i for i in expd[adb.bbag] if 0 < expd[adb.bbag][i].bbagid < 11])
-        await bottledef(mem)
+        await bottledef(mem, indicate=not adb.sleepmode)
 
 
 @tasks.loop(hours=1)
@@ -1411,7 +1411,7 @@ def AkariCoder():
     return file5
 
 
-async def bottledef(m, g=None, channel=None):
+async def bottledef(m, g=None, channel=None, indicate=True):
     if not channel:
         channel = mainchannel
     if g:
@@ -1464,7 +1464,8 @@ async def bottledef(m, g=None, channel=None):
     if g == adb.bbag and not adb.if_host:
         await mem.add_roles(role)
     db.commit()
-    await channel.send(embed=emb)
+    if indicate:
+        await channel.send(embed=emb)
     AESavedef('giving a bottle')
 
 
