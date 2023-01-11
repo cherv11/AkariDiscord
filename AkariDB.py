@@ -1,3 +1,18 @@
+import random
+import discord
+from collections import Counter, defaultdict
+import math
+import os
+import time
+import re
+import functools
+import ast
+
+# config
+nexus_on = False
+if_host = 'coconut.png' in os.listdir('.')
+sleepmode = True
+tensor_on = if_host and not sleepmode
 
 bbag_role = 601017010012553216 # роли
 dmh_role = 393305847930945536
@@ -21,8 +36,8 @@ mlinput = (624624969661284353, 666100469650685982)
 ilinput = (624624969661284353, 666100469650685982, 388321118269734922, 596449475656941588)
 
 programistishe = 767757224051212308
-bbagmain = 923693557053796354
-oldchannels = [658827819614470146, 601016625482956800, 792154078532206593]
+bbagmain = 1055974799588991076
+oldchannels = [658827819614470146, 601016625482956800, 792154078532206593, 923693557053796354]
 monopolishe = 829638646726000641
 
 taisetsu = 388321118269734922
@@ -167,21 +182,11 @@ rusb = ('Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ', 
 checks = ((0, 1), (-1, 0), (0, -1), (1, 0), (-1, 1), (1, 1), (-1, -1), (1, -1))
 
 # defs
-import random
-import discord
-from collections import Counter
-import math
-import os
-import time
-import re
-import functools
-import ast
-
 if os.path.exists('pips'):
     print('Waiting for dicts to be loaded...')
     rusdict = open('pips/engwords.txt', 'r', encoding='utf-8').read().split('\n')
     engdict = open('pips/ruswords.txt', 'r', encoding='utf-8').read().split('\n')
-    rusnlpdict = ast.literal_eval(open('pips/ruswordsnlp.txt', 'r', encoding='utf-8').read())
+    rusnlpdict = ast.literal_eval(open('pips/ruswordsnlp.txt', 'r', encoding='utf-8').read()) if tensor_on else defaultdict(str)
 
 
 def ti(func):
@@ -294,6 +299,8 @@ def randomnicks(type=0, c=None, nicks=2):
 
 
 def randomnick_nlp(type=0, c=None):
+    if not tensor_on:
+        return randomnick(type, c)
     if not c:
         c = [35, 35, 25, 5]
     if type == 0:
@@ -657,10 +664,6 @@ cas_cd = 60
 cas_reward = {'<:velosiped:934631339133665320>': 10000, '<:UebuSuka:655488680080965634>': 20000,
             '<:TemaOr:605323006310612992>': 30000, '🧀': 5000, '💗': 15000, '🛺': 7500}
 reload = '<:reload:849129952707870760>'
-
-nexus_on = False
-if_host = 'coconut.png' in os.listdir('.')
-tensor_on = if_host
 
 print(time.strftime("%d.%m.%Y, %X", time.localtime()))
 

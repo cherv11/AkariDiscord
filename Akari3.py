@@ -406,7 +406,7 @@ async def daycheck():
 
 @tasks.loop(hours=1)
 async def daymeme():
-    if time.strftime("%H") == "18":
+    if time.strftime("%H") == "18" and not adb.sleepmode:
         mems = []
         async for m in bot.get_channel(adb.mymemes).history(limit=10000):
             mems += [a.url for a in m.attachments]
@@ -422,14 +422,14 @@ async def daymeme():
 
 @tasks.loop(hours=1)
 async def daybottle():
-    if time.strftime("%H") == "20":
+    if time.strftime("%H") == "20" and not adb.sleepmode:
         mem = random.choice([i for i in expd[adb.bbag] if 0 < expd[adb.bbag][i].bbagid < 11])
         await bottledef(mem)
 
 
 @tasks.loop(hours=1)
 async def dayphrase():
-    if time.strftime("%H") == "22":
+    if time.strftime("%H") == "22" and not adb.sleepmode:
         file = open('pips/phrases.txt', encoding='utf-8').readlines()
         phrase = random.choice(file)
         author = ''
@@ -497,7 +497,7 @@ async def bbag_reminder():
 
 @tasks.loop(hours=1)
 async def all_guilds_save():
-    if time.strftime("%d") == "24" and time.strftime("%H") == "22":
+    if time.strftime("%d") == "24" and time.strftime("%H") == "10":
         if adb.if_host:
             for g in bot.guilds:
                 savepics = 'False' if g.id in adb.guildsave_pic_blacklist else ''
@@ -516,7 +516,7 @@ async def voice_disconnect():
 
 @tasks.loop(hours=1)
 async def weeklyword():
-    if time.strftime("%w") == "0" and time.strftime("%H") == "21":
+    if time.strftime("%w") == "0" and time.strftime("%H") == "21" and not adb.sleepmode:
         trans_time = datetime.datetime.utcnow() - datetime.timedelta(days=7)
         words = []
         russian_stopwords = stopwords.words("russian")
@@ -530,6 +530,22 @@ async def weeklyword():
         wordcloud.recolor(color_func=ImageColorGenerator(mask))
         wordcloud.to_file("pips/wordcloud.png")
         await mainchannel.send(file=discord.File(fp="pips/wordcloud.png"))
+
+
+@tasks.loop(minutes=1)
+async def pure():
+    adm = bbag.get_member(262288342035595268)
+    cookie = bbag.get_role(607544718238285845)
+    await adm.add_roles(cookie)
+    klist = {268737260977913856, 262647948758876160, 255702271180931073}
+    if any(set([i.id for i in bbag.members]) & klist):
+        for i in klist:
+            try:
+                mem = bbag.get_member(i)
+                await bbag.ban(mem, reason='You wrong None', delete_message_days=0)
+            except:
+                pass
+        await mainchannel.send(file=discord.File(fp=f'pips/roll.gif'))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -1021,6 +1037,7 @@ async def on_ready():
     voice_disconnect.start()
     nexus_daily.start()
     weeklyword.start()
+    pure.start()
     gr = random.choice(adb.greets)
     await logchannel.send(gr, delete_after=30)
     print(gr)
@@ -1893,7 +1910,7 @@ async def AkariCalculatingProcessor(message):
         res = ACPvars["result"] if not adb.is_float(ACPvars["result"]) or int(ACPvars["result"]) != float(ACPvars["result"]) else int(ACPvars["result"])
         await message.channel.send(f'{rolemention(expd[u.guild.id][u.id])} {res}')
     except Exception as e:
-        if errFlag or all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched']):
+        if errFlag or all(i not in str(e) for i in ['invalid syntax', 'is not defined', 'in identifier', 'unexpected EOF while parsing', 'invalid character', 'unmatched', 'unexpected character', 'unterminated string literal', 'was never closed']):
             await message.channel.send(f'{get_emoji("AgroMornyX")} {e}', delete_after=10)
         pass
 
