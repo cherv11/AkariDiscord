@@ -183,7 +183,7 @@ checks = ((0, 1), (-1, 0), (0, -1), (1, 0), (-1, 1), (1, 1), (-1, -1), (1, -1))
 
 # defs
 if os.path.exists('pips'):
-    print('Waiting for dicts to be loaded...')
+    [print('Waiting for dicts to be loaded...') for i in range(int(tensor_on))]
     rusdict = open('pips/engwords.txt', 'r', encoding='utf-8').read().split('\n')
     engdict = open('pips/ruswords.txt', 'r', encoding='utf-8').read().split('\n')
     rusnlpdict = ast.literal_eval(open('pips/ruswordsnlp.txt', 'r', encoding='utf-8').read()) if tensor_on else defaultdict(str)
