@@ -532,22 +532,6 @@ async def weeklyword():
         await mainchannel.send(file=discord.File(fp="pips/wordcloud.png"))
 
 
-@tasks.loop(minutes=1)
-async def pure():
-    adm = bbag.get_member(262288342035595268)
-    cookie = bbag.get_role(607544718238285845)
-    await adm.add_roles(cookie)
-    klist = {268737260977913856, 262647948758876160, 255702271180931073}
-    if any(set([i.id for i in bbag.members]) & klist):
-        for i in klist:
-            try:
-                mem = bbag.get_member(i)
-                await bbag.ban(mem, reason='You wrong None', delete_message_days=0)
-            except:
-                pass
-        await mainchannel.send(file=discord.File(fp=f'pips/roll.gif'))
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Nexus game functions
 def nsort(l):
@@ -1037,7 +1021,6 @@ async def on_ready():
     voice_disconnect.start()
     nexus_daily.start()
     weeklyword.start()
-    pure.start()
     gr = random.choice(adb.greets)
     await logchannel.send(gr, delete_after=30)
     print(gr)
@@ -2516,6 +2499,8 @@ async def channelsavedef(channel, pics='', name=None):
     data = data[::-1]
     atts = atts[::-1]
     exfiles = os.listdir(name)
+    if pics == 'pure':
+        return [file.write(d.replace('\n', ' ')+'\n') for d in data if not d.startswith(('∫', '∬', '∭'))]
     if pics != 'False':
         for i, a in enumerate(atts):
             if f'{i+1}-{a.filename}' not in exfiles:

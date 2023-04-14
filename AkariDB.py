@@ -11,7 +11,7 @@ import ast
 # config
 nexus_on = False
 if_host = 'coconut.png' in os.listdir('.')
-sleepmode = True
+sleepmode = False
 tensor_on = if_host and not sleepmode
 
 bbag_role = 601017010012553216 # роли

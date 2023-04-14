@@ -1,0 +1,5 @@
+[20740:20576:0117/155901.932:WARNING:chrome_main_delegate.cc(607)] This is Chrome version 109.0.5414.75 (not a warning)
+[20740:20576:0117/155902.862:INFO:CONSOLE(1)] "JQMIGRATE: jQuery.browser is deprecated", source: https://ege.sdamgia.ru/js/jquery-migrate-1.0.0.js (1)
+[20740:20576:0117/155903.334:INFO:CONSOLE(0)] "[DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o", source: https://rus-ege.sdamgia.ru/test?theme=339 (0)
+[20740:20576:0117/155903.977:INFO:CONSOLE(18)] "1564 672", source: https://rus-ege.sdamgia.ru/js/pager.js?1673943571 (18)
+[20740:20576:0117/155904.935:WARNING:pref_notifier_impl.cc(41)] Pref observer for media_router.cast_allow_all_ips found at shutdown.
